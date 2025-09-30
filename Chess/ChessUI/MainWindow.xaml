@@ -8,6 +8,8 @@
         Title="Chess Engine" Height="600" Width="600"
         Icon="/Assets/icon.ico">
     <Grid>
-
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Board.png"/>
+        </Grid.Background>
     </Grid>
 </Window>
