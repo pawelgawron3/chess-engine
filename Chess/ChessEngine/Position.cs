@@ -20,6 +20,17 @@ public readonly struct Position
         }
     }
 
+    /// <summary>
+    /// Gets the color of the square at this position on the chessboard.
+    /// </summary>
+    public SquareColor Color
+    {
+        get
+        {
+            return (Row + Column) % 2 == 0 ? SquareColor.Light : SquareColor.Dark;
+        }
+    }
+
     public Position(int row, int column)
     {
         Row = row;
