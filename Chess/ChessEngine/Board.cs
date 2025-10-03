@@ -7,7 +7,7 @@ public class Board
 
     public void MakeMove(Move move)
     {
-        var piece = Squares[move.From.Row, move.From.Column];
+        Piece? piece = Squares[move.From.Row, move.From.Column];
         Squares[move.To.Row, move.To.Column] = piece;
         Squares[move.From.Row, move.From.Column] = null;
         CurrentPlayer = CurrentPlayer.Opponent();
