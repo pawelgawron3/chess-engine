@@ -1,6 +1,9 @@
 ﻿namespace ChessEngine;
 
-public class Move
+/// <summary>
+/// Represents a move from one position to another on the chessboard.
+/// </summary>
+public readonly struct Move
 {
     public Position From { get; }
     public Position To { get; }
@@ -10,4 +13,6 @@ public class Move
         From = from;
         To = to;
     }
+
+    public override string ToString() => $"{From} -> {To}";
 }
