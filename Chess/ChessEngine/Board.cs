@@ -45,12 +45,14 @@ public class Board
         }
     }
 
-    public void MakeMove(Move move)
+    public bool MakeMove(Move move)
     {
+        if (!IsMoveLegal(move)) return false;
         Piece? piece = this[move.From];
         this[move.To] = piece;
         this[move.From] = null;
         CurrentPlayer = CurrentPlayer.Opponent();
+        return true;
     }
 
     public bool IsMoveLegal(Move move)
