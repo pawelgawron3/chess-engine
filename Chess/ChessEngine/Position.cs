@@ -10,17 +10,6 @@ public readonly struct Position
     public int Column { get; }
 
     /// <summary>
-    /// Checks whether the position is inside the standard 8x8 chessboard.
-    /// </summary>
-    public bool IsValid
-    {
-        get
-        {
-            return Row >= 0 && Row < 8 && Column >= 0 && Column < 8;
-        }
-    }
-
-    /// <summary>
     /// Gets the color of the square at this position on the chessboard.
     /// </summary>
     public SquareColor Color
