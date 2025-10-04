@@ -7,10 +7,10 @@ public class Board
 
     public Piece? this[int row, int col]
     {
-        get => (row >= 0 && row < 8 && col >= 0 && col < 8) ? _squares[row, col] : null;
+        get => IsInside(row, col) ? _squares[row, col] : null;
         set
         {
-            if (row >= 0 && row < 8 && col >= 0 && col < 8)
+            if (IsInside(row, col))
             {
                 _squares[row, col] = value;
             }
@@ -19,9 +19,16 @@ public class Board
 
     public Piece? this[Position pos]
     {
-        get => pos.IsValid ? this[pos.Row, pos.Column] : null;
-        set { if (pos.IsValid) this[pos.Row, pos.Column] = value; }
+        get => IsInside(pos) ? this[pos.Row, pos.Column] : null;
+        set { if (IsInside(pos)) this[pos.Row, pos.Column] = value; }
     }
+
+    public static bool IsInside(int row, int col)
+    {
+        return row >= 0 && row < 8 && col >= 0 && col < 8;
+    }
+
+    public static bool IsInside(Position pos) => pos.IsValid;
 
     public void Initialize()
     {
@@ -57,7 +64,7 @@ public class Board
 
     public bool IsMoveLegal(Move move)
     {
-        if (!move.From.IsValid || !move.To.IsValid)
+        if (!IsInside(move.From) || !IsInside(move.To))
         {
             return false;
         }
