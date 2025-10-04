@@ -1,4 +1,6 @@
-﻿namespace ChessEngine;
+﻿using static ChessEngine.PositionUtils;
+
+namespace ChessEngine;
 
 public class Board
 {
@@ -23,13 +25,6 @@ public class Board
         set { if (IsInside(pos)) this[pos.Row, pos.Column] = value; }
     }
 
-    public static bool IsInside(int row, int col)
-    {
-        return row >= 0 && row < 8 && col >= 0 && col < 8;
-    }
-
-    public static bool IsInside(Position pos) => pos.IsValid;
-
     public void Initialize()
     {
         // Pawns
@@ -39,12 +34,13 @@ public class Board
             this[1, col] = new Piece(PieceType.Pawn, Player.Black);
         }
 
-        PieceType[] majorPieceOrder = new[]
+        PieceType[] majorPieceOrder =
         {
             PieceType.Rook, PieceType.Knight, PieceType.Bishop, PieceType.Queen,
             PieceType.King, PieceType.Bishop, PieceType.Knight, PieceType.Rook
         };
 
+        // Major pieces
         for (int col = 0; col < 8; col++)
         {
             this[7, col] = new Piece(majorPieceOrder[col], Player.White);
