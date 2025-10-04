@@ -1,11 +1,10 @@
 ﻿using static ChessEngine.PositionUtils;
-using ChessEngine;
 
 namespace ChessEngine;
 
-public static class MoveGenerator
+public static class PseudoLegalMoveGenerator
 {
-    public static IEnumerable<Move> GenerateMoves(Board board, Player player)
+    public static IEnumerable<Move> GeneratePseudoLegalMoves(Board board, Player player)
     {
         for (int row = 0; row < 8; row++)
         {
@@ -19,32 +18,32 @@ public static class MoveGenerator
                 switch (piece.Type)
                 {
                     case PieceType.Pawn:
-                        foreach (var move in GeneratePawnMoves(board, from, piece))
+                        foreach (var move in GeneratePseudoLegalPawnMoves(board, from, piece))
                             yield return move;
                         break;
 
                     //case PieceType.Knight:
-                    //    foreach (var move in GenerateKnightMoves(from, piece.Owner))
+                    //    foreach (var move in GeneratePseudoLegalKnightMoves(from, piece.Owner))
                     //        yield return move;
                     //    break;
 
                     //case PieceType.Bishop:
-                    //    foreach (var move in GenerateBishopMoves(from, piece.Owner))
+                    //    foreach (var move in GeneratePseudoLegalBishopMoves(from, piece.Owner))
                     //        yield return move;
                     //    break;
 
                     //case PieceType.Rook:
-                    //    foreach (var move in GenerateRookMoves(from, piece.Owner))
+                    //    foreach (var move in GeneratePseudoLegalRookMoves(from, piece.Owner))
                     //        yield return move;
                     //    break;
 
                     //case PieceType.Queen:
-                    //    foreach (var move in GenerateQueenMoves(from, piece.Owner))
+                    //    foreach (var move in GeneratePseudoLegalQueenMoves(from, piece.Owner))
                     //        yield return move;
                     //    break;
 
                     case PieceType.King:
-                        foreach (var move in GenerateKingMoves(board, from, player))
+                        foreach (var move in GeneratePseudoLegalKingMoves(board, from, player))
                             yield return move;
                         break;
                 }
@@ -52,7 +51,7 @@ public static class MoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GeneratePawnMoves(Board board, Position pos, Piece piece)
+    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece)
     {
         int direction = (piece.Owner == Player.White) ? -1 : 1;
 
@@ -85,7 +84,7 @@ public static class MoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GenerateKingMoves(Board board, Position pos, Player player)
+    private static IEnumerable<Move> GeneratePseudoLegalKingMoves(Board board, Position pos, Player player)
     {
         Position[] directions =
         {
@@ -105,7 +104,7 @@ public static class MoveGenerator
 
             Piece? targetPiece = board[target];
 
-            if(targetPiece == null || targetPiece.Owner == player.Opponent())
+            if (targetPiece == null || targetPiece.Owner == player.Opponent())
             {
                 yield return new Move(pos, target);
             }
