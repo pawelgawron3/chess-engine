@@ -1,4 +1,5 @@
 ﻿using static ChessEngine.PositionUtils;
+using ChessEngine;
 
 namespace ChessEngine;
 
@@ -22,30 +23,30 @@ public static class MoveGenerator
                             yield return move;
                         break;
 
-                        //case PieceType.Knight:
-                        //    foreach (var move in GenerateKnightMoves(from, piece.Owner))
-                        //        yield return move;
-                        //    break;
+                    //case PieceType.Knight:
+                    //    foreach (var move in GenerateKnightMoves(from, piece.Owner))
+                    //        yield return move;
+                    //    break;
 
-                        //case PieceType.Bishop:
-                        //    foreach (var move in GenerateBishopMoves(from, piece.Owner))
-                        //        yield return move;
-                        //    break;
+                    //case PieceType.Bishop:
+                    //    foreach (var move in GenerateBishopMoves(from, piece.Owner))
+                    //        yield return move;
+                    //    break;
 
-                        //case PieceType.Rook:
-                        //    foreach (var move in GenerateRookMoves(from, piece.Owner))
-                        //        yield return move;
-                        //    break;
+                    //case PieceType.Rook:
+                    //    foreach (var move in GenerateRookMoves(from, piece.Owner))
+                    //        yield return move;
+                    //    break;
 
-                        //case PieceType.Queen:
-                        //    foreach (var move in GenerateQueenMoves(from, piece.Owner))
-                        //        yield return move;
-                        //    break;
+                    //case PieceType.Queen:
+                    //    foreach (var move in GenerateQueenMoves(from, piece.Owner))
+                    //        yield return move;
+                    //    break;
 
-                        //case PieceType.King:
-                        //    foreach (var move in GenerateKingMoves(from, piece.Owner))
-                        //        yield return move;
-                        //    break;
+                    case PieceType.King:
+                        foreach (var move in GenerateKingMoves(board, from, player))
+                            yield return move;
+                        break;
                 }
             }
         }
@@ -78,6 +79,33 @@ public static class MoveGenerator
         {
             Piece? targetPiece = board[target];
             if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
+            {
+                yield return new Move(pos, target);
+            }
+        }
+    }
+
+    private static IEnumerable<Move> GenerateKingMoves(Board board, Position pos, Player player)
+    {
+        Position[] directions =
+        {
+        new Position(pos.Row - 1, pos.Column),
+        new Position(pos.Row + 1, pos.Column),
+        new Position(pos.Row, pos.Column - 1),
+        new Position(pos.Row, pos.Column + 1),
+        new Position(pos.Row - 1, pos.Column - 1),
+        new Position(pos.Row - 1, pos.Column + 1),
+        new Position(pos.Row + 1, pos.Column - 1),
+        new Position(pos.Row + 1, pos.Column + 1)
+        };
+
+        foreach (var target in directions)
+        {
+            if (!IsInside(target)) continue;
+
+            Piece? targetPiece = board[target];
+
+            if(targetPiece == null || targetPiece.Owner == player.Opponent())
             {
                 yield return new Move(pos, target);
             }
