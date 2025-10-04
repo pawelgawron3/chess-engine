@@ -2,16 +2,34 @@
 
 public class Board
 {
-    public Piece?[,] Squares { get; } = new Piece?[8, 8];
+    private readonly Piece?[,] _squares = new Piece?[8, 8];
     public Player CurrentPlayer { get; set; } = Player.White;
+
+    public Piece? this[int row, int col]
+    {
+        get => (row >= 0 && row < 8 && col >= 0 && col < 8) ? _squares[row, col] : null;
+        set
+        {
+            if (row >= 0 && row < 8 && col >= 0 && col < 8)
+            {
+                _squares[row, col] = value;
+            }
+        }
+    }
+
+    public Piece? this[Position pos]
+    {
+        get => pos.IsValid ? this[pos.Row, pos.Column] : null;
+        set { if (pos.IsValid) this[pos.Row, pos.Column] = value; }
+    }
 
     public void Initialize()
     {
         // Pawns
         for (int col = 0; col < 8; col++)
         {
-            Squares[6, col] = new Piece(PieceType.Pawn, Player.White);
-            Squares[1, col] = new Piece(PieceType.Pawn, Player.Black);
+            this[6, col] = new Piece(PieceType.Pawn, Player.White);
+            this[1, col] = new Piece(PieceType.Pawn, Player.Black);
         }
 
         PieceType[] majorPieceOrder = new[]
@@ -22,16 +40,16 @@ public class Board
 
         for (int col = 0; col < 8; col++)
         {
-            Squares[7, col] = new Piece(majorPieceOrder[col], Player.White);
-            Squares[0, col] = new Piece(majorPieceOrder[col], Player.Black);
+            this[7, col] = new Piece(majorPieceOrder[col], Player.White);
+            this[0, col] = new Piece(majorPieceOrder[col], Player.Black);
         }
     }
 
     public void MakeMove(Move move)
     {
-        Piece? piece = Squares[move.From.Row, move.From.Column];
-        Squares[move.To.Row, move.To.Column] = piece;
-        Squares[move.From.Row, move.From.Column] = null;
+        Piece? piece = this[move.From];
+        this[move.To] = piece;
+        this[move.From] = null;
         CurrentPlayer = CurrentPlayer.Opponent();
     }
 
@@ -42,7 +60,7 @@ public class Board
             return false;
         }
 
-        Piece? piece = Squares[move.From.Row, move.From.Column];
+        Piece? piece = this[move.From];
         if (piece == null)
         {
             return false;
@@ -53,7 +71,7 @@ public class Board
             return false;
         }
 
-        Piece? targetPiece = Squares[move.To.Row, move.To.Column];
+        Piece? targetPiece = this[move.To];
 
         if (targetPiece != null && targetPiece.Owner == CurrentPlayer)
         {
