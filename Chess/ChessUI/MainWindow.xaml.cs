@@ -47,4 +47,9 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private void BoardGrid_MouseDown()
+    {
+
+    }
 }

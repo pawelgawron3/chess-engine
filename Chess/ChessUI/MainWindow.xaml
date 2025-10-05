@@ -9,10 +9,15 @@
         WindowStartupLocation="CenterScreen"
         Background="#9e9e9e">
     <Viewbox>
-        <Grid Width="600" Height="600">
+        <Grid x:Name="BoardGrid" 
+              Width="600" 
+              Height="600"
+              MouseDown="BoardGrid_MouseDown">
             <Grid.Background>
                 <ImageBrush ImageSource="/Assets/Board.png" />
             </Grid.Background>
+
+            <Canvas x:Name="HighlightLayer" IsHitTestVisible="False"/>
 
             <Canvas x:Name="PiecesLayer"
                     RenderOptions.BitmapScalingMode="HighQuality" />
