@@ -5,7 +5,6 @@ namespace ChessEngine;
 public class Board
 {
     private readonly Piece?[,] _squares = new Piece?[8, 8];
-    public Player CurrentPlayer { get; private set; } = Player.White;
 
     public Piece? this[int row, int col]
     {
@@ -48,46 +47,12 @@ public class Board
         }
     }
 
-    public bool MakeMove(Move move)
+    public void MakeMove(Move move)
     {
-        if (!IsMoveLegal(move)) return false;
-
         Piece? piece = this[move.From];
-        if (piece != null)
-        {
-            this[move.To] = piece.Clone();
-            this[move.From] = null;
-            CurrentPlayer = CurrentPlayer.Opponent();
-            return true;
-        }
-        return false;
-    }
+        if (piece == null) return;
 
-    public bool IsMoveLegal(Move move)
-    {
-        if (!IsInside(move.From) || !IsInside(move.To))
-        {
-            return false;
-        }
-
-        Piece? piece = this[move.From];
-        if (piece == null)
-        {
-            return false;
-        }
-
-        if (piece.Owner != CurrentPlayer)
-        {
-            return false;
-        }
-
-        Piece? targetPiece = this[move.To];
-
-        if (targetPiece != null && targetPiece.Owner == CurrentPlayer)
-        {
-            return false;
-        }
-
-        return true;
+        this[move.To] = piece.Clone();
+        this[move.From] = null;
     }
 }
