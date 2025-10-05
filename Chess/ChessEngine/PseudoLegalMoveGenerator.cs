@@ -22,10 +22,10 @@ public static class PseudoLegalMoveGenerator
                             yield return move;
                         break;
 
-                    //case PieceType.Knight:
-                    //    foreach (var move in GeneratePseudoLegalKnightMoves(from, piece.Owner))
-                    //        yield return move;
-                    //    break;
+                    case PieceType.Knight:
+                        foreach (var move in GeneratePseudoLegalKnightMoves(board, from, player))
+                            yield return move;
+                        break;
 
                     case PieceType.Bishop:
                         foreach (var move in GeneratePseudoLegalBishopMoves(board, from, player))
@@ -78,6 +78,37 @@ public static class PseudoLegalMoveGenerator
         {
             Piece? targetPiece = board[target];
             if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
+            {
+                yield return new Move(pos, target);
+            }
+        }
+    }
+
+    private static IEnumerable<Move> GeneratePseudoLegalKnightMoves(Board board, Position pos, Player player)
+    {
+        int[][] jumps =
+        [
+            [-2, -1],
+            [-2, 1],
+            [-1, 2],
+            [1, 2],
+            [2, 1],
+            [2, -1],
+            [1, -2],
+            [-1, -2],
+        ];
+
+        foreach (var jump in jumps)
+        {
+            int row = pos.Row + jump[0];
+            int col = pos.Column + jump[1];
+
+            if (!IsInside(row, col)) continue;
+
+            Position target = new Position(row, col);
+            Piece? targetPiece = board[target];
+
+            if (targetPiece == null || targetPiece.Owner == player.Opponent())
             {
                 yield return new Move(pos, target);
             }
