@@ -23,4 +23,6 @@ public class Piece
         Type = type;
         Owner = owner;
     }
+
+    public Piece Clone() => new Piece(Type, Owner);
 }
