@@ -27,10 +27,10 @@ public static class PseudoLegalMoveGenerator
                     //        yield return move;
                     //    break;
 
-                    //case PieceType.Bishop:
-                    //    foreach (var move in GeneratePseudoLegalBishopMoves(from, piece.Owner))
-                    //        yield return move;
-                    //    break;
+                    case PieceType.Bishop:
+                        foreach (var move in GeneratePseudoLegalBishopMoves(board, from, player))
+                            yield return move;
+                        break;
 
                     case PieceType.Rook:
                         foreach (var move in GeneratePseudoLegalRookMoves(board, from, player))
@@ -80,6 +80,45 @@ public static class PseudoLegalMoveGenerator
             if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
             {
                 yield return new Move(pos, target);
+            }
+        }
+    }
+
+    private static IEnumerable<Move> GeneratePseudoLegalBishopMoves(Board board, Position pos, Player player)
+    {
+        int[][] directions =
+        [
+            [-1, -1],
+            [-1, 1],
+            [1, -1],
+            [1, 1],
+        ];
+
+        foreach (var dir in directions)
+        {
+            int row = pos.Row + dir[0];
+            int col = pos.Column + dir[1];
+
+            while (IsInside(row, col))
+            {
+                var target = new Position(row, col);
+                var targetPiece = board[target];
+
+                if (targetPiece == null)
+                {
+                    yield return new Move(pos, target);
+                }
+                else
+                {
+                    if (targetPiece.Owner == player.Opponent())
+                    {
+                        yield return new Move(pos, target);
+                    }
+                    break;
+                }
+
+                row += dir[0];
+                col += dir[1];
             }
         }
     }
