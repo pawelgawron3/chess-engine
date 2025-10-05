@@ -194,8 +194,8 @@ public static class PseudoLegalMoveGenerator
 
             while (IsInside(row, col))
             {
-                var target = new Position(row, col);
-                var targetPiece = board[target];
+                Position target = new Position(row, col);
+                Piece? targetPiece = board[target];
 
                 if (targetPiece == null)
                 {
