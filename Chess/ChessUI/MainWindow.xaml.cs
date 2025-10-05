@@ -10,12 +10,11 @@ namespace ChessUI;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private Board board = new Board();
+    private GameState _gameState = new GameState();
 
     public MainWindow()
     {
         InitializeComponent();
-        board.Initialize();
         DrawBoard();
     }
 
@@ -29,7 +28,7 @@ public partial class MainWindow : Window
         {
             for (int col = 0; col < 8; col++)
             {
-                Piece? piece = board.Squares[row, col];
+                Piece? piece = _gameState.Board[row, col];
 
                 if (piece != null)
                 {
