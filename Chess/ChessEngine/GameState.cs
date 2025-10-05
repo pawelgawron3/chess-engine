@@ -22,6 +22,14 @@ public class GameState
         Board.Initialize();
     }
 
+    public IEnumerable<Move> GetPseudoLegalMovesForPiece()
+    {
+        if (SelectedPosition == null)
+            return Enumerable.Empty<Move>();
+
+        return PseudoLegalMoveGenerator.GeneratePseudoLegalMovesForPiece(Board, SelectedPosition.Value);
+    }
+
     public IEnumerable<Move> GetPseudoLegalMoves()
     {
         return PseudoLegalMoveGenerator.GeneratePseudoLegalMoves(Board, CurrentPlayer);
@@ -44,7 +52,7 @@ public class GameState
 
         Board.MakeMove(move);
         MoveHistory.Add(move);
-        SelectedPosition = null;
+        ClearSelection();
         CurrentPlayer = CurrentPlayer.Opponent();
         return true;
     }
@@ -63,6 +71,11 @@ public class GameState
 
         Piece? targetPiece = Board[move.To];
         if (targetPiece != null && targetPiece.Owner == CurrentPlayer)
+            return false;
+
+        if (!PseudoLegalMoveGenerator
+        .GeneratePseudoLegalMovesForPiece(Board, move.From)
+        .Any(m => m.To.Equals(move.To)))
             return false;
 
         return true;
