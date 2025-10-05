@@ -37,10 +37,10 @@ public static class PseudoLegalMoveGenerator
                             yield return move;
                         break;
 
-                    //case PieceType.Queen:
-                    //    foreach (var move in GeneratePseudoLegalQueenMoves(from, piece.Owner))
-                    //        yield return move;
-                    //    break;
+                    case PieceType.Queen:
+                        foreach (var move in GeneratePseudoLegalQueenMoves(board, from, player))
+                            yield return move;
+                        break;
 
                     case PieceType.King:
                         foreach (var move in GeneratePseudoLegalKingMoves(board, from, player))
@@ -94,33 +94,7 @@ public static class PseudoLegalMoveGenerator
             [1, 1],
         ];
 
-        foreach (var dir in directions)
-        {
-            int row = pos.Row + dir[0];
-            int col = pos.Column + dir[1];
-
-            while (IsInside(row, col))
-            {
-                var target = new Position(row, col);
-                var targetPiece = board[target];
-
-                if (targetPiece == null)
-                {
-                    yield return new Move(pos, target);
-                }
-                else
-                {
-                    if (targetPiece.Owner == player.Opponent())
-                    {
-                        yield return new Move(pos, target);
-                    }
-                    break;
-                }
-
-                row += dir[0];
-                col += dir[1];
-            }
-        }
+        return GenerateSlidingMoves(board, pos, player, directions);
     }
 
     private static IEnumerable<Move> GeneratePseudoLegalRookMoves(Board board, Position pos, Player player)
@@ -133,33 +107,24 @@ public static class PseudoLegalMoveGenerator
             [0, 1],
         ];
 
-        foreach (var dir in directions)
-        {
-            int row = pos.Row + dir[0];
-            int col = pos.Column + dir[1];
+        return GenerateSlidingMoves(board, pos, player, directions);
+    }
 
-            while (IsInside(row, col))
-            {
-                var target = new Position(row, col);
-                var targetPiece = board[target];
+    private static IEnumerable<Move> GeneratePseudoLegalQueenMoves(Board board, Position pos, Player player)
+    {
+        int[][] directions =
+        [
+            [-1, 0],
+            [1, 0],
+            [0, -1],
+            [0, 1],
+            [-1, -1],
+            [-1, 1],
+            [1, -1],
+            [1, 1],
+        ];
 
-                if (targetPiece == null)
-                {
-                    yield return new Move(pos, target);
-                }
-                else
-                {
-                    if (targetPiece.Owner == player.Opponent())
-                    {
-                        yield return new Move(pos, target);
-                    }
-                    break;
-                }
-
-                row += dir[0];
-                col += dir[1];
-            }
-        }
+        return GenerateSlidingMoves(board, pos, player, directions);
     }
 
     private static IEnumerable<Move> GeneratePseudoLegalKingMoves(Board board, Position pos, Player player)
@@ -185,6 +150,37 @@ public static class PseudoLegalMoveGenerator
             if (targetPiece == null || targetPiece.Owner == player.Opponent())
             {
                 yield return new Move(pos, target);
+            }
+        }
+    }
+
+    private static IEnumerable<Move> GenerateSlidingMoves(Board board, Position pos, Player player, int[][] directions)
+    {
+        foreach (var dir in directions)
+        {
+            int row = pos.Row + dir[0];
+            int col = pos.Column + dir[1];
+
+            while (IsInside(row, col))
+            {
+                var target = new Position(row, col);
+                var targetPiece = board[target];
+
+                if (targetPiece == null)
+                {
+                    yield return new Move(pos, target);
+                }
+                else
+                {
+                    if (targetPiece.Owner == player.Opponent())
+                    {
+                        yield return new Move(pos, target);
+                    }
+                    break;
+                }
+
+                row += dir[0];
+                col += dir[1];
             }
         }
     }
