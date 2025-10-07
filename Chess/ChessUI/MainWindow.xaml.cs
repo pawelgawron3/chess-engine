@@ -19,6 +19,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DrawBoard();
+        SetCursor(_gameState.CurrentPlayer);
     }
 
     private void DrawBoard()
@@ -140,6 +141,7 @@ public partial class MainWindow : Window
             {
                 ClearHighlights();
                 DrawBoard();
+                SetCursor(_gameState.CurrentPlayer);
             }
             else
             {
@@ -147,5 +149,10 @@ public partial class MainWindow : Window
                 ClearHighlights();
             }
         }
+    }
+
+    private void SetCursor(Player player)
+    {
+        Cursor = (player == Player.White) ? ChessCursors.White : ChessCursors.Black;
     }
 }
