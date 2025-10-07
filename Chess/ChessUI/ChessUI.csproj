@@ -23,6 +23,8 @@
     <None Remove="Assets\QueenW.png" />
     <None Remove="Assets\RookB.png" />
     <None Remove="Assets\RookW.png" />
+	<None Remove="Assets\CursorB.cur" />
+	<None Remove="Assets\CursorW.cur" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,6 +34,7 @@
   <ItemGroup>
     <Resource Include="Assets\*.png" />
 	<Resource Include="Assets\icon.ico" />
+	<Resource Include="Assets\*.cur" />
   </ItemGroup>
 
 </Project>
