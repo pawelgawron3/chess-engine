@@ -2,6 +2,10 @@
 
 namespace ChessEngine;
 
+/// <summary>
+/// Represents the current state of a chess game, including the board, active player,
+/// selected square, move history, and game progression logic.
+/// </summary>
 public class GameState
 {
     public Board Board { get; }
@@ -22,6 +26,9 @@ public class GameState
         Board.Initialize();
     }
 
+    /// <summary>
+    /// Generates all pseudo-legal moves for the currently selected piece.
+    /// </summary>
     public IEnumerable<Move> GetPseudoLegalMovesForPiece()
     {
         if (SelectedPosition == null)
@@ -30,21 +37,33 @@ public class GameState
         return PseudoLegalMoveGenerator.GeneratePseudoLegalMovesForPiece(Board, SelectedPosition.Value);
     }
 
+    /// <summary>
+    /// Generates all pseudo-legal moves for the current player.
+    /// </summary>
     public IEnumerable<Move> GetPseudoLegalMoves()
     {
         return PseudoLegalMoveGenerator.GeneratePseudoLegalMoves(Board, CurrentPlayer);
     }
 
+    /// <summary>
+    /// Selects a position on the board.
+    /// </summary>
     public void SelectPosition(Position pos)
     {
         SelectedPosition = pos;
     }
 
+    /// <summary>
+    /// Clears the current selection.
+    /// </summary>
     public void ClearSelection()
     {
         SelectedPosition = null;
     }
 
+    /// <summary>
+    /// Attempts to execute a move.
+    /// </summary>
     public bool TryMakeMove(Move move)
     {
         if (!IsMoveLegal(move))
@@ -57,6 +76,9 @@ public class GameState
         return true;
     }
 
+    /// <summary>
+    /// Checks whether a given move is pseudo-legal within the current game state.
+    /// </summary>
     public bool IsMoveLegal(Move move)
     {
         if (!IsInside(move.From) || !IsInside(move.To))

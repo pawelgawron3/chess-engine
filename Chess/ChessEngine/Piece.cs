@@ -24,5 +24,8 @@ public class Piece
         Owner = owner;
     }
 
+    /// <summary>
+    /// Creates a deep copy of this <see cref="Piece"/> instance.
+    /// </summary>
     public Piece Clone() => new Piece(Type, Owner);
 }
