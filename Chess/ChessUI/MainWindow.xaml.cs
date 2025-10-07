@@ -72,6 +72,8 @@ public partial class MainWindow : Window
         ClearHighlights();
         if (_gameState.SelectedPosition == null) return;
 
+        HighlightSelectedSquare();
+
         var moves = _gameState.GetPseudoLegalMovesForPiece().ToList();
 
         const int squareSize = 75;
@@ -97,6 +99,27 @@ public partial class MainWindow : Window
     private void ClearHighlights()
     {
         HighlightLayer.Children.Clear();
+    }
+
+    private void HighlightSelectedSquare()
+    {
+        if (_gameState.SelectedPosition == null) return;
+
+        const int squareSize = 75;
+        Position pos = _gameState.SelectedPosition.Value;
+
+        Rectangle rect = new Rectangle()
+        {
+            Width = squareSize,
+            Height = squareSize,
+            Fill = new SolidColorBrush(Color.FromArgb(90, 0, 255, 0)),
+            IsHitTestVisible = false
+        };
+
+        Canvas.SetLeft(rect, pos.Column * squareSize);
+        Canvas.SetTop(rect, pos.Row * squareSize);
+
+        HighlightLayer.Children.Add(rect);
     }
 
     private void HandleBoardClick(Position pos)
