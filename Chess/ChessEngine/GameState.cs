@@ -1,5 +1,4 @@
-﻿using static ChessEngine.AttackUtils;
-using static ChessEngine.PositionUtils;
+﻿using static ChessEngine.LegalMoveGenerator;
 
 namespace ChessEngine;
 
@@ -28,22 +27,22 @@ public class GameState
     }
 
     /// <summary>
-    /// Generates all pseudo-legal moves for the currently selected piece.
+    /// Returns all legal moves for the currently selected piece.
     /// </summary>
-    public IEnumerable<Move> GetPseudoLegalMovesForPiece()
+    public IEnumerable<Move> GetLegalMovesForPiece()
     {
         if (SelectedPosition == null)
             return Enumerable.Empty<Move>();
 
-        return PseudoLegalMoveGenerator.GeneratePseudoLegalMovesForPiece(Board, SelectedPosition.Value);
+        return GenerateLegalMovesForPiece(Board, SelectedPosition.Value, CurrentPlayer);
     }
 
     /// <summary>
-    /// Generates all pseudo-legal moves for the current player.
+    /// Returns all legal moves for the current player.
     /// </summary>
-    public IEnumerable<Move> GetPseudoLegalMoves()
+    public IEnumerable<Move> GetLegalMoves()
     {
-        return PseudoLegalMoveGenerator.GeneratePseudoLegalMoves(Board, CurrentPlayer);
+        return GenerateLegalMoves(Board, CurrentPlayer);
     }
 
     /// <summary>
@@ -67,7 +66,7 @@ public class GameState
     /// </summary>
     public bool TryMakeMove(Move move)
     {
-        if (!IsMovePseudoLegal(move))
+        if (!IsMoveLegal(Board, move, CurrentPlayer))
             return false;
 
         Piece movedPiece = Board[move.From]!;
@@ -82,53 +81,6 @@ public class GameState
         return true;
     }
 
-    /// <summary>
-    /// Checks whether a given move is pseudo-legal within the current game state.
-    /// </summary>
-    public bool IsMovePseudoLegal(Move move)
-    {
-        if (!IsInside(move.From) || !IsInside(move.To))
-            return false;
-
-        Piece? piece = Board[move.From];
-        if (piece == null)
-            return false;
-
-        if (piece.Owner != CurrentPlayer)
-            return false;
-
-        Piece? targetPiece = Board[move.To];
-        if (targetPiece != null && targetPiece.Owner == CurrentPlayer)
-            return false;
-
-        if (!PseudoLegalMoveGenerator
-        .GeneratePseudoLegalMovesForPiece(Board, move.From)
-        .Any(m => m.To.Equals(move.To)))
-            return false;
-
-        return true;
-    }
-
-    public bool IsMoveLegal(Move move)
-    {
-        if (!IsMovePseudoLegal(move))
-            return false;
-
-        Piece? movedPiece = Board[move.From];
-        Piece? capturedPiece = Board[move.To];
-
-        var record = new MoveRecord(move, movedPiece!, capturedPiece);
-
-        Board.MakeMove(move);
-
-        Position kingPosition = GetKingPosition(Board, CurrentPlayer);
-        bool isKingInCheck = IsSquareAttacked(Board, kingPosition, CurrentPlayer.Opponent());
-
-        UndoTestMove(record);
-
-        return !isKingInCheck;
-    }
-
     public void UndoLastMove()
     {
         if (MoveHistory.Count == 0)
@@ -141,11 +93,5 @@ public class GameState
         Board[last.Move.To] = last.CapturedPiece;
 
         CurrentPlayer = CurrentPlayer.Opponent();
-    }
-
-    private void UndoTestMove(MoveRecord record)
-    {
-        Board[record.Move.From] = record.MovedPiece;
-        Board[record.Move.To] = record.CapturedPiece;
     }
 }
