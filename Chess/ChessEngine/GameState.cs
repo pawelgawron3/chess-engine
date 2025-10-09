@@ -14,7 +14,7 @@ public class GameState
 
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
-    public Result? Result { get; private set; } = null;
+    public Result? GameResult { get; private set; } = null;
 
     public GameState(Board board)
     {
@@ -79,7 +79,26 @@ public class GameState
 
         ClearSelection();
         CurrentPlayer = CurrentPlayer.Opponent();
+        CheckForGameOver();
+
         return true;
+    }
+
+    private void CheckForGameOver()
+    {
+        if (!GetLegalMoves().Any())
+        {
+            bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer);
+
+            if (kingInCheck)
+            {
+                GameResult = Result.Win(CurrentPlayer.Opponent());
+            }
+            else
+            {
+                GameResult = Result.Draw(GameEndReason.Stalemate);
+            }
+        }
     }
 
     public void UndoLastMove()
@@ -94,5 +113,6 @@ public class GameState
         Board[last.Move.To] = last.CapturedPiece;
 
         CurrentPlayer = CurrentPlayer.Opponent();
+        GameResult = null;
     }
 }
