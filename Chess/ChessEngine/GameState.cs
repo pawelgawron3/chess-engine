@@ -15,6 +15,7 @@ public class GameState
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
     public Result? GameResult { get; private set; } = null;
+    public int FullMoveCounter => (_halfMoveClock / 2) + 1;
     private int _halfMoveClock = 0;
 
     public GameState(Board board)
