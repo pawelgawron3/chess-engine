@@ -1,0 +1,23 @@
+﻿namespace ChessEngine;
+
+public class Result
+{
+    public Player Winner { get; }
+    public GameEndReason Reason { get; }
+
+    public Result(Player winner, GameEndReason reason)
+    {
+        Winner = winner;
+        Reason = reason;
+    }
+
+    public static Result Win(Player winner)
+    {
+        return new Result(winner, GameEndReason.Checkmate);
+    }
+
+    public static Result Draw(GameEndReason reason)
+    {
+        return new Result(Player.None, reason);
+    }
+}
