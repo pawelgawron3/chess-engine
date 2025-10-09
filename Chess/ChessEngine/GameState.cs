@@ -75,7 +75,7 @@ public class GameState
         Piece? capturedPiece = Board[move.To];
 
         Board.MakeMove(move);
-        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece));
+        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
 
         if (movedPiece.Type == PieceType.Pawn || capturedPiece != null)
             _halfMoveClock = 0;
@@ -123,7 +123,7 @@ public class GameState
         Board[last.Move.To] = last.CapturedPiece;
 
         CurrentPlayer = CurrentPlayer.Opponent();
-        _halfMoveClock--;
+        _halfMoveClock = last.HalfMoveClockBefore;
         GameResult = null;
     }
 }
