@@ -66,7 +66,7 @@ public class GameState
     /// </summary>
     public bool TryMakeMove(Move move)
     {
-        if (!IsMoveLegal(move))
+        if (!IsMovePseudoLegal(move))
             return false;
 
         Board.MakeMove(move);
@@ -79,7 +79,7 @@ public class GameState
     /// <summary>
     /// Checks whether a given move is pseudo-legal within the current game state.
     /// </summary>
-    public bool IsMoveLegal(Move move)
+    public bool IsMovePseudoLegal(Move move)
     {
         if (!IsInside(move.From) || !IsInside(move.To))
             return false;
