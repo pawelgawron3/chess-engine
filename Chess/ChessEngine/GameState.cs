@@ -13,7 +13,7 @@ public class GameState
     public Player CurrentPlayer { get; private set; } = Player.White;
 
     public Position? SelectedPosition { get; private set; }
-    public List<Move> MoveHistory { get; } = new List<Move>();
+    public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
 
     public GameState(Board board)
     {
