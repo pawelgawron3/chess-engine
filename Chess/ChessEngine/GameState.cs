@@ -107,4 +107,18 @@ public class GameState
 
         return true;
     }
+
+    public void UndoLastMove()
+    {
+        if (MoveHistory.Count == 0)
+            return;
+
+        var last = MoveHistory.Last();
+        MoveHistory.RemoveAt(MoveHistory.Count - 1);
+
+        Board[last.Move.From] = last.MovedPiece;
+        Board[last.Move.To] = last.CapturedPiece;
+
+        CurrentPlayer = CurrentPlayer.Opponent();
+    }
 }
