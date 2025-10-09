@@ -15,6 +15,7 @@ public class GameState
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
     public Result? GameResult { get; private set; } = null;
+    private int _halfMoveClock = 0;
 
     public GameState(Board board)
     {
@@ -74,8 +75,11 @@ public class GameState
         Piece? capturedPiece = Board[move.To];
 
         Board.MakeMove(move);
-
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece));
+
+        if (movedPiece.Type == PieceType.Pawn || capturedPiece != null)
+            _halfMoveClock = 0;
+        else _halfMoveClock++;
 
         ClearSelection();
         CurrentPlayer = CurrentPlayer.Opponent();
@@ -86,6 +90,12 @@ public class GameState
 
     private void CheckForGameOver()
     {
+        if (_halfMoveClock >= 100)
+        {
+            GameResult = Result.Draw(GameEndReason.FiftyMovesRule);
+            return;
+        }
+
         if (!GetLegalMoves().Any())
         {
             bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer);
@@ -113,6 +123,7 @@ public class GameState
         Board[last.Move.To] = last.CapturedPiece;
 
         CurrentPlayer = CurrentPlayer.Opponent();
+        _halfMoveClock--;
         GameResult = null;
     }
 }
