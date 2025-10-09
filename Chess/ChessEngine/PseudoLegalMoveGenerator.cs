@@ -142,14 +142,14 @@ public static class PseudoLegalMoveGenerator
     {
         Position[] directions =
         {
-        new Position(pos.Row - 1, pos.Column),
-        new Position(pos.Row + 1, pos.Column),
-        new Position(pos.Row, pos.Column - 1),
-        new Position(pos.Row, pos.Column + 1),
-        new Position(pos.Row - 1, pos.Column - 1),
-        new Position(pos.Row - 1, pos.Column + 1),
-        new Position(pos.Row + 1, pos.Column - 1),
-        new Position(pos.Row + 1, pos.Column + 1)
+            new Position(pos.Row - 1, pos.Column),
+            new Position(pos.Row + 1, pos.Column),
+            new Position(pos.Row, pos.Column - 1),
+            new Position(pos.Row, pos.Column + 1),
+            new Position(pos.Row - 1, pos.Column - 1),
+            new Position(pos.Row - 1, pos.Column + 1),
+            new Position(pos.Row + 1, pos.Column - 1),
+            new Position(pos.Row + 1, pos.Column + 1)
         };
 
         foreach (var target in directions)
