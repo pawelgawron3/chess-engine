@@ -43,13 +43,12 @@ public static class LegalMoveGenerator
 
         board.MakeMove(move);
 
-        Position kingPosition = GetKingPosition(board, player);
-        bool isKingInCheck = IsSquareAttacked(board, kingPosition, player.Opponent());
+        bool kingInCheck = IsKingInCheck(board, player);
 
         board[move.From] = movedPiece;
         board[move.To] = capturedPiece;
 
-        return !isKingInCheck;
+        return !kingInCheck;
     }
 
     /// <summary>
