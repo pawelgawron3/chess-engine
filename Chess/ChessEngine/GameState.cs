@@ -69,8 +69,13 @@ public class GameState
         if (!IsMovePseudoLegal(move))
             return false;
 
+        Piece movedPiece = Board[move.From]!;
+        Piece? capturedPiece = Board[move.To];
+
         Board.MakeMove(move);
-        MoveHistory.Add(move);
+
+        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece));
+
         ClearSelection();
         CurrentPlayer = CurrentPlayer.Opponent();
         return true;
