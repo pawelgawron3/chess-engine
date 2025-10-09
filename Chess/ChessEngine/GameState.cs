@@ -125,9 +125,9 @@ public class GameState
 
         Board[last.Move.From] = last.MovedPiece;
         Board[last.Move.To] = last.CapturedPiece;
+        _halfMoveClock = last.HalfMoveClockBefore;
 
         CurrentPlayer = CurrentPlayer.Opponent();
-        _halfMoveClock = last.HalfMoveClockBefore;
         GameResult = null;
     }
 }
