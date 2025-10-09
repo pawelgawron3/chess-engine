@@ -14,6 +14,7 @@ public class GameState
 
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
+    public Result? Result { get; private set; } = null;
 
     public GameState(Board board)
     {
