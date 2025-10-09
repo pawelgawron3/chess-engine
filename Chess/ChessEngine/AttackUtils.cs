@@ -4,7 +4,13 @@ namespace ChessEngine;
 
 public static class AttackUtils
 {
-    public static Position GetKingPosition(Board board, Player player)
+    public static bool IsKingInCheck(Board board, Player player)
+    {
+        Position kingPos = GetKingPosition(board, player);
+        return IsSquareAttacked(board, kingPos, player.Opponent());
+    }
+
+    private static Position GetKingPosition(Board board, Player player)
     {
         for (int row = 0; row < 8; row++)
         {
