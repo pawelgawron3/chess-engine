@@ -1,4 +1,5 @@
-﻿using static ChessEngine.PositionUtils;
+﻿using static ChessEngine.AttackUtils;
+using static ChessEngine.PositionUtils;
 
 namespace ChessEngine;
 
@@ -108,6 +109,26 @@ public class GameState
         return true;
     }
 
+    public bool IsMoveLegal(Move move)
+    {
+        if (!IsMovePseudoLegal(move))
+            return false;
+
+        Piece? movedPiece = Board[move.From];
+        Piece? capturedPiece = Board[move.To];
+
+        var record = new MoveRecord(move, movedPiece!, capturedPiece);
+
+        Board.MakeMove(move);
+
+        Position kingPosition = GetKingPosition(Board, CurrentPlayer);
+        bool isKingInCheck = IsSquareAttacked(Board, kingPosition, CurrentPlayer.Opponent());
+
+        UndoTestMove(record);
+
+        return !isKingInCheck;
+    }
+
     public void UndoLastMove()
     {
         if (MoveHistory.Count == 0)
@@ -120,5 +141,11 @@ public class GameState
         Board[last.Move.To] = last.CapturedPiece;
 
         CurrentPlayer = CurrentPlayer.Opponent();
+    }
+
+    private void UndoTestMove(MoveRecord record)
+    {
+        Board[record.Move.From] = record.MovedPiece;
+        Board[record.Move.To] = record.CapturedPiece;
     }
 }
