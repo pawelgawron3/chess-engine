@@ -92,6 +92,9 @@ public class GameState
         return true;
     }
 
+    /// <summary>
+    /// Checks game ending conditions.
+    /// </summary>
     private void CheckForGameOver()
     {
         if (_halfMoveClock >= 100)
