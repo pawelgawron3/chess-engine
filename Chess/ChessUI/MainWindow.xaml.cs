@@ -75,7 +75,7 @@ public partial class MainWindow : Window
 
         HighlightSelectedSquare();
 
-        var moves = _gameState.GetPseudoLegalMovesForPiece().ToList();
+        var moves = _gameState.GetLegalMovesForPiece().ToList();
 
         const int squareSize = 75;
 
