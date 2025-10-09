@@ -61,11 +61,11 @@ public static class LegalMoveGenerator
             return false;
 
         Piece? piece = board[move.From];
-        if (piece == null || piece.Owner != player)
+        if (piece?.Owner != player)
             return false;
 
         Piece? targetPiece = board[move.To];
-        if (targetPiece != null && targetPiece.Owner == player)
+        if (targetPiece?.Owner == player)
             return false;
 
         if (!GeneratePseudoLegalMovesForPiece(board, move.From)
