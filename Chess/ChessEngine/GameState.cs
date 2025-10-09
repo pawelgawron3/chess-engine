@@ -68,6 +68,9 @@ public class GameState
     /// </summary>
     public bool TryMakeMove(Move move)
     {
+        if (GameResult != null)
+            return false;
+
         if (!IsMoveLegal(Board, move, CurrentPlayer))
             return false;
 
