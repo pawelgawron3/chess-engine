@@ -15,7 +15,8 @@ public class GameState
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
     public Result? GameResult { get; private set; } = null;
-    public int FullMoveCounter => (_halfMoveClock / 2) + 1;
+    public int FullMoveCounter => _fullMoveNumber;
+    private int _fullMoveNumber = 1;
     private int _halfMoveClock = 0;
 
     public GameState(Board board)
@@ -84,6 +85,9 @@ public class GameState
         if (movedPiece.Type == PieceType.Pawn || capturedPiece != null)
             _halfMoveClock = 0;
         else _halfMoveClock++;
+
+        if (CurrentPlayer == Player.Black)
+            _fullMoveNumber++;
 
         ClearSelection();
         CurrentPlayer = CurrentPlayer.Opponent();
