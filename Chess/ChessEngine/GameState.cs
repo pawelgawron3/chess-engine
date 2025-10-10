@@ -38,7 +38,7 @@ public class GameState
         if (SelectedPosition == null)
             return Enumerable.Empty<Move>();
 
-        return GenerateLegalMovesForPiece(Board, SelectedPosition.Value, CurrentPlayer);
+        return GenerateLegalMovesForPiece(this);
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public class GameState
     /// </summary>
     public IEnumerable<Move> GetLegalMoves()
     {
-        return GenerateLegalMoves(Board, CurrentPlayer);
+        return GenerateLegalMoves(this);
     }
 
     /// <summary>
