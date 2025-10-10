@@ -15,11 +15,13 @@ public readonly struct Move
 {
     public Position From { get; }
     public Position To { get; }
+    public MoveType Type { get; }
 
-    public Move(Position from, Position to)
+    public Move(Position from, Position to, MoveType type = MoveType.Normal)
     {
         From = from;
         To = to;
+        Type = type;
     }
 
     public override string ToString() => $"{From} -> {To}";
