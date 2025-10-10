@@ -9,11 +9,15 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Generates all legal moves for the currently selected piece in the provided board state.
     /// </summary>
-    public static IEnumerable<Move> GenerateLegalMovesForPiece(Board board, Position from, Player player)
+    public static IEnumerable<Move> GenerateLegalMovesForPiece(GameState state)
     {
-        foreach (var move in GeneratePseudoLegalMovesForPiece(board, from))
+        if (state.SelectedPosition == null)
+            yield break;
+
+        Position from = state.SelectedPosition.Value;
+        foreach (var move in GeneratePseudoLegalMovesForPiece(state, from))
         {
-            if (IsMoveLegal(board, move, player))
+            if (IsMoveLegal(state, move))
                 yield return move;
         }
     }
@@ -21,11 +25,11 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Generates all legal moves for a given player in the provided board state.
     /// </summary>
-    public static IEnumerable<Move> GenerateLegalMoves(Board board, Player player)
+    public static IEnumerable<Move> GenerateLegalMoves(GameState state)
     {
-        foreach (var move in GeneratePseudoLegalMoves(board, player))
+        foreach (var move in GeneratePseudoLegalMoves(state))
         {
-            if (IsMoveLegal(board, move, player))
+            if (IsMoveLegal(state, move))
                 yield return move;
         }
     }
@@ -33,20 +37,20 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Tests if a move is legal without modifying the actual game history.
     /// </summary>
-    public static bool IsMoveLegal(Board board, Move move, Player player)
+    public static bool IsMoveLegal(GameState state, Move move)
     {
-        if (!IsMovePseudoLegal(board, move, player))
+        if (!IsMovePseudoLegal(state, move))
             return false;
 
-        Piece? movedPiece = board[move.From];
-        Piece? capturedPiece = board[move.To];
+        Piece? movedPiece = state.Board[move.From];
+        Piece? capturedPiece = state.Board[move.To];
 
-        board.MakeMove(move);
+        state.Board.MakeMove(move);
 
-        bool kingInCheck = IsKingInCheck(board, player);
+        bool kingInCheck = IsKingInCheck(state.Board, state.CurrentPlayer);
 
-        board[move.From] = movedPiece;
-        board[move.To] = capturedPiece;
+        state.Board[move.From] = movedPiece;
+        state.Board[move.To] = capturedPiece;
 
         return !kingInCheck;
     }
@@ -54,20 +58,20 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Checks whether a given move is pseudo-legal on the board.
     /// </summary>
-    private static bool IsMovePseudoLegal(Board board, Move move, Player player)
+    private static bool IsMovePseudoLegal(GameState state, Move move)
     {
         if (!IsInside(move.From) || !IsInside(move.To))
             return false;
 
-        Piece? piece = board[move.From];
-        if (piece?.Owner != player)
+        Piece? piece = state.Board[move.From];
+        if (piece?.Owner != state.CurrentPlayer)
             return false;
 
-        Piece? targetPiece = board[move.To];
-        if (targetPiece?.Owner == player)
+        Piece? targetPiece = state.Board[move.To];
+        if (targetPiece?.Owner == state.CurrentPlayer)
             return false;
 
-        if (!GeneratePseudoLegalMovesForPiece(board, move.From)
+        if (!GeneratePseudoLegalMovesForPiece(state, move.From)
             .Any(m => m.To.Equals(move.To)))
             return false;
 

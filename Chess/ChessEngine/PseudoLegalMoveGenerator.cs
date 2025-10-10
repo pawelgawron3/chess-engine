@@ -4,26 +4,31 @@ namespace ChessEngine;
 
 public static class PseudoLegalMoveGenerator
 {
-    public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(Board board, Position from)
+    public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameState state, Position from)
     {
-        Piece? piece = board[from];
+        Piece? piece = state.Board[from];
+        MoveRecord? lastMove = state.MoveHistory.LastOrDefault();
+
         if (piece == null) return Enumerable.Empty<Move>();
 
-        return GenerateMovesFor(board, from, piece);
+        return GenerateMovesFor(state.Board, from, piece, lastMove);
     }
 
-    public static IEnumerable<Move> GeneratePseudoLegalMoves(Board board, Player player)
+    public static IEnumerable<Move> GeneratePseudoLegalMoves(GameState state)
     {
+        Player player = state.CurrentPlayer;
+        MoveRecord? lastMove = state.MoveHistory.LastOrDefault();
+
         for (int row = 0; row < 8; row++)
         {
             for (int col = 0; col < 8; col++)
             {
-                if (board[row, col] == null || board[row, col]?.Owner != player) continue;
+                if (state.Board[row, col] == null || state.Board[row, col]?.Owner != player) continue;
 
                 Position from = new Position(row, col);
-                Piece piece = board[from]!;
+                Piece piece = state.Board[from]!;
 
-                foreach (var move in GenerateMovesFor(board, from, piece))
+                foreach (var move in GenerateMovesFor(state.Board, from, piece, lastMove))
                 {
                     yield return move;
                 }
@@ -31,7 +36,7 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece)
+    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece, MoveRecord? lastMove)
     {
         int direction = (piece.Owner == Player.White) ? -1 : 1;
 
@@ -60,6 +65,20 @@ public static class PseudoLegalMoveGenerator
             if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
             {
                 yield return new Move(pos, target);
+            }
+        }
+
+        if (lastMove?.MovedPiece.Type == PieceType.Pawn && Math.Abs(lastMove.Move.From.Row - lastMove.Move.To.Row) == 2)
+        {
+            int lastPawnCol = lastMove.Move.To.Column;
+            if (Math.Abs(lastPawnCol - pos.Column) == 1 && lastMove.Move.To.Row == pos.Row)
+            {
+                Position enPassantTarget = new Position(pos.Row + direction, lastPawnCol);
+
+                if (IsInside(enPassantTarget) && board[enPassantTarget] == null)
+                {
+                    yield return new Move(pos, enPassantTarget);
+                }
             }
         }
     }
@@ -196,11 +215,11 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GenerateMovesFor(Board board, Position from, Piece piece)
+    private static IEnumerable<Move> GenerateMovesFor(Board board, Position from, Piece piece, MoveRecord? lastMove)
     {
         switch (piece.Type)
         {
-            case PieceType.Pawn: return GeneratePseudoLegalPawnMoves(board, from, piece);
+            case PieceType.Pawn: return GeneratePseudoLegalPawnMoves(board, from, piece, lastMove);
             case PieceType.Knight: return GeneratePseudoLegalKnightMoves(board, from, piece);
             case PieceType.Bishop: return GeneratePseudoLegalBishopMoves(board, from, piece);
             case PieceType.Rook: return GeneratePseudoLegalRookMoves(board, from, piece);
