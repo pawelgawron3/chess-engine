@@ -73,7 +73,7 @@ public class GameState
         if (GameResult != null)
             return false;
 
-        if (!IsMoveLegal(Board, move, CurrentPlayer))
+        if (!IsMoveLegal(this, move))
             return false;
 
         Piece movedPiece = Board[move.From]!;
