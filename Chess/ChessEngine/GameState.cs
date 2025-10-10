@@ -82,9 +82,7 @@ public class GameState
         Board.MakeMove(move);
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
 
-        if (movedPiece.Type == PieceType.Pawn || capturedPiece != null)
-            _halfMoveClock = 0;
-        else _halfMoveClock++;
+        _halfMoveClock = (movedPiece.Type == PieceType.Pawn || capturedPiece != null) ? 0 : _halfMoveClock + 1;
 
         if (CurrentPlayer == Player.Black)
             _fullMoveNumber++;
