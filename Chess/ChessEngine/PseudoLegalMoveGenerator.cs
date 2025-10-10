@@ -62,7 +62,7 @@ public static class PseudoLegalMoveGenerator
         foreach (var target in diagonals)
         {
             Piece? targetPiece = board[target];
-            if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
+            if (IsInside(target) && targetPiece?.Owner != piece.Owner)
             {
                 yield return new Move(pos, target);
             }
