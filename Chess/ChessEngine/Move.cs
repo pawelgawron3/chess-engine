@@ -1,5 +1,13 @@
 ﻿namespace ChessEngine;
 
+public enum MoveType
+{
+    Normal,
+    EnPassant,
+    Castling,
+    Promotion
+}
+
 /// <summary>
 /// Represents a move from one position to another on the chessboard.
 /// </summary>
