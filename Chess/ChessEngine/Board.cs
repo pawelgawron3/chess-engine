@@ -70,7 +70,51 @@ public class Board
         Piece? piece = this[move.From];
         if (piece == null) return;
 
-        this[move.To] = piece.Clone();
-        this[move.From] = null;
+        switch (move.Type)
+        {
+            case MoveType.Normal:
+                this[move.To] = piece.Clone();
+                this[move.From] = null;
+                break;
+
+            case MoveType.EnPassant:
+                this[move.From.Row, move.To.Column] = null;
+                this[move.To] = piece.Clone();
+                this[move.From] = null;
+                break;
+
+            case MoveType.Castling:
+                //TODO
+                break;
+
+            case MoveType.Promotion:
+                //TODO
+                break;
+        }
+    }
+
+    public void UndoMove(MoveRecord last)
+    {
+        switch (last.Move.Type)
+        {
+            case MoveType.Normal:
+                this[last.Move.From] = last.MovedPiece.Clone();
+                this[last.Move.To] = last.CapturedPiece?.Clone();
+                break;
+
+            case MoveType.EnPassant:
+                this[last.Move.From] = last.MovedPiece.Clone();
+                this[last.Move.To] = null;
+                this[last.Move.From.Row, last.Move.To.Column] = last.CapturedPiece!.Clone();
+                break;
+
+            case MoveType.Castling:
+                //TODO
+                break;
+
+            case MoveType.Promotion:
+                //TODO
+                break;
+        }
     }
 }

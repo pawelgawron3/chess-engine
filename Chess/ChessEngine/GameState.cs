@@ -79,9 +79,6 @@ public class GameState
         Piece movedPiece = Board[move.From]!;
         Piece? capturedPiece = (move.Type == MoveType.Normal) ? Board[move.To] : Board[move.From.Row, move.To.Column];
 
-        if (move.Type == MoveType.EnPassant)
-            Board[move.From.Row, move.To.Column] = null;
-
         Board.MakeMove(move);
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
 
@@ -123,7 +120,7 @@ public class GameState
         }
     }
 
-    public void UndoLastMove()
+    public void TryUndoMove()
     {
         if (MoveHistory.Count == 0)
             return;
@@ -131,12 +128,9 @@ public class GameState
         var last = MoveHistory.Last();
         MoveHistory.RemoveAt(MoveHistory.Count - 1);
 
-        Board[last.Move.From] = last.MovedPiece;
-        Board[last.Move.To] = (last.Move.Type == MoveType.Normal) ? last.CapturedPiece : null;
-        if (last.Move.Type == MoveType.EnPassant)
-            Board[last.Move.From.Row, last.Move.To.Column] = last.CapturedPiece;
-        _halfMoveClock = last.HalfMoveClockBefore;
+        Board.UndoMove(last);
 
+        _halfMoveClock = last.HalfMoveClockBefore;
         CurrentPlayer = CurrentPlayer.Opponent();
         GameResult = null;
     }
