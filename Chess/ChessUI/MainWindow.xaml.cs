@@ -136,8 +136,10 @@ public partial class MainWindow : Window
         }
         else
         {
-            Move move = new Move(_gameState.SelectedPosition.Value, pos);
-            if (_gameState.TryMakeMove(move))
+            Move move = _gameState.GetLegalMovesForPiece()
+                .FirstOrDefault(m => m.To.Equals(pos));
+
+            if (!move.Equals(default(Move)) && _gameState.TryMakeMove(move))
             {
                 ClearHighlights();
                 DrawBoard();
