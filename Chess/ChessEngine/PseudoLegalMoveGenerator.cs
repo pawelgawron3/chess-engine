@@ -4,6 +4,9 @@ namespace ChessEngine;
 
 public static class PseudoLegalMoveGenerator
 {
+    /// <summary>
+    /// Generates all pseudo-legal moves for the currently selected piece.
+    /// </summary>
     public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameState state, Position from)
     {
         Piece? piece = state.Board[from];
@@ -14,6 +17,9 @@ public static class PseudoLegalMoveGenerator
         return GenerateMovesFor(state.Board, from, piece, lastMove);
     }
 
+    /// <summary>
+    /// Generates all pseudo-legal moves for the current player.
+    /// </summary>
     public static IEnumerable<Move> GeneratePseudoLegalMoves(GameState state)
     {
         Player player = state.CurrentPlayer;

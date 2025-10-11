@@ -1,5 +1,9 @@
 ﻿namespace ChessEngine;
 
+/// <summary>
+/// Represents the outcome of a chess game, including the winner (if any) and the reason the game ended.
+/// Provides helper methods to create a win or a draw result.
+/// </summary>
 public class Result
 {
     public Player Winner { get; }

@@ -93,6 +93,9 @@ public class Board
         }
     }
 
+    /// <summary>
+    /// Reverts a move previously made on the board, restoring the pieces to their original positions.
+    /// </summary>
     public void UndoMove(MoveRecord last)
     {
         switch (last.Move.Type)

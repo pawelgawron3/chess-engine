@@ -7,7 +7,7 @@ namespace ChessEngine;
 public static class LegalMoveGenerator
 {
     /// <summary>
-    /// Generates all legal moves for the currently selected piece in the provided board state.
+    /// Generates all legal moves for the currently selected piece.
     /// </summary>
     public static IEnumerable<Move> GenerateLegalMovesForPiece(GameState state)
     {
@@ -23,7 +23,7 @@ public static class LegalMoveGenerator
     }
 
     /// <summary>
-    /// Generates all legal moves for a given player in the provided board state.
+    /// Generates all legal moves for the current player.
     /// </summary>
     public static IEnumerable<Move> GenerateLegalMoves(GameState state)
     {

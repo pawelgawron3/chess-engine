@@ -120,6 +120,9 @@ public class GameState
         }
     }
 
+    /// <summary>
+    /// Attempts to undo the last move.
+    /// </summary>
     public void TryUndoMove()
     {
         if (MoveHistory.Count == 0)
