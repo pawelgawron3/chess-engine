@@ -62,22 +62,26 @@ public static class PseudoLegalMoveGenerator
         foreach (var target in diagonals)
         {
             Piece? targetPiece = board[target];
-            if (IsInside(target) && targetPiece?.Owner != piece.Owner)
+            if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
             {
                 yield return new Move(pos, target);
             }
         }
 
-        if (lastMove?.MovedPiece.Type == PieceType.Pawn && Math.Abs(lastMove.Move.From.Row - lastMove.Move.To.Row) == 2)
+        if (lastMove != null &&
+            lastMove.MovedPiece.Type == PieceType.Pawn &&
+            lastMove.MovedPiece.Owner != piece.Owner &&
+            Math.Abs(lastMove.Move.From.Row - lastMove.Move.To.Row) == 2)
         {
             int lastPawnCol = lastMove.Move.To.Column;
+
             if (Math.Abs(lastPawnCol - pos.Column) == 1 && lastMove.Move.To.Row == pos.Row)
             {
                 Position enPassantTarget = new Position(pos.Row + direction, lastPawnCol);
 
                 if (IsInside(enPassantTarget) && board[enPassantTarget] == null)
                 {
-                    yield return new Move(pos, enPassantTarget);
+                    yield return new Move(pos, enPassantTarget, MoveType.EnPassant);
                 }
             }
         }
