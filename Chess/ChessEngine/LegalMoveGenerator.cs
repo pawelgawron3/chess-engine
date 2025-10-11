@@ -42,15 +42,14 @@ public static class LegalMoveGenerator
         if (!IsMovePseudoLegal(state, move))
             return false;
 
-        Piece? movedPiece = state.Board[move.From];
-        Piece? capturedPiece = state.Board[move.To];
+        Piece movedPiece = state.Board[move.From]!;
+        Piece? capturedPiece = (move.Type == MoveType.Normal) ? state.Board[move.To] : state.Board[move.From.Row, move.To.Column];
 
         state.Board.MakeMove(move);
 
         bool kingInCheck = IsKingInCheck(state.Board, state.CurrentPlayer);
 
-        state.Board[move.From] = movedPiece;
-        state.Board[move.To] = capturedPiece;
+        state.Board.UndoMove(new MoveRecord(move, movedPiece, capturedPiece, 0));
 
         return !kingInCheck;
     }
