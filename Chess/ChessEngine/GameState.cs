@@ -18,6 +18,7 @@ public class GameState
     public int FullMoveCounter => _fullMoveNumber;
     private int _fullMoveNumber = 1;
     private int _halfMoveClock = 0;
+    private Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> _castlingRights;
 
     public GameState(Board board)
     {
@@ -28,6 +29,11 @@ public class GameState
     {
         Board = new Board();
         Board.Initialize();
+        _castlingRights = new Dictionary<Player, (bool, bool, bool)>
+        {
+            {Player.White, (false, false, false) },
+            {Player.Black, (false, false, false) },
+        };
     }
 
     /// <summary>
