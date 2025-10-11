@@ -79,6 +79,13 @@ public class GameState
         Piece movedPiece = Board[move.From]!;
         Piece? capturedPiece = Board[move.To];
 
+        if (move.Type == MoveType.EnPassant)
+        {
+            int row = move.From.Row;
+            int col = move.To.Column;
+            Board[row, col] = null;
+        }
+
         Board.MakeMove(move);
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
 
