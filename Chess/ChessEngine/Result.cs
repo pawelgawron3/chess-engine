@@ -1,5 +1,8 @@
 ﻿namespace ChessEngine;
 
+/// <summary>
+/// Specifies the reason why a chess game ended.
+/// </summary>
 public enum GameEndReason
 {
     Checkmate,
