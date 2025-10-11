@@ -1,5 +1,14 @@
 ﻿namespace ChessEngine;
 
+public enum GameEndReason
+{
+    Checkmate,
+    Stalemate,
+    FiftyMovesRule,
+    InsufficientMaterial,
+    ThreefoldRepetition
+}
+
 /// <summary>
 /// Represents the outcome of a chess game, including the winner (if any) and the reason the game ended.
 /// Provides helper methods to create a win or a draw result.
