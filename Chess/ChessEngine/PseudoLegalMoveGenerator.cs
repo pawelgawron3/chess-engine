@@ -7,7 +7,7 @@ public static class PseudoLegalMoveGenerator
     public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameState state, Position from)
     {
         Piece? piece = state.Board[from];
-        MoveRecord? lastMove = state.MoveHistory.LastOrDefault();
+        MoveRecord? lastMove = (state.MoveHistory.Count > 0) ? state.MoveHistory.Last() : null;
 
         if (piece == null) return Enumerable.Empty<Move>();
 
@@ -17,7 +17,7 @@ public static class PseudoLegalMoveGenerator
     public static IEnumerable<Move> GeneratePseudoLegalMoves(GameState state)
     {
         Player player = state.CurrentPlayer;
-        MoveRecord? lastMove = state.MoveHistory.LastOrDefault();
+        MoveRecord? lastMove = (state.MoveHistory.Count > 0) ? state.MoveHistory.Last() : null;
 
         for (int row = 0; row < 8; row++)
         {
