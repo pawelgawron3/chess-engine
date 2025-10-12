@@ -103,7 +103,8 @@ public class Board
                 break;
 
             case MoveType.Promotion:
-                //TODO
+                this[move.To] = new Piece(move.PromotionPiece!.Value, piece.Owner);
+                this[move.From] = null;
                 break;
         }
     }
@@ -146,7 +147,8 @@ public class Board
                 break;
 
             case MoveType.Promotion:
-                //TODO
+                this[last.Move.From] = last.MovedPiece?.Clone();
+                this[last.Move.To] = last.CapturedPiece?.Clone();
                 break;
         }
     }
