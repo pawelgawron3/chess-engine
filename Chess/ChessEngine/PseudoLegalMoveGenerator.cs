@@ -48,11 +48,22 @@ public static class PseudoLegalMoveGenerator
     private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece, MoveRecord? lastMove)
     {
         int direction = (piece.Owner == Player.White) ? -1 : 1;
+        int promotionRow = (piece.Owner == Player.White) ? 0 : 7;
 
         Position oneStep = new Position(pos.Row + direction, pos.Column);
         if (IsInside(oneStep) && board[oneStep] == null)
         {
-            yield return new Move(pos, oneStep);
+            if (oneStep.Row == promotionRow)
+            {
+                yield return new Move(pos, oneStep, MoveType.Promotion, PieceType.Queen);
+                yield return new Move(pos, oneStep, MoveType.Promotion, PieceType.Rook);
+                yield return new Move(pos, oneStep, MoveType.Promotion, PieceType.Bishop);
+                yield return new Move(pos, oneStep, MoveType.Promotion, PieceType.Knight);
+            }
+            else
+            {
+                yield return new Move(pos, oneStep);
+            }
 
             int startRow = (piece.Owner == Player.White) ? 6 : 1;
             Position twoStep = new Position(pos.Row + (2 * direction), pos.Column);
@@ -70,10 +81,22 @@ public static class PseudoLegalMoveGenerator
 
         foreach (var target in diagonals)
         {
+            if (!IsInside(target)) continue;
             Piece? targetPiece = board[target];
-            if (IsInside(target) && targetPiece != null && targetPiece.Owner != piece.Owner)
+
+            if (targetPiece != null && targetPiece.Owner != piece.Owner)
             {
-                yield return new Move(pos, target);
+                if (target.Row == promotionRow)
+                {
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Queen);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Rook);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Bishop);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Knight);
+                }
+                else
+                {
+                    yield return new Move(pos, target);
+                }
             }
         }
 
