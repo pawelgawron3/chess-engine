@@ -15,10 +15,10 @@ public class GameState
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
     public Result? GameResult { get; private set; } = null;
+    public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; }
     public int FullMoveCounter => _fullMoveNumber;
     private int _fullMoveNumber = 1;
     private int _halfMoveClock = 0;
-    private Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> _castlingRights;
 
     public GameState(Board board)
     {
@@ -29,7 +29,7 @@ public class GameState
     {
         Board = new Board();
         Board.Initialize();
-        _castlingRights = new Dictionary<Player, (bool, bool, bool)>
+        CastlingRights = new Dictionary<Player, (bool, bool, bool)>
         {
             {Player.White, (false, false, false) },
             {Player.Black, (false, false, false) },
@@ -83,7 +83,34 @@ public class GameState
             return false;
 
         Piece movedPiece = Board[move.From]!;
-        Piece? capturedPiece = (move.Type == MoveType.Normal) ? Board[move.To] : Board[move.From.Row, move.To.Column];
+        Piece? capturedPiece = move.Type switch
+        {
+            MoveType.Normal => Board[move.To],
+            MoveType.EnPassant => Board[move.From.Row, move.To.Column],
+            MoveType.Castling => null,
+            _ => null
+        };
+        //Piece? capturedPiece = (move.Type == MoveType.Normal) ? Board[move.To] : Board[move.From.Row, move.To.Column];
+
+        if (movedPiece.Type == PieceType.King)
+        {
+            var rights = CastlingRights[movedPiece.Owner];
+            if (rights.KingMoved == false)
+                CastlingRights[movedPiece.Owner] = (true, rights.RookAMoved, rights.RookHMoved);
+        }
+        else if (movedPiece.Type == PieceType.Rook)
+        {
+            var rights = CastlingRights[movedPiece.Owner];
+
+            if (rights.RookAMoved == false && move.From.Column == 0)
+            {
+                CastlingRights[movedPiece.Owner] = (rights.KingMoved, true, rights.RookHMoved);
+            }
+            else if (rights.RookHMoved == false && move.From.Column == 7)
+            {
+                CastlingRights[movedPiece.Owner] = (rights.KingMoved, rights.RookAMoved, true);
+            }
+        }
 
         Board.MakeMove(move);
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
