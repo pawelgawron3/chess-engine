@@ -127,7 +127,22 @@ public class Board
                 break;
 
             case MoveType.Castling:
-                //TODO
+                int fromRow = last.Move.From.Row;
+                int toCol = last.Move.To.Column;
+
+                this[last.Move.From] = last.MovedPiece.Clone();
+                this[last.Move.To] = null;
+
+                if (toCol == 6)
+                {
+                    this[fromRow, 7] = this[fromRow, 5]?.Clone();
+                    this[fromRow, 5] = null;
+                }
+                else if (toCol == 2)
+                {
+                    this[fromRow, 0] = this[fromRow, 3]?.Clone();
+                    this[fromRow, 3] = null;
+                }
                 break;
 
             case MoveType.Promotion:
