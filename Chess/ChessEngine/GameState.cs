@@ -85,7 +85,7 @@ public class GameState
         Piece movedPiece = Board[move.From]!;
         Piece? capturedPiece = move.Type switch
         {
-            MoveType.Normal => Board[move.To],
+            MoveType.Normal or MoveType.Promotion => Board[move.To],
             MoveType.EnPassant => Board[move.From.Row, move.To.Column],
             _ => null
         };
