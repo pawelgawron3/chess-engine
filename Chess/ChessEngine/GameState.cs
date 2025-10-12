@@ -87,7 +87,6 @@ public class GameState
         {
             MoveType.Normal => Board[move.To],
             MoveType.EnPassant => Board[move.From.Row, move.To.Column],
-            MoveType.Castling => null,
             _ => null
         };
 
