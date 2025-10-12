@@ -90,25 +90,24 @@ public class GameState
             MoveType.Castling => null,
             _ => null
         };
-        //Piece? capturedPiece = (move.Type == MoveType.Normal) ? Board[move.To] : Board[move.From.Row, move.To.Column];
 
         if (movedPiece.Type == PieceType.King)
         {
-            var rights = CastlingRights[movedPiece.Owner];
-            if (rights.KingMoved == false)
-                CastlingRights[movedPiece.Owner] = (true, rights.RookAMoved, rights.RookHMoved);
+            var (king_moved, rookA_moved, rookH_moved) = CastlingRights[movedPiece.Owner];
+            if (king_moved == false)
+                CastlingRights[movedPiece.Owner] = (true, rookA_moved, rookH_moved);
         }
         else if (movedPiece.Type == PieceType.Rook)
         {
-            var rights = CastlingRights[movedPiece.Owner];
+            var (king_moved, rookA_moved, rookH_moved) = CastlingRights[movedPiece.Owner];
 
-            if (rights.RookAMoved == false && move.From.Column == 0)
+            if (rookA_moved == false && move.From.Column == 0)
             {
-                CastlingRights[movedPiece.Owner] = (rights.KingMoved, true, rights.RookHMoved);
+                CastlingRights[movedPiece.Owner] = (king_moved, true, rookH_moved);
             }
-            else if (rights.RookHMoved == false && move.From.Column == 7)
+            else if (rookH_moved == false && move.From.Column == 7)
             {
-                CastlingRights[movedPiece.Owner] = (rights.KingMoved, rights.RookAMoved, true);
+                CastlingRights[movedPiece.Owner] = (king_moved, rookA_moved, true);
             }
         }
 
