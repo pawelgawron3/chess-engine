@@ -20,16 +20,16 @@
                          HorizontalAlignment="Center"
                          Cursor="Hand">
                 <Button Tag="Queen" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image Source="/Assets/QueenW.png" Width="40" Height="40" />
+                    <Image x:Name="QueenImage" Width="40" Height="40" />
                 </Button>
                 <Button Tag="Rook" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image Source="/Assets/RookW.png" Width="40" Height="40" />
+                    <Image x:Name="RookImage" Width="40" Height="40" />
                 </Button>
                 <Button Tag="Bishop" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image Source="/Assets/BishopW.png" Width="40" Height="40" />
+                    <Image x:Name="BishopImage" Width="40" Height="40" />
                 </Button>
                 <Button Tag="Knight" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image Source="/Assets/KnightW.png" Width="40" Height="40" />
+                    <Image x:Name="KnightImage" Width="40" Height="40" />
                 </Button>
             </UniformGrid>
         </StackPanel>

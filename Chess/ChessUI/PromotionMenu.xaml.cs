@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using ChessEngine;
 
 namespace ChessUI;
@@ -36,7 +38,19 @@ public partial class PromotionMenu : UserControl
 
     public void ShowForPlayer(Player player)
     {
-        // TODO: Dynamic piece color selection
+        string colorSuffix = (player == Player.White) ? "W" : "B";
+
+        QueenImage.Source = LoadPieceImage("Queen", colorSuffix);
+        RookImage.Source = LoadPieceImage("Rook", colorSuffix);
+        BishopImage.Source = LoadPieceImage("Bishop", colorSuffix);
+        KnightImage.Source = LoadPieceImage("Knight", colorSuffix);
+
         this.Visibility = Visibility.Visible;
+
+        static ImageSource LoadPieceImage(string pieceName, string colorSuffix)
+        {
+            var uri = new Uri($"/Assets/{pieceName}{colorSuffix}.png", UriKind.Relative);
+            return new BitmapImage(uri);
+        }
     }
 }
