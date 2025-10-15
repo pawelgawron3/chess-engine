@@ -15,11 +15,15 @@ public partial class MainWindow : Window
 {
     private GameState _gameState = new GameState();
 
+    private Move _pendingPromotionMove;
+    private bool _isAwaitingPromotion = false;
+
     public MainWindow()
     {
         InitializeComponent();
         DrawBoard();
         SetCursor(_gameState.CurrentPlayer);
+        PromotionMenu.PieceSelected += OnPromotionPieceSelected;
     }
 
     private void DrawBoard()
@@ -54,6 +58,9 @@ public partial class MainWindow : Window
 
     private void BoardGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        if (_isAwaitingPromotion)
+            return;
+
         Point point = e.GetPosition(BoardGrid);
         Position pos = GetBoardPositionFromClick(point);
 
@@ -127,34 +134,80 @@ public partial class MainWindow : Window
     {
         if (_gameState.SelectedPosition == null)
         {
-            Piece? piece = _gameState.Board[pos];
-            if (piece != null && piece.Owner == _gameState.CurrentPlayer)
-            {
-                _gameState.SelectPosition(pos);
-                HighlightMovesForSelectedPiece();
-            }
+            TrySelectPiece(pos);
         }
         else
         {
-            Move move = _gameState.GetLegalMovesForPiece()
-                .FirstOrDefault(m => m.To.Equals(pos));
+            TryMakeMove(pos);
+        }
+    }
 
-            if (!move.Equals(default(Move)) && _gameState.TryMakeMove(move))
-            {
-                ClearHighlights();
-                DrawBoard();
-                SetCursor(_gameState.CurrentPlayer);
-            }
-            else
-            {
-                _gameState.ClearSelection();
-                ClearHighlights();
-            }
+    private void TrySelectPiece(Position pos)
+    {
+        Piece? piece = _gameState.Board[pos];
+        if (piece != null && piece.Owner == _gameState.CurrentPlayer)
+        {
+            _gameState.SelectPosition(pos);
+            HighlightMovesForSelectedPiece();
+        }
+    }
+
+    private void TryMakeMove(Position pos)
+    {
+        Move move = _gameState.GetLegalMovesForPiece()
+               .FirstOrDefault(m => m.To.Equals(pos));
+
+        if (move.Equals(default(Move)))
+        {
+            _gameState.ClearSelection();
+            ClearHighlights();
+            return;
+        }
+
+        if (move.Type == MoveType.Promotion)
+        {
+            _pendingPromotionMove = move;
+            _isAwaitingPromotion = true;
+            Piece piece = _gameState.Board[move.From]!;
+            PromotionMenu.ShowForPlayer(piece.Owner);
+            return;
+        }
+
+        if (_gameState.TryMakeMove(move))
+        {
+            ClearHighlights();
+            DrawBoard();
+            SetCursor(_gameState.CurrentPlayer);
+        }
+        else
+        {
+            _gameState.ClearSelection();
+            ClearHighlights();
         }
     }
 
     private void SetCursor(Player player)
     {
         Cursor = (player == Player.White) ? ChessCursors.White : ChessCursors.Black;
+    }
+
+    private void OnPromotionPieceSelected(PieceType selectedPiece)
+    {
+        Move promotionMove = new Move(
+            _pendingPromotionMove.From,
+            _pendingPromotionMove.To,
+            MoveType.Promotion,
+            selectedPiece
+        );
+
+        if (_gameState.TryMakeMove(promotionMove))
+        {
+            _isAwaitingPromotion = false;
+            ClearHighlights();
+            DrawBoard();
+            SetCursor(_gameState.CurrentPlayer);
+        }
+
+        PromotionMenu.Visibility = Visibility.Collapsed;
     }
 }
