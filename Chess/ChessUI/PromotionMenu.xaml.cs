@@ -1,26 +1,42 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using ChessEngine;
 
 namespace ChessUI;
+
 /// <summary>
-/// Logika interakcji dla klasy PromotionMenu.xaml
+/// Interaction logic for PromotionMenu.xaml
 /// </summary>
 public partial class PromotionMenu : UserControl
 {
+    public event Action<PieceType>? PieceSelected;
+
     public PromotionMenu()
     {
         InitializeComponent();
+    }
+
+    private void OnSelectPiece(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is string tag)
+        {
+            var piece = tag switch
+            {
+                "Queen" => PieceType.Queen,
+                "Rook" => PieceType.Rook,
+                "Bishop" => PieceType.Bishop,
+                "Knight" => PieceType.Knight,
+                _ => PieceType.Queen
+            };
+
+            PieceSelected?.Invoke(piece);
+            this.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    public void ShowForPlayer(Player player)
+    {
+        // TODO: Dynamic piece color selection
+        this.Visibility = Visibility.Visible;
     }
 }
