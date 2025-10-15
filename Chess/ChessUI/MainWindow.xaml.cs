@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ChessEngine;
@@ -91,19 +92,54 @@ public partial class MainWindow : Window
 
         foreach (var move in moves)
         {
-            Ellipse ellipse = new Ellipse
+            Piece? targetPiece = _gameState.Board[move.To];
+
+            if (targetPiece == null)
             {
-                Width = 40,
-                Height = 40,
-                Fill = Brushes.Yellow,
-                Opacity = 0.3,
-                IsHitTestVisible = false
-            };
+                Ellipse ellipse = new Ellipse
+                {
+                    Width = 30,
+                    Height = 30,
+                    Fill = new SolidColorBrush(Color.FromArgb(140, 120, 120, 120)),
+                    Effect = new DropShadowEffect
+                    {
+                        BlurRadius = 8,
+                        Color = Colors.Black,
+                        Opacity = 0.3,
+                        ShadowDepth = 0
+                    },
+                    IsHitTestVisible = false
+                };
 
-            Canvas.SetLeft(ellipse, move.To.Column * squareSize + (squareSize - 40) / 2);
-            Canvas.SetTop(ellipse, move.To.Row * squareSize + (squareSize - 40) / 2);
+                Canvas.SetLeft(ellipse, move.To.Column * squareSize + (squareSize - ellipse.Width) / 2);
+                Canvas.SetTop(ellipse, move.To.Row * squareSize + (squareSize - ellipse.Height) / 2);
 
-            HighlightLayer.Children.Add(ellipse);
+                HighlightLayer.Children.Add(ellipse);
+            }
+            else
+            {
+                Ellipse ring = new Ellipse
+                {
+                    Width = squareSize - 6,
+                    Height = squareSize - 6,
+                    Stroke = new SolidColorBrush(Color.FromArgb(180, 120, 120, 120)),
+                    StrokeThickness = 6,
+                    Fill = Brushes.Transparent,
+                    Effect = new DropShadowEffect
+                    {
+                        BlurRadius = 8,
+                        Color = Colors.Black,
+                        Opacity = 0.35,
+                        ShadowDepth = 0
+                    },
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(ring, move.To.Column * squareSize + 2);
+                Canvas.SetTop(ring, move.To.Row * squareSize + 2);
+
+                HighlightLayer.Children.Add(ring);
+            }
         }
     }
 
