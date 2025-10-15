@@ -82,7 +82,10 @@ public partial class MainWindow : Window
 
         HighlightSelectedSquare();
 
-        var moves = _gameState.GetLegalMovesForPiece().ToList();
+        var moves = _gameState.GetLegalMovesForPiece()
+            .GroupBy(m => m.To)
+            .Select(g => g.First())
+            .ToList();
 
         const int squareSize = 75;
 
