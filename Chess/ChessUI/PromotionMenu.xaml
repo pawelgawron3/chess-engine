@@ -4,32 +4,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
-             d:DesignHeight="130" d:DesignWidth="280"
+             d:DesignHeight="200" d:DesignWidth="460"
              Background="#80000000">
     <Border Style="{StaticResource BorderStyle}"
-            Padding="10"
+            Padding="20"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             Background="{StaticResource FillColor}">
         <StackPanel RenderOptions.BitmapScalingMode="HighQuality">
             <TextBlock Text="SELECT A PIECE TO PROMOTE"
                        Style="{StaticResource TextStyle}"
-                       FontSize="18"
-                       Margin="0,0,0,10" />
+                       FontSize="22"
+                       Margin="0,0,0,20" />
             <UniformGrid Columns="4"
                          HorizontalAlignment="Center"
                          Cursor="Hand">
-                <Button Tag="Queen" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image x:Name="QueenImage" Width="40" Height="40" />
+                <Button Tag="Queen" Click="OnSelectPiece" Margin="10" Padding="10">
+                    <Image x:Name="QueenImage" Width="60" Height="60" />
                 </Button>
-                <Button Tag="Rook" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image x:Name="RookImage" Width="40" Height="40" />
+                <Button Tag="Rook" Click="OnSelectPiece" Margin="10" Padding="10">
+                    <Image x:Name="RookImage" Width="60" Height="60" />
                 </Button>
-                <Button Tag="Bishop" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image x:Name="BishopImage" Width="40" Height="40" />
+                <Button Tag="Bishop" Click="OnSelectPiece" Margin="10" Padding="10">
+                    <Image x:Name="BishopImage" Width="60" Height="60" />
                 </Button>
-                <Button Tag="Knight" Click="OnSelectPiece" Margin="5" Padding="5">
-                    <Image x:Name="KnightImage" Width="40" Height="40" />
+                <Button Tag="Knight" Click="OnSelectPiece" Margin="10" Padding="10">
+                    <Image x:Name="KnightImage" Width="60" Height="60" />
                 </Button>
             </UniformGrid>
         </StackPanel>
