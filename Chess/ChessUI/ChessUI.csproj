@@ -9,33 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\BishopB.png" />
-    <None Remove="Assets\BishopW.png" />
-    <None Remove="Assets\Board.png" />
-    <None Remove="Assets\icon.ico" />
-    <None Remove="Assets\KingB.png" />
-    <None Remove="Assets\KingW.png" />
-    <None Remove="Assets\KnightB.png" />
-    <None Remove="Assets\KnightW.png" />
-    <None Remove="Assets\PawnB.png" />
-    <None Remove="Assets\PawnW.png" />
-    <None Remove="Assets\QueenB.png" />
-    <None Remove="Assets\QueenW.png" />
-    <None Remove="Assets\RookB.png" />
-    <None Remove="Assets\RookW.png" />
-	<None Remove="Assets\CursorB.cur" />
-	<None Remove="Assets\CursorW.cur" />
+	<Resource Include="Assets\Images\**\*" />
+	<None Include="Assets\Sounds\**\*" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ChessEngine\ChessEngine.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\*.png" />
-	<Resource Include="Assets\icon.ico" />
-	<Resource Include="Assets\*.cur" />
-	<None Include="Assets\Sounds\*.wav" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
