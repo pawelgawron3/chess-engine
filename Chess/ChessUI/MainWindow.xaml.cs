@@ -25,10 +25,7 @@ public partial class MainWindow : Window
         DrawBoard();
         SetCursor(_gameState.CurrentPlayer);
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
-        _gameState.MoveMade += (move, captured) =>
-        {
-            ChessSounds.PlaySoundForMove(move, captured);
-        };
+        _gameState.MoveMade += PlaySound;
     }
 
     private void DrawBoard()
@@ -252,5 +249,10 @@ public partial class MainWindow : Window
         }
 
         PromotionMenu.Visibility = Visibility.Collapsed;
+    }
+
+    private void PlaySound(Move move, Piece? captured)
+    {
+        ChessSounds.PlaySoundForMove(move, captured);
     }
 }
