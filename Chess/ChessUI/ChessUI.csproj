@@ -35,6 +35,7 @@
     <Resource Include="Assets\*.png" />
 	<Resource Include="Assets\icon.ico" />
 	<Resource Include="Assets\*.cur" />
+	<None Include="Assets\Sounds\*.wav" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
 </Project>
