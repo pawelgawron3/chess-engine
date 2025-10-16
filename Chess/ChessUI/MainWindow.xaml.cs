@@ -25,6 +25,10 @@ public partial class MainWindow : Window
         DrawBoard();
         SetCursor(_gameState.CurrentPlayer);
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
+        _gameState.MoveMade += (move, captured) =>
+        {
+            ChessSounds.PlaySoundForMove(move, captured);
+        };
     }
 
     private void DrawBoard()

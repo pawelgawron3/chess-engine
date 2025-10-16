@@ -17,6 +17,9 @@ public class GameState
     public Result? GameResult { get; private set; } = null;
     public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; }
     public int FullMoveCounter => _fullMoveNumber;
+
+    public event Action<Move, Piece?>? MoveMade;
+
     private int _fullMoveNumber = 1;
     private int _halfMoveClock = 0;
 
@@ -109,6 +112,8 @@ public class GameState
                 CastlingRights[movedPiece.Owner] = (king_moved, rookA_moved, true);
             }
         }
+
+        MoveMade?.Invoke(move, capturedPiece);
 
         Board.MakeMove(move);
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
