@@ -49,7 +49,7 @@ public partial class PromotionMenu : UserControl
 
         static ImageSource LoadPieceImage(string pieceName, string colorSuffix)
         {
-            var uri = new Uri($"/Assets/{pieceName}{colorSuffix}.png", UriKind.Relative);
+            var uri = new Uri($"/Assets/Images/{pieceName}{colorSuffix}.png", UriKind.Relative);
             return new BitmapImage(uri);
         }
     }

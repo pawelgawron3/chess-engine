@@ -46,7 +46,7 @@ public partial class MainWindow : Window
                     {
                         Width = squareSize,
                         Height = squareSize,
-                        Source = new BitmapImage(new Uri($"/Assets/{piece.Type}{(piece.Owner == Player.White ? "W" : "B")}.png", UriKind.Relative))
+                        Source = new BitmapImage(new Uri($"/Assets/Images/{piece.Type}{(piece.Owner == Player.White ? "W" : "B")}.png", UriKind.Relative))
                     };
 
                     Canvas.SetLeft(img, col * squareSize);
