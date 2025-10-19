@@ -9,7 +9,7 @@
         Icon="/Assets/Images/icon.ico"
         WindowStartupLocation="CenterScreen"
         Background="#9e9e9e">
-    <Viewbox>
+    <Viewbox Stretch="Uniform">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="600" />
