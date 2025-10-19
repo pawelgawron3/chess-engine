@@ -5,28 +5,62 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessUI"
         mc:Ignorable="d"
-        Title="Chess Engine" Width="600" SizeToContent="Height"
+        Title="Chess Engine" Width="800" SizeToContent="Height"
         Icon="/Assets/Images/icon.ico"
         WindowStartupLocation="CenterScreen"
         Background="#9e9e9e">
     <Viewbox>
-        <Grid x:Name="BoardGrid"
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="600" />
+                <ColumnDefinition Width="200" />
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="BoardGrid"
               Width="600"
               Height="600"
-              MouseDown="BoardGrid_MouseDown">
-            <Grid.Background>
-                <ImageBrush ImageSource="/Assets/Images/Board.png" />
-            </Grid.Background>
+              MouseDown="BoardGrid_MouseDown"
+              Grid.Column="0">
+                <Grid.Background>
+                    <ImageBrush ImageSource="/Assets/Images/Board.png" />
+                </Grid.Background>
 
-            <Canvas x:Name="HighlightLayer" IsHitTestVisible="False" />
+                <Canvas x:Name="HighlightLayer" IsHitTestVisible="False" />
 
-            <Canvas x:Name="PiecesLayer"
+                <Canvas x:Name="PiecesLayer"
                     RenderOptions.BitmapScalingMode="HighQuality" />
 
-            <local:PromotionMenu x:Name="PromotionMenu"
+                <local:PromotionMenu x:Name="PromotionMenu"
                              Visibility="Collapsed"
                              HorizontalAlignment="Center"
                              VerticalAlignment="Center" />
+            </Grid>
+
+            <Border Background="WhiteSmoke"
+                    Padding="10"
+                    BorderBrush="#ccc"
+                    BorderThickness="1,0,1,0"
+                    Grid.Column="1">
+
+                <StackPanel VerticalAlignment="Top">
+                    <TextBlock Text="Game Info"
+                               TextAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="18"
+                               Margin="0,0,0,10"
+                               Foreground="#333" />
+
+                    <StackPanel>
+                        <TextBlock Text="Last Move:" FontWeight="SemiBold" />
+                        <TextBlock x:Name="LastMoveText" Text="—" Margin="0,2,0,0" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Move Count:" FontWeight="SemiBold" />
+                        <TextBlock x:Name="MoveCountText" Text="0" Margin="0,2,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Grid>
     </Viewbox>
 </Window>
