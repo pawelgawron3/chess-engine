@@ -25,7 +25,7 @@ public partial class MainWindow : Window
         DrawBoard();
         SetCursor(_gameState.CurrentPlayer);
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
-        _gameState.MoveMade += PlaySound;
+        _gameState.MoveMade += OnMoveMade;
     }
 
     private void DrawBoard()
@@ -251,8 +251,16 @@ public partial class MainWindow : Window
         PromotionMenu.Visibility = Visibility.Collapsed;
     }
 
-    private void PlaySound(Move move, Piece? captured)
+    private void OnMoveMade(Move move, Piece? captured)
     {
         ChessSounds.PlaySoundForMove(move, captured);
+
+        UpdateGameInfo(move);
+    }
+
+    private void UpdateGameInfo(Move move)
+    {
+        MoveCountText.Text = _gameState.FullMoveCounter.ToString();
+        LastMoveText.Text = move.ToString();
     }
 }
