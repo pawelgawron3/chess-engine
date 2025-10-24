@@ -261,6 +261,10 @@ public partial class MainWindow : Window
     private void UpdateGameInfo(Move move)
     {
         MoveCountText.Text = _gameState.FullMoveCounter.ToString();
-        LastMoveText.Text = move.ToString();
+
+        if (_gameState.MoveHistory.Count > 0)
+            LastMoveText.Text = AttackUtils.ReturnChessNotation(_gameState.MoveHistory.Last());
+        else
+            LastMoveText.Text = "-";
     }
 }
