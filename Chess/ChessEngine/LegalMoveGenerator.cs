@@ -43,12 +43,7 @@ public static class LegalMoveGenerator
             return false;
 
         Piece movedPiece = state.Board[move.From]!;
-        Piece? capturedPiece = move.Type switch
-        {
-            MoveType.Normal or MoveType.Promotion => state.Board[move.To],
-            MoveType.EnPassant => state.Board[move.From.Row, move.To.Column],
-            _ => null
-        };
+        Piece? capturedPiece = GetCapturedPiece(state.Board, move);
 
         state.Board.MakeMove(move);
 
