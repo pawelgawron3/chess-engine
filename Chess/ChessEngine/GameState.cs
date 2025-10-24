@@ -4,7 +4,7 @@ namespace ChessEngine;
 
 /// <summary>
 /// Represents the current state of a chess game, including the board, active player,
-/// selected square, move history, and game progression logic.
+/// move history, and game logic.
 /// </summary>
 public class GameState
 {
@@ -14,24 +14,21 @@ public class GameState
 
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
-    public Result? GameResult { get; private set; } = null;
+    public Result? GameResult { get; private set; }
     public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; }
-    public int FullMoveCounter => _fullMoveNumber;
 
     public event Action<Move, Piece?>? MoveMade;
 
+    public int FullMoveCounter => _fullMoveNumber;
+
     private int _fullMoveNumber = 1;
     private int _halfMoveClock = 0;
-
-    public GameState(Board board)
-    {
-        Board = board;
-    }
 
     public GameState()
     {
         Board = new Board();
         Board.Initialize();
+
         CastlingRights = new Dictionary<Player, (bool, bool, bool)>
         {
             {Player.White, (false, false, false) },
@@ -42,21 +39,13 @@ public class GameState
     /// <summary>
     /// Returns all legal moves for the currently selected piece.
     /// </summary>
-    public IEnumerable<Move> GetLegalMovesForPiece()
-    {
-        if (SelectedPosition == null)
-            return Enumerable.Empty<Move>();
-
-        return GenerateLegalMovesForPiece(this);
-    }
+    public IEnumerable<Move> GetLegalMovesForPiece() =>
+        (SelectedPosition == null) ? Enumerable.Empty<Move>() : GenerateLegalMovesForPiece(this);
 
     /// <summary>
     /// Returns all legal moves for the current player.
     /// </summary>
-    public IEnumerable<Move> GetLegalMoves()
-    {
-        return GenerateLegalMoves(this);
-    }
+    public IEnumerable<Move> GetLegalMoves() => GenerateLegalMoves(this);
 
     /// <summary>
     /// Selects a position on the board.
@@ -79,59 +68,65 @@ public class GameState
     /// </summary>
     public bool TryMakeMove(Move move)
     {
-        if (GameResult != null)
-            return false;
-
-        if (!IsMoveLegal(this, move))
+        if (GameResult != null || !IsMoveLegal(this, move))
             return false;
 
         Piece movedPiece = Board[move.From]!;
-        Piece? capturedPiece = move.Type switch
-        {
-            MoveType.Normal or MoveType.Promotion => Board[move.To],
-            MoveType.EnPassant => Board[move.From.Row, move.To.Column],
-            _ => null
-        };
+        Piece? capturedPiece = AttackUtils.GetCapturedPiece(Board, move);
         PieceType? promotionPiece = move.PromotionPiece;
 
-        if (movedPiece.Type == PieceType.King)
-        {
-            var (king_moved, rookA_moved, rookH_moved) = CastlingRights[movedPiece.Owner];
-            if (king_moved == false)
-                CastlingRights[movedPiece.Owner] = (true, rookA_moved, rookH_moved);
-        }
-        else if (movedPiece.Type == PieceType.Rook)
-        {
-            var (king_moved, rookA_moved, rookH_moved) = CastlingRights[movedPiece.Owner];
-
-            if (rookA_moved == false && move.From.Column == 0)
-            {
-                CastlingRights[movedPiece.Owner] = (king_moved, true, rookH_moved);
-            }
-            else if (rookH_moved == false && move.From.Column == 7)
-            {
-                CastlingRights[movedPiece.Owner] = (king_moved, rookA_moved, true);
-            }
-        }
-
-        //MoveMade?.Invoke(move, capturedPiece);
+        UpdateCastlingRights(movedPiece, move);
 
         Board.MakeMove(move);
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, promotionPiece));
-
         MoveMade?.Invoke(move, capturedPiece);
 
-        _halfMoveClock = (movedPiece.Type == PieceType.Pawn || capturedPiece != null) ? 0 : _halfMoveClock + 1;
-
-        if (CurrentPlayer == Player.Black)
-            _fullMoveNumber++;
-
+        UpdateClocks(movedPiece, capturedPiece);
+        SwitchPlayer();
         ClearSelection();
-        CurrentPlayer = CurrentPlayer.Opponent();
         CheckForGameOver();
 
         return true;
     }
+
+    /// <summary>
+    /// Updates castling rights for the current player.
+    /// </summary>
+    private void UpdateCastlingRights(Piece movedPiece, Move move)
+    {
+        if (movedPiece.Type == PieceType.King)
+        {
+            var (king_moved, rookA_moved, rookH_moved) = CastlingRights[movedPiece.Owner];
+            if (!king_moved) CastlingRights[movedPiece.Owner] = (true, rookA_moved, rookH_moved);
+        }
+        else if (movedPiece.Type == PieceType.Rook)
+        {
+            var (king_moved, rookA_moved, rookH_moved) = CastlingRights[movedPiece.Owner];
+            if (!rookA_moved && move.From.Column == 0)
+            {
+                CastlingRights[movedPiece.Owner] = (king_moved, true, rookH_moved);
+            }
+            else if (!rookH_moved && move.From.Column == 7)
+            {
+                CastlingRights[movedPiece.Owner] = (king_moved, rookA_moved, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates half-move number and full-move number.
+    /// </summary>
+    private void UpdateClocks(Piece movedPiece, Piece? capturedPiece)
+    {
+        _halfMoveClock = (movedPiece.Type == PieceType.Pawn || capturedPiece != null)
+            ? 0
+            : _halfMoveClock + 1;
+
+        if (CurrentPlayer == Player.Black)
+            _fullMoveNumber++;
+    }
+
+    private void SwitchPlayer() => CurrentPlayer = CurrentPlayer.Opponent();
 
     /// <summary>
     /// Checks game ending conditions.
@@ -144,19 +139,14 @@ public class GameState
             return;
         }
 
-        if (!GetLegalMoves().Any())
-        {
-            bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer);
+        var legalMoves = GetLegalMoves().ToList();
+        if (legalMoves.Any()) return;
 
-            if (kingInCheck)
-            {
-                GameResult = Result.Win(CurrentPlayer.Opponent());
-            }
-            else
-            {
-                GameResult = Result.Draw(GameEndReason.Stalemate);
-            }
-        }
+        bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer);
+
+        GameResult = kingInCheck
+            ? Result.Win(CurrentPlayer.Opponent())
+            : Result.Draw(GameEndReason.Stalemate);
     }
 
     /// <summary>
@@ -169,11 +159,10 @@ public class GameState
 
         var last = MoveHistory.Last();
         MoveHistory.RemoveAt(MoveHistory.Count - 1);
-
         Board.UndoMove(last);
 
         _halfMoveClock = last.HalfMoveClockBefore;
-        CurrentPlayer = CurrentPlayer.Opponent();
+        SwitchPlayer();
         GameResult = null;
     }
 }
