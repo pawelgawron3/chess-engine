@@ -92,6 +92,7 @@ public class GameState
             MoveType.EnPassant => Board[move.From.Row, move.To.Column],
             _ => null
         };
+        PieceType? promotionPiece = move.PromotionPiece;
 
         if (movedPiece.Type == PieceType.King)
         {
@@ -113,10 +114,12 @@ public class GameState
             }
         }
 
-        MoveMade?.Invoke(move, capturedPiece);
+        //MoveMade?.Invoke(move, capturedPiece);
 
         Board.MakeMove(move);
-        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock));
+        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, promotionPiece));
+
+        MoveMade?.Invoke(move, capturedPiece);
 
         _halfMoveClock = (movedPiece.Type == PieceType.Pawn || capturedPiece != null) ? 0 : _halfMoveClock + 1;
 

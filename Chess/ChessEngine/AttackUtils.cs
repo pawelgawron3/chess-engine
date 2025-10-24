@@ -153,7 +153,11 @@ public static class AttackUtils
 
         string destination = ReturnAlgebraic(move.To);
 
-        return $"{piece}{captureSign}{destination}";
+        string promotion = moveRecord.PromotedPieceType != null
+        ? $"={GetPieceLetter(moveRecord.PromotedPieceType.Value)}"
+        : "";
+
+        return $"{piece}{captureSign}{destination}{promotion}";
     }
 
     private static string ReturnAlgebraic(Position pos)
@@ -162,4 +166,13 @@ public static class AttackUtils
         int rank = 8 - pos.Row;
         return $"{file}{rank}";
     }
+
+    private static string GetPieceLetter(PieceType type) => type switch
+    {
+        PieceType.Queen => "Q",
+        PieceType.Rook => "R",
+        PieceType.Bishop => "B",
+        PieceType.Knight => "N",
+        _ => ""
+    };
 }
