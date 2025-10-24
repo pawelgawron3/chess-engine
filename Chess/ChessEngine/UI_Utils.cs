@@ -38,6 +38,9 @@ public static class UI_Utils
         if (moveRecord.PromotedPieceType is PieceType promoted)
             notation += $"={GetPieceLetter(promoted)}";
 
+        if (moveRecord.KingInCheck)
+            notation += "+";
+
         return notation;
     }
 
