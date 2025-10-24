@@ -17,7 +17,7 @@ public class GameState
     public Result? GameResult { get; private set; }
     public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; }
 
-    public event Action<Move, Piece?>? MoveMade;
+    public event Action<MoveRecord>? MoveMade;
 
     public int FullMoveCounter => _fullMoveNumber;
 
@@ -76,10 +76,10 @@ public class GameState
         PieceType? promotionPiece = move.PromotionPiece;
 
         UpdateCastlingRights(movedPiece, move);
-
         Board.MakeMove(move);
-        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, promotionPiece));
-        MoveMade?.Invoke(move, capturedPiece);
+        bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer.Opponent());
+        MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, promotionPiece, kingInCheck));
+        MoveMade?.Invoke(MoveHistory.Last());
 
         UpdateClocks(movedPiece, capturedPiece);
         SwitchPlayer();

@@ -251,11 +251,11 @@ public partial class MainWindow : Window
         PromotionMenu.Visibility = Visibility.Collapsed;
     }
 
-    private void OnMoveMade(Move move, Piece? captured)
+    private void OnMoveMade(MoveRecord lastMove)
     {
-        ChessSounds.PlaySoundForMove(move, captured);
+        ChessSounds.PlaySoundForMove(lastMove.Move, lastMove.CapturedPiece, lastMove.KingInCheck);
 
-        UpdateGameInfo(move);
+        UpdateGameInfo(lastMove.Move);
     }
 
     private void UpdateGameInfo(Move move)
