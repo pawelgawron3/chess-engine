@@ -132,4 +132,12 @@ public static class AttackUtils
 
         return false;
     }
+
+    public static Piece? GetCapturedPiece(Board board, Move move) =>
+        move.Type switch
+        {
+            MoveType.Normal or MoveType.Promotion => board[move.To],
+            MoveType.EnPassant => board[move.From.Row, move.To.Column],
+            _ => null
+        };
 }
