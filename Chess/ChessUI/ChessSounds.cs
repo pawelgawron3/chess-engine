@@ -12,6 +12,7 @@ public static class ChessSounds
     private static readonly SoundPlayer CaptureSound = new SoundPlayer(Path.Combine(BasePath, "capture.wav"));
     private static readonly SoundPlayer PromoteSound = new SoundPlayer(Path.Combine(BasePath, "promote.wav"));
     private static readonly SoundPlayer CastleSound = new SoundPlayer(Path.Combine(BasePath, "castle.wav"));
+    private static readonly SoundPlayer CheckSound = new SoundPlayer(Path.Combine(BasePath, "move-check.wav"));
 
     static ChessSounds()
     {
@@ -21,6 +22,7 @@ public static class ChessSounds
             CaptureSound.Load();
             PromoteSound.Load();
             CastleSound.Load();
+            CheckSound.Load();
         }
         catch (Exception ex)
         {
@@ -28,8 +30,14 @@ public static class ChessSounds
         }
     }
 
-    public static void PlaySoundForMove(Move move, Piece? capturedPiece)
+    public static void PlaySoundForMove(Move move, Piece? capturedPiece, bool KingInCheck)
     {
+        if (KingInCheck)
+        {
+            PlayCheckSound();
+            return;
+        }
+
         switch (move.Type)
         {
             case MoveType.Normal:
@@ -71,5 +79,10 @@ public static class ChessSounds
     private static void PlayCastleSound()
     {
         CastleSound.Play();
+    }
+
+    private static void PlayCheckSound()
+    {
+        CheckSound.Play();
     }
 }
