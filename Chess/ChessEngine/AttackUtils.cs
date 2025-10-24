@@ -132,47 +132,4 @@ public static class AttackUtils
 
         return false;
     }
-
-    public static string ReturnChessNotation(MoveRecord moveRecord)
-    {
-        Move move = moveRecord.Move;
-        var pieceType = moveRecord.MovedPiece.Type;
-
-        string piece = pieceType switch
-        {
-            PieceType.Queen => "Q",
-            PieceType.King => "K",
-            PieceType.Bishop => "B",
-            PieceType.Knight => "N",
-            PieceType.Rook => "R",
-            _ => ""
-        };
-
-        bool isCapture = moveRecord.CapturedPiece != null;
-        string captureSign = isCapture ? "x" : "";
-
-        string destination = ReturnAlgebraic(move.To);
-
-        string promotion = moveRecord.PromotedPieceType != null
-        ? $"={GetPieceLetter(moveRecord.PromotedPieceType.Value)}"
-        : "";
-
-        return $"{piece}{captureSign}{destination}{promotion}";
-    }
-
-    private static string ReturnAlgebraic(Position pos)
-    {
-        char file = (char)('a' + pos.Column);
-        int rank = 8 - pos.Row;
-        return $"{file}{rank}";
-    }
-
-    private static string GetPieceLetter(PieceType type) => type switch
-    {
-        PieceType.Queen => "Q",
-        PieceType.Rook => "R",
-        PieceType.Bishop => "B",
-        PieceType.Knight => "N",
-        _ => ""
-    };
 }
