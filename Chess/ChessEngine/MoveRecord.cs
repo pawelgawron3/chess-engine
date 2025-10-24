@@ -4,5 +4,6 @@ public record MoveRecord(
     Piece MovedPiece,
     Piece? CapturedPiece,
     int HalfMoveClockBefore,
-    PieceType? PromotedPieceType = null
+    PieceType? PromotedPieceType = null,
+    bool KingInCheck = false
 );
