@@ -25,6 +25,4 @@ public readonly struct Move
         Type = type;
         PromotionPiece = promotionPiece;
     }
-
-    public override string ToString() => $"{From} -> {To}";
 }
