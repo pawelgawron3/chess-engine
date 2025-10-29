@@ -63,7 +63,7 @@ public class ZobristHasher
         return hash;
     }
 
-    private void UpdateHash()
+    public void UpdateHash()
     {
         CurrentHash = ComputeZobristHash();
 
