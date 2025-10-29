@@ -26,6 +26,7 @@ public partial class MainWindow : Window
         SetCursor(_gameState.CurrentPlayer);
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
         _gameState.MoveMade += OnMoveMade;
+        _gameState.GameEnded += OnGameEnded;
     }
 
     private void DrawBoard()
@@ -266,5 +267,17 @@ public partial class MainWindow : Window
             LastMoveText.Text = UI_Utils.ReturnChessNotation(_gameState.MoveHistory.Last());
         else
             LastMoveText.Text = "-";
+    }
+
+    private void OnGameEnded(Result result)
+    {
+        string message;
+
+        if (result.Winner == Player.None)
+            message = $"Draw: {result.Reason}";
+        else
+            message = $"Winner: {result.Winner} ({result.Reason})";
+
+        GameStatusText.Text = message;
     }
 }
