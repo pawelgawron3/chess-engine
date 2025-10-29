@@ -24,7 +24,48 @@ public class ZobristHasher
         PositionCounts[CurrentHash] = 1;
     }
 
-    public ulong ComputeZobristHash()
+    public void ApplyMove(Move move, Piece movedPiece, Piece? capturedPiece, int? previousEnPassantFile, int? newEnPassantFile)
+    {
+        int playerIndex = movedPiece.Owner == Player.White ? 0 : 1;
+        int pieceIndex = (int)movedPiece.Type;
+
+        int fromIndex = move.From.Row * 8 + move.From.Column;
+        int toIndex = move.To.Row * 8 + move.To.Column;
+
+        CurrentHash ^= Zobrist.PieceKeys[playerIndex, pieceIndex, fromIndex];
+
+        if (capturedPiece != null)
+        {
+            int capturedPlayerIndex = capturedPiece.Owner == Player.White ? 0 : 1;
+            int capturedPieceIndex = (int)capturedPiece.Type;
+            int capturedSquare = (movedPiece.Type == PieceType.Pawn && move.Type == MoveType.EnPassant)
+                ? move.From.Row * 8 + move.To.Column
+                : move.To.Row * 8 + move.To.Column;
+
+            CurrentHash ^= Zobrist.PieceKeys[capturedPlayerIndex, capturedPieceIndex, capturedSquare];
+        }
+
+        PieceType newType = move.PromotionPiece ?? movedPiece.Type;
+        int newPieceIndex = (int)newType;
+        CurrentHash ^= Zobrist.PieceKeys[playerIndex, newPieceIndex, toIndex];
+
+        if (previousEnPassantFile.HasValue)
+            CurrentHash ^= Zobrist.EnPassantKeys[previousEnPassantFile.Value];
+
+        if (newEnPassantFile.HasValue)
+            CurrentHash ^= Zobrist.EnPassantKeys[newEnPassantFile.Value];
+
+        CurrentHash ^= Zobrist.SideToMoveKey;
+
+        // castling rights XOR
+
+        if (PositionCounts.ContainsKey(CurrentHash))
+            PositionCounts[CurrentHash]++;
+        else
+            PositionCounts[CurrentHash] = 1;
+    }
+
+    private ulong ComputeZobristHash()
     {
         ulong hash = 0;
 
@@ -61,15 +102,5 @@ public class ZobristHasher
             hash ^= Zobrist.SideToMoveKey;
 
         return hash;
-    }
-
-    public void UpdateHash()
-    {
-        CurrentHash = ComputeZobristHash();
-
-        if (PositionCounts.ContainsKey(CurrentHash))
-            PositionCounts[CurrentHash]++;
-        else
-            PositionCounts[CurrentHash] = 1;
     }
 }
