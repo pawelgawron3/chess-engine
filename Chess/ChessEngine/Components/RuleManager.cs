@@ -4,6 +4,9 @@ public class RuleManager
 {
     public int? EnPassantFile { get; private set; }
 
+    public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights =>
+        _castlingRights;
+
     private readonly Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> _castlingRights;
 
     public RuleManager(Dictionary<Player, (bool, bool, bool)> castlingRights)

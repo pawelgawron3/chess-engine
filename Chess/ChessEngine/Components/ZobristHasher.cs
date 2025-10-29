@@ -24,7 +24,13 @@ public class ZobristHasher
         PositionCounts[CurrentHash] = 1;
     }
 
-    public void ApplyMove(Move move, Piece movedPiece, Piece? capturedPiece, int? previousEnPassantFile, int? newEnPassantFile)
+    public void ApplyMove(Move move,
+        Piece movedPiece,
+        Piece? capturedPiece,
+        int? previousEnPassantFile,
+        int? newEnPassantFile,
+        Dictionary<Player, (bool, bool, bool)> castlingBefore,
+        Dictionary<Player, (bool, bool, bool)> castlingAfter)
     {
         int playerIndex = movedPiece.Owner == Player.White ? 0 : 1;
         int pieceIndex = (int)movedPiece.Type;
@@ -55,14 +61,36 @@ public class ZobristHasher
         if (newEnPassantFile.HasValue)
             CurrentHash ^= Zobrist.EnPassantKeys[newEnPassantFile.Value];
 
-        CurrentHash ^= Zobrist.SideToMoveKey;
+        ulong beforeHash = ComputeCastlingRightsHash(castlingBefore);
+        ulong afterHash = ComputeCastlingRightsHash(castlingAfter);
 
-        // castling rights XOR
+        CurrentHash ^= beforeHash;
+        CurrentHash ^= afterHash;
+
+        CurrentHash ^= Zobrist.SideToMoveKey;
 
         if (PositionCounts.ContainsKey(CurrentHash))
             PositionCounts[CurrentHash]++;
         else
             PositionCounts[CurrentHash] = 1;
+    }
+
+    private static ulong ComputeCastlingRightsHash(Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> rights)
+    {
+        ulong hash = 0;
+
+        foreach (var kv in rights)
+        {
+            int playerIndex = kv.Key == Player.White ? 0 : 1;
+            var (kingMoved, rookAMoved, rookHMoved) = kv.Value;
+
+            if (!kingMoved && !rookAMoved)
+                hash ^= Zobrist.CastlingKeys[playerIndex, 0];
+            if (!kingMoved && !rookHMoved)
+                hash ^= Zobrist.CastlingKeys[playerIndex, 1];
+        }
+
+        return hash;
     }
 
     private ulong ComputeZobristHash()
@@ -98,7 +126,7 @@ public class ZobristHasher
         if (_getEnPassantFile() is int file)
             hash ^= Zobrist.EnPassantKeys[file];
 
-        if (_getCurrentPlayer() == Player.White)
+        if (_getCurrentPlayer() == Player.Black)
             hash ^= Zobrist.SideToMoveKey;
 
         return hash;

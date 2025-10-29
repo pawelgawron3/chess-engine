@@ -81,13 +81,17 @@ public class GameState
         Piece movedPiece = Board[move.From]!;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(Board, move);
 
+        var prevCastling = _ruleManager.CastlingRights;
+        int? prevEnPassant = _ruleManager.EnPassantFile;
+
         _ruleManager.UpdateCastlingRights(movedPiece, move);
         Board.MakeMove(move);
 
-        int? prevEnPassant = _ruleManager.EnPassantFile;
         _ruleManager.UpdateEnPassantFile(move, movedPiece);
         int? newEnPassant = _ruleManager.EnPassantFile;
-        _hasher.ApplyMove(move, movedPiece, capturedPiece, prevEnPassant, newEnPassant);
+
+        var newCastling = _ruleManager.CastlingRights;
+        _hasher.ApplyMove(move, movedPiece, capturedPiece, prevEnPassant, newEnPassant, prevCastling, newCastling);
 
         bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer.Opponent());
         MoveRecord record = new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, move.PromotionPiece, kingInCheck);
