@@ -15,6 +15,9 @@ public class GameState
     public Position? SelectedPosition { get; private set; }
     public List<MoveRecord> MoveHistory { get; } = new List<MoveRecord>();
     public Result? GameResult { get; private set; }
+
+    public event Action<Result>? GameEnded;
+
     public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; }
 
     public event Action<MoveRecord>? MoveMade;
@@ -144,12 +147,14 @@ public class GameState
         if (_positionCounts.TryGetValue(_currentHash, out int count) && count >= 3)
         {
             GameResult = Result.Draw(GameEndReason.ThreefoldRepetition);
+            GameEnded?.Invoke(GameResult);
             return;
         }
 
         if (_halfMoveClock >= 100)
         {
             GameResult = Result.Draw(GameEndReason.FiftyMovesRule);
+            GameEnded?.Invoke(GameResult);
             return;
         }
 
@@ -161,6 +166,8 @@ public class GameState
         GameResult = kingInCheck
             ? Result.Win(CurrentPlayer.Opponent())
             : Result.Draw(GameEndReason.Stalemate);
+
+        GameEnded?.Invoke(GameResult);
     }
 
     /// <summary>
