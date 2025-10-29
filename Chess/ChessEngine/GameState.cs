@@ -23,6 +23,9 @@ public class GameState
 
     private int _fullMoveNumber = 1;
     private int _halfMoveClock = 0;
+    private ulong _currentHash;
+    public int? EnPassantFile { get; private set; } = null;
+    private readonly Dictionary<ulong, int> _positionCounts = new Dictionary<ulong, int>();
 
     public GameState()
     {
@@ -34,6 +37,9 @@ public class GameState
             {Player.White, (false, false, false) },
             {Player.Black, (false, false, false) },
         };
+
+        _currentHash = ComputeZobristHash();
+        _positionCounts[_currentHash] = 1;
     }
 
     /// <summary>
@@ -77,6 +83,8 @@ public class GameState
 
         UpdateCastlingRights(movedPiece, move);
         Board.MakeMove(move);
+        UpdateEnPassantFile(move, movedPiece);
+        UpdateHash();
         bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer.Opponent());
         MoveHistory.Add(new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, promotionPiece, kingInCheck));
         MoveMade?.Invoke(MoveHistory.Last());
@@ -133,6 +141,12 @@ public class GameState
     /// </summary>
     private void CheckForGameOver()
     {
+        if (_positionCounts.TryGetValue(_currentHash, out int count) && count >= 3)
+        {
+            GameResult = Result.Draw(GameEndReason.ThreefoldRepetition);
+            return;
+        }
+
         if (_halfMoveClock >= 100)
         {
             GameResult = Result.Draw(GameEndReason.FiftyMovesRule);
@@ -164,5 +178,65 @@ public class GameState
         _halfMoveClock = last.HalfMoveClockBefore;
         SwitchPlayer();
         GameResult = null;
+    }
+
+    private ulong ComputeZobristHash()
+    {
+        ulong hash = 0;
+
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                Piece? piece = Board[row, col];
+                if (piece != null)
+                {
+                    int playerIndex = piece.Owner == Player.White ? 0 : 1;
+                    int typeIndex = (int)piece.Type;
+                    int squareIndex = row * 8 + col;
+
+                    hash ^= Zobrist.PieceKeys[playerIndex, typeIndex, squareIndex];
+                }
+            }
+        }
+
+        foreach (var kv in CastlingRights)
+        {
+            int playerIndex = kv.Key == Player.White ? 0 : 1;
+            var (king_moved, rookA_moved, rookH_moved) = kv.Value;
+
+            if (!king_moved && !rookA_moved)
+                hash ^= Zobrist.CastlingKeys[playerIndex, 0];
+            if (!king_moved && !rookH_moved)
+                hash ^= Zobrist.CastlingKeys[playerIndex, 1];
+        }
+
+        if (EnPassantFile.HasValue)
+            hash ^= Zobrist.EnPassantKeys[EnPassantFile.Value];
+
+        if (CurrentPlayer == Player.White)
+            hash ^= Zobrist.SideToMoveKey;
+
+        return hash;
+    }
+
+    private void UpdateHash()
+    {
+        _currentHash = ComputeZobristHash();
+
+        if (_positionCounts.ContainsKey(_currentHash))
+            _positionCounts[_currentHash]++;
+        else
+            _positionCounts[_currentHash] = 1;
+    }
+
+    private void UpdateEnPassantFile(Move move, Piece movedPiece)
+    {
+        EnPassantFile = null;
+
+        if (movedPiece.Type == PieceType.Pawn && Math.Abs(move.From.Row - move.To.Row) == 2)
+        {
+            EnPassantFile = move.From.Column;
+        }
     }
 }
