@@ -9,17 +9,6 @@ public readonly struct Position
     public int Row { get; }
     public int Column { get; }
 
-    /// <summary>
-    /// Gets the color of the square at this position on the chessboard.
-    /// </summary>
-    public SquareColor Color
-    {
-        get
-        {
-            return (Row + Column) % 2 == 0 ? SquareColor.Light : SquareColor.Dark;
-        }
-    }
-
     public Position(int row, int column)
     {
         Row = row;
