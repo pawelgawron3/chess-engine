@@ -1,148 +1,38 @@
-﻿using ChessEngine.Components;
-using static ChessEngine.LegalMoveGenerator;
+﻿namespace ChessEngine;
 
-namespace ChessEngine;
-
-/// <summary>
-/// Represents the current state of a chess game, including the board, active player,
-/// move history, and game logic.
-/// </summary>
 public class GameState
 {
     public Board Board { get; }
-
-    public Player CurrentPlayer { get; private set; } = Player.White;
-
+    public Player CurrentPlayer { get; internal set; } = Player.White;
     public Position? SelectedPosition { get; private set; }
-    public Result? GameResult { get; private set; }
-
-    public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights
-    => _ruleManager.CastlingRights;
-
-    public int? EnPassantFile => _ruleManager.EnPassantFile;
-    public List<MoveRecord> MoveHistory => _historyManager.MoveHistory;
-    public int FullMoveCounter => _fullMoveNumber;
-
-    private readonly RuleManager _ruleManager;
-    private readonly MoveHistoryManager _historyManager;
-    private readonly ZobristHasher _hasher;
-    private readonly GameResultEvaluator _resultEvaluator;
-
-    private int _halfMoveClock = 0;
-    private int _fullMoveNumber = 1;
+    public Result? GameResult { get; internal set; }
+    public GameServices Services { get; }
 
     public event Action<MoveRecord>? MoveMade;
 
     public event Action<Result?>? OnGameEnded;
 
+    internal void RaiseMoveMade(MoveRecord record) => MoveMade?.Invoke(record);
+
+    internal void RaiseGameEnded(Result? result) => OnGameEnded?.Invoke(result);
+
     public GameState()
     {
         Board = new Board();
         Board.Initialize();
-
-        var castlingRights = new Dictionary<Player, (bool, bool, bool)>
-        {
-            {Player.White, (false, false, false) },
-            {Player.Black, (false, false, false) },
-        };
-
-        _ruleManager = new RuleManager(castlingRights);
-        _historyManager = new MoveHistoryManager();
-        _hasher = new ZobristHasher(Board, () => CurrentPlayer, () => castlingRights, () => _ruleManager.EnPassantFile);
-        _resultEvaluator = new GameResultEvaluator(this);
+        Services = new GameServices(this);
     }
 
-    /// <summary>
-    /// Returns all legal moves for the currently selected piece.
-    /// </summary>
+    public IEnumerable<Move> GetLegalMoves() => LegalMoveGenerator.GenerateLegalMoves(this);
+
     public IEnumerable<Move> GetLegalMovesForPiece() =>
-        (SelectedPosition == null) ? Enumerable.Empty<Move>() : GenerateLegalMovesForPiece(this);
+        (SelectedPosition != null) ? LegalMoveGenerator.GenerateLegalMovesForPiece(this) : Enumerable.Empty<Move>();
 
-    /// <summary>
-    /// Returns all legal moves for the current player.
-    /// </summary>
-    public IEnumerable<Move> GetLegalMoves() => GenerateLegalMoves(this);
+    public void SelectPosition(Position pos) => SelectedPosition = pos;
 
-    /// <summary>
-    /// Selects a position on the board.
-    /// </summary>
-    public void SelectPosition(Position pos)
-    {
-        SelectedPosition = pos;
-    }
+    public void ClearSelection() => SelectedPosition = null;
 
-    /// <summary>
-    /// Clears the current selection.
-    /// </summary>
-    public void ClearSelection()
-    {
-        SelectedPosition = null;
-    }
+    public bool TryMakeMove(Move move) => Services.MakeMove(move);
 
-    /// <summary>
-    /// Attempts to execute a move.
-    /// </summary>
-    public bool TryMakeMove(Move move)
-    {
-        if (GameResult != null || !IsMoveLegal(this, move))
-            return false;
-
-        Piece movedPiece = Board[move.From]!;
-        Piece? capturedPiece = AttackUtils.GetCapturedPiece(Board, move);
-
-        var castlingBefore = _ruleManager.CastlingRights;
-        int? enPassantBefore = _ruleManager.EnPassantFile;
-
-        _ruleManager.UpdateCastlingRights(movedPiece, move);
-        Board.MakeMove(move);
-        _ruleManager.UpdateEnPassantFile(move, movedPiece);
-
-        var castlingAfter = _ruleManager.CastlingRights;
-        int? enPassantAfter = _ruleManager.EnPassantFile;
-
-        _hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
-
-        bool opponentKingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer.Opponent());
-        MoveRecord record = new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, move.PromotionPiece, opponentKingInCheck);
-
-        _historyManager.Add(record);
-        MoveMade?.Invoke(record);
-
-        UpdateClocks(movedPiece, capturedPiece);
-        SwitchPlayer();
-        ClearSelection();
-
-        GameResult = _resultEvaluator.Evaluate(_hasher.CurrentHash, _hasher.PositionCounts, _halfMoveClock);
-        OnGameEnded?.Invoke(GameResult);
-
-        return true;
-    }
-
-    private void SwitchPlayer() => CurrentPlayer = CurrentPlayer.Opponent();
-
-    /// <summary>
-    /// Updates half-move number and full-move number.
-    /// </summary>
-    private void UpdateClocks(Piece movedPiece, Piece? capturedPiece)
-    {
-        _halfMoveClock = (movedPiece.Type == PieceType.Pawn || capturedPiece != null)
-            ? 0
-            : _halfMoveClock + 1;
-
-        if (CurrentPlayer == Player.Black)
-            _fullMoveNumber++;
-    }
-
-    /// <summary>
-    /// Attempts to undo the last move.
-    /// </summary>
-    public void TryUndoMove()
-    {
-        MoveRecord? last = _historyManager.Undo(Board);
-        if (last == null) return;
-
-        _halfMoveClock = last.HalfMoveClockBefore;
-        SwitchPlayer();
-        GameResult = null;
-    }
+    public void TryUndoMove() => Services.UndoMove();
 }
