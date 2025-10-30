@@ -11,8 +11,8 @@ public static class PseudoLegalMoveGenerator
     public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameState state, Position from)
     {
         Piece? piece = state.Board[from];
-        var castlingRights = state.CastlingRights;
-        int? enPassantFile = state.EnPassantFile;
+        var castlingRights = state.Services.Rules.CastlingRights;
+        int? enPassantFile = state.Services.Rules.EnPassantFile;
 
         if (piece == null) return Enumerable.Empty<Move>();
 
@@ -25,8 +25,8 @@ public static class PseudoLegalMoveGenerator
     public static IEnumerable<Move> GeneratePseudoLegalMoves(GameState state)
     {
         Player player = state.CurrentPlayer;
-        var castlingRights = state.CastlingRights;
-        int? enPassantFile = state.EnPassantFile;
+        var castlingRights = state.Services.Rules.CastlingRights;
+        int? enPassantFile = state.Services.Rules.EnPassantFile;
 
         for (int row = 0; row < 8; row++)
         {
