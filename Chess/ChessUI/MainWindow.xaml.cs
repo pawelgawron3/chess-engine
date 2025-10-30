@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         SetCursor(_gameState.CurrentPlayer);
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
         _gameState.MoveMade += OnMoveMade;
-        _gameState.GameEnded += OnGameEnded;
+        _gameState.OnGameEnded += OnGameEnded;
     }
 
     private void DrawBoard()
@@ -269,9 +269,15 @@ public partial class MainWindow : Window
             LastMoveText.Text = "-";
     }
 
-    private void OnGameEnded(Result result)
+    private void OnGameEnded(Result? result)
     {
-        string message;
+        string message = "Game in progress...";
+
+        if (result == null)
+        {
+            GameStatusText.Text = message;
+            return;
+        }
 
         if (result.Winner == Player.None)
             message = $"Draw: {result.Reason}";

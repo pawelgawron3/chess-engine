@@ -11,12 +11,12 @@ public static class PseudoLegalMoveGenerator
     public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameState state, Position from)
     {
         Piece? piece = state.Board[from];
-        MoveRecord? lastMove = (state.MoveHistory.Count > 0) ? state.MoveHistory.Last() : null;
         var castlingRights = state.CastlingRights;
+        int? enPassantFile = state.EnPassantFile;
 
         if (piece == null) return Enumerable.Empty<Move>();
 
-        return GenerateMovesFor(state.Board, from, piece, lastMove, castlingRights);
+        return GenerateMovesFor(state.Board, from, piece, enPassantFile, castlingRights);
     }
 
     /// <summary>
@@ -25,8 +25,8 @@ public static class PseudoLegalMoveGenerator
     public static IEnumerable<Move> GeneratePseudoLegalMoves(GameState state)
     {
         Player player = state.CurrentPlayer;
-        MoveRecord? lastMove = (state.MoveHistory.Count > 0) ? state.MoveHistory.Last() : null;
         var castlingRights = state.CastlingRights;
+        int? enPassantFile = state.EnPassantFile;
 
         for (int row = 0; row < 8; row++)
         {
@@ -37,7 +37,7 @@ public static class PseudoLegalMoveGenerator
                 Position from = new Position(row, col);
                 Piece piece = state.Board[from]!;
 
-                foreach (var move in GenerateMovesFor(state.Board, from, piece, lastMove, castlingRights))
+                foreach (var move in GenerateMovesFor(state.Board, from, piece, enPassantFile, castlingRights))
                 {
                     yield return move;
                 }
@@ -45,7 +45,7 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece, MoveRecord? lastMove)
+    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece, int? enPassantFile)
     {
         int direction = (piece.Owner == Player.White) ? -1 : 1;
         int promotionRow = (piece.Owner == Player.White) ? 0 : 7;
@@ -100,21 +100,16 @@ public static class PseudoLegalMoveGenerator
             }
         }
 
-        if (lastMove != null &&
-            lastMove.MovedPiece.Type == PieceType.Pawn &&
-            lastMove.MovedPiece.Owner != piece.Owner &&
-            Math.Abs(lastMove.Move.From.Row - lastMove.Move.To.Row) == 2)
+        if (enPassantFile is int epFile && Math.Abs(epFile - pos.Column) == 1)
         {
-            int lastPawnCol = lastMove.Move.To.Column;
+            int targetRow = pos.Row + direction;
+            int targetCol = epFile;
 
-            if (Math.Abs(lastPawnCol - pos.Column) == 1 && lastMove.Move.To.Row == pos.Row)
+            var sidePawn = board[pos.Row, targetCol];
+            if (sidePawn?.Type == PieceType.Pawn && sidePawn.Owner != piece.Owner)
             {
-                Position enPassantTarget = new Position(pos.Row + direction, lastPawnCol);
-
-                if (IsInside(enPassantTarget) && board[enPassantTarget] == null)
-                {
-                    yield return new Move(pos, enPassantTarget, MoveType.EnPassant);
-                }
+                if (IsInside(targetRow, targetCol) && board[targetRow, targetCol] == null)
+                    yield return new Move(pos, new Position(targetRow, targetCol), MoveType.EnPassant);
             }
         }
     }
@@ -275,11 +270,11 @@ public static class PseudoLegalMoveGenerator
     }
 
     private static IEnumerable<Move> GenerateMovesFor(Board board, Position from, Piece piece,
-        MoveRecord? lastMove, Dictionary<Player, (bool, bool, bool)> castlingRights)
+        int? enPassantFile, Dictionary<Player, (bool, bool, bool)> castlingRights)
     {
         switch (piece.Type)
         {
-            case PieceType.Pawn: return GeneratePseudoLegalPawnMoves(board, from, piece, lastMove);
+            case PieceType.Pawn: return GeneratePseudoLegalPawnMoves(board, from, piece, enPassantFile);
             case PieceType.Knight: return GeneratePseudoLegalKnightMoves(board, from, piece);
             case PieceType.Bishop: return GeneratePseudoLegalBishopMoves(board, from, piece);
             case PieceType.Rook: return GeneratePseudoLegalRookMoves(board, from, piece);

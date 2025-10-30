@@ -16,6 +16,13 @@ public class GameState
     public Position? SelectedPosition { get; private set; }
     public Result? GameResult { get; private set; }
 
+    public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights
+    => _ruleManager.CastlingRights;
+
+    public int? EnPassantFile => _ruleManager.EnPassantFile;
+    public List<MoveRecord> MoveHistory => _historyManager.MoveHistory;
+    public int FullMoveCounter => _fullMoveNumber;
+
     private readonly RuleManager _ruleManager;
     private readonly MoveHistoryManager _historyManager;
     private readonly ZobristHasher _hasher;
@@ -25,6 +32,8 @@ public class GameState
     private int _fullMoveNumber = 1;
 
     public event Action<MoveRecord>? MoveMade;
+
+    public event Action<Result?>? OnGameEnded;
 
     public GameState()
     {
@@ -81,29 +90,30 @@ public class GameState
         Piece movedPiece = Board[move.From]!;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(Board, move);
 
-        var prevCastling = _ruleManager.CastlingRights;
-        int? prevEnPassant = _ruleManager.EnPassantFile;
+        var castlingBefore = _ruleManager.CastlingRights;
+        int? enPassantBefore = _ruleManager.EnPassantFile;
 
         _ruleManager.UpdateCastlingRights(movedPiece, move);
         Board.MakeMove(move);
-
         _ruleManager.UpdateEnPassantFile(move, movedPiece);
-        int? newEnPassant = _ruleManager.EnPassantFile;
 
-        var newCastling = _ruleManager.CastlingRights;
-        _hasher.ApplyMove(move, movedPiece, capturedPiece, prevEnPassant, newEnPassant, prevCastling, newCastling);
+        var castlingAfter = _ruleManager.CastlingRights;
+        int? enPassantAfter = _ruleManager.EnPassantFile;
 
-        bool kingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer.Opponent());
-        MoveRecord record = new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, move.PromotionPiece, kingInCheck);
+        _hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
+
+        bool opponentKingInCheck = AttackUtils.IsKingInCheck(Board, CurrentPlayer.Opponent());
+        MoveRecord record = new MoveRecord(move, movedPiece, capturedPiece, _halfMoveClock, move.PromotionPiece, opponentKingInCheck);
 
         _historyManager.Add(record);
         MoveMade?.Invoke(record);
 
         UpdateClocks(movedPiece, capturedPiece);
         SwitchPlayer();
-
         ClearSelection();
+
         GameResult = _resultEvaluator.Evaluate(_hasher.CurrentHash, _hasher.PositionCounts, _halfMoveClock);
+        OnGameEnded?.Invoke(GameResult);
 
         return true;
     }
