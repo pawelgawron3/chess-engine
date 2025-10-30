@@ -152,4 +152,16 @@ public class Board
                 break;
         }
     }
+
+    public IEnumerable<(Piece piece, Position pos)> GetAllPiecesWithPosition()
+    {
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                if (this[row, col] != null)
+                    yield return (this[row, col]!, new Position(row, col));
+            }
+        }
+    }
 }
