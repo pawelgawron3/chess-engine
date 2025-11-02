@@ -29,6 +29,27 @@ public class GameResultEvaluator
             : Result.Draw(GameEndReason.Stalemate);
     }
 
+    public string ToDisplayString(Result? result)
+    {
+        if (result == null)
+            return "Game in progress...";
+
+        return result.Winner switch
+        {
+            Player.None => $"Draw: {FormatReason(result.Reason)}",
+            _ => $"Winner: {result.Winner} ({FormatReason(result.Reason)})"
+        };
+    }
+
+    private string FormatReason(GameEndReason reason) => reason switch
+    {
+        GameEndReason.Stalemate => "Stalemate",
+        GameEndReason.FiftyMovesRule => "50-move rule",
+        GameEndReason.InsufficientMaterial => "Insufficient Material",
+        GameEndReason.ThreefoldRepetition => "Threefold Repetition",
+        _ => reason.ToString()
+    };
+
     private bool IsInsufficientMaterial(Board board)
     {
         var pieces = board.GetAllPiecesWithPosition().ToList();

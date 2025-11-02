@@ -269,21 +269,6 @@ public partial class MainWindow : Window
             LastMoveText.Text = "-";
     }
 
-    private void OnGameEnded(Result? result)
-    {
-        string message = "Game in progress...";
-
-        if (result == null)
-        {
-            GameStatusText.Text = message;
-            return;
-        }
-
-        if (result.Winner == Player.None)
-            message = $"Draw: {result.Reason}";
-        else
-            message = $"Winner: {result.Winner} ({result.Reason})";
-
-        GameStatusText.Text = message;
-    }
+    private void OnGameEnded(Result? result) =>
+        GameStatusText.Text = _gameState.Services.Evaluator.ToDisplayString(result);
 }
