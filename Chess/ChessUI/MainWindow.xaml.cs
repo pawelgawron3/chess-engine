@@ -19,11 +19,14 @@ public partial class MainWindow : Window
     private Move _pendingPromotionMove;
     private bool _isAwaitingPromotion = false;
 
+    private const int _squareSize = 75;
+
     public MainWindow()
     {
         InitializeComponent();
         DrawBoard();
         SetCursor(_gameState.CurrentPlayer);
+
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
         _gameState.MoveMade += OnMoveMade;
         _gameState.OnGameEnded += OnGameEnded;
@@ -33,30 +36,33 @@ public partial class MainWindow : Window
     {
         PiecesLayer.Children.Clear();
 
-        const int squareSize = 75;
-
         for (int row = 0; row < 8; row++)
         {
             for (int col = 0; col < 8; col++)
             {
                 Piece? piece = _gameState.Board[row, col];
+                if (piece == null) continue;
 
-                if (piece != null)
+                var img = new Image
                 {
-                    var img = new Image
-                    {
-                        Width = squareSize,
-                        Height = squareSize,
-                        Source = new BitmapImage(new Uri($"/Assets/Images/{piece.Type}{(piece.Owner == Player.White ? "W" : "B")}.png", UriKind.Relative))
-                    };
+                    Width = _squareSize,
+                    Height = _squareSize,
+                    Source = new BitmapImage(new Uri($"/Assets/Images/{piece.Type}{(piece.Owner == Player.White ? "W" : "B")}.png", UriKind.Relative))
+                };
 
-                    Canvas.SetLeft(img, col * squareSize);
-                    Canvas.SetTop(img, row * squareSize);
-
-                    PiecesLayer.Children.Add(img);
-                }
+                Canvas.SetLeft(img, col * _squareSize);
+                Canvas.SetTop(img, row * _squareSize);
+                PiecesLayer.Children.Add(img);
             }
         }
+    }
+
+    private void RefreshUI()
+    {
+        DrawBoard();
+        ClearHighlights();
+        SetCursor(_gameState.CurrentPlayer);
+        UpdateGameInfo();
     }
 
     private void BoardGrid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -78,6 +84,75 @@ public partial class MainWindow : Window
         return new Position(row, col);
     }
 
+    private void HandleBoardClick(Position pos)
+    {
+        if (_gameState.SelectedPosition == null)
+            TrySelectPiece(pos);
+        else
+            TryMakeMove(pos);
+    }
+
+    private void TrySelectPiece(Position pos)
+    {
+        Piece? piece = _gameState.Board[pos];
+        if (piece != null && piece.Owner == _gameState.CurrentPlayer)
+        {
+            _gameState.SelectPosition(pos);
+            HighlightMovesForSelectedPiece();
+        }
+    }
+
+    private void TryMakeMove(Position pos)
+    {
+        Move move = _gameState.GetLegalMovesForPiece()
+                              .FirstOrDefault(m => m.To.Equals(pos));
+
+        if (move.Equals(default(Move)))
+        {
+            _gameState.ClearSelection();
+            ClearHighlights();
+            return;
+        }
+
+        if (move.Type == MoveType.Promotion)
+        {
+            _pendingPromotionMove = move;
+            _isAwaitingPromotion = true;
+
+            Piece piece = _gameState.Board[move.From]!;
+            PromotionMenu.ShowForPlayer(piece.Owner);
+            return;
+        }
+
+        if (_gameState.TryMakeMove(move))
+            RefreshUI();
+        else
+        {
+            _gameState.ClearSelection();
+            ClearHighlights();
+        }
+    }
+
+    private void HidePromotionMenu() => PromotionMenu.Visibility = Visibility.Collapsed;
+
+    private void OnPromotionPieceSelected(PieceType selectedPiece)
+    {
+        Move promotionMove = new Move(
+            _pendingPromotionMove.From,
+            _pendingPromotionMove.To,
+            MoveType.Promotion,
+            selectedPiece
+        );
+
+        if (_gameState.TryMakeMove(promotionMove))
+        {
+            _isAwaitingPromotion = false;
+            RefreshUI();
+        }
+
+        HidePromotionMenu();
+    }
+
     private void HighlightMovesForSelectedPiece()
     {
         ClearHighlights();
@@ -86,11 +161,9 @@ public partial class MainWindow : Window
         HighlightSelectedSquare();
 
         var moves = _gameState.GetLegalMovesForPiece()
-            .GroupBy(m => m.To)
-            .Select(g => g.First())
-            .ToList();
-
-        const int squareSize = 75;
+                              .GroupBy(m => m.To)
+                              .Select(g => g.First())
+                              .ToList();
 
         foreach (var move in moves)
         {
@@ -113,17 +186,16 @@ public partial class MainWindow : Window
                     IsHitTestVisible = false
                 };
 
-                Canvas.SetLeft(ellipse, move.To.Column * squareSize + (squareSize - ellipse.Width) / 2);
-                Canvas.SetTop(ellipse, move.To.Row * squareSize + (squareSize - ellipse.Height) / 2);
-
+                Canvas.SetLeft(ellipse, move.To.Column * _squareSize + (_squareSize - ellipse.Width) / 2);
+                Canvas.SetTop(ellipse, move.To.Row * _squareSize + (_squareSize - ellipse.Height) / 2);
                 HighlightLayer.Children.Add(ellipse);
             }
             else
             {
                 Ellipse ring = new Ellipse
                 {
-                    Width = squareSize - 6,
-                    Height = squareSize - 6,
+                    Width = _squareSize - 6,
+                    Height = _squareSize - 6,
                     Stroke = new SolidColorBrush(Color.FromArgb(180, 120, 120, 120)),
                     StrokeThickness = 6,
                     Fill = Brushes.Transparent,
@@ -137,94 +209,43 @@ public partial class MainWindow : Window
                     IsHitTestVisible = false
                 };
 
-                Canvas.SetLeft(ring, move.To.Column * squareSize + 2);
-                Canvas.SetTop(ring, move.To.Row * squareSize + 2);
-
+                Canvas.SetLeft(ring, move.To.Column * _squareSize + 2);
+                Canvas.SetTop(ring, move.To.Row * _squareSize + 2);
                 HighlightLayer.Children.Add(ring);
             }
         }
-    }
-
-    private void ClearHighlights()
-    {
-        HighlightLayer.Children.Clear();
     }
 
     private void HighlightSelectedSquare()
     {
         if (_gameState.SelectedPosition == null) return;
 
-        const int squareSize = 75;
         Position pos = _gameState.SelectedPosition.Value;
 
         Rectangle rect = new Rectangle()
         {
-            Width = squareSize,
-            Height = squareSize,
+            Width = _squareSize,
+            Height = _squareSize,
             Fill = new SolidColorBrush(Color.FromArgb(90, 0, 255, 0)),
             IsHitTestVisible = false
         };
 
-        Canvas.SetLeft(rect, pos.Column * squareSize);
-        Canvas.SetTop(rect, pos.Row * squareSize);
-
+        Canvas.SetLeft(rect, pos.Column * _squareSize);
+        Canvas.SetTop(rect, pos.Row * _squareSize);
         HighlightLayer.Children.Add(rect);
     }
 
-    private void HandleBoardClick(Position pos)
+    private void ClearHighlights() => HighlightLayer.Children.Clear();
+
+    private void UpdateGameInfo()
     {
-        if (_gameState.SelectedPosition == null)
-        {
-            TrySelectPiece(pos);
-        }
+        if (_gameState.CurrentPlayer == Player.Black)
+            MoveCountText.Text = _gameState.Services.FullMoveCounter.ToString();
+
+        if (_gameState.Services.History.MoveHistory.Count > 0)
+            LastMoveText.Text = UI_Utils.ReturnChessNotation(_gameState.Services.History.MoveHistory.Last());
         else
-        {
-            TryMakeMove(pos);
-        }
-    }
-
-    private void TrySelectPiece(Position pos)
-    {
-        Piece? piece = _gameState.Board[pos];
-        if (piece != null && piece.Owner == _gameState.CurrentPlayer)
-        {
-            _gameState.SelectPosition(pos);
-            HighlightMovesForSelectedPiece();
-        }
-    }
-
-    private void TryMakeMove(Position pos)
-    {
-        Move move = _gameState.GetLegalMovesForPiece()
-               .FirstOrDefault(m => m.To.Equals(pos));
-
-        if (move.Equals(default(Move)))
-        {
-            _gameState.ClearSelection();
-            ClearHighlights();
-            return;
-        }
-
-        if (move.Type == MoveType.Promotion)
-        {
-            _pendingPromotionMove = move;
-            _isAwaitingPromotion = true;
-            Piece piece = _gameState.Board[move.From]!;
-            PromotionMenu.ShowForPlayer(piece.Owner);
-            return;
-        }
-
-        if (_gameState.TryMakeMove(move))
-        {
-            ClearHighlights();
-            DrawBoard();
-            SetCursor(_gameState.CurrentPlayer);
-        }
-        else
-        {
-            _gameState.ClearSelection();
-            ClearHighlights();
-        }
+            LastMoveText.Text = "-";
     }
 
     private void SetCursor(Player player)
@@ -232,41 +253,10 @@ public partial class MainWindow : Window
         Cursor = (player == Player.White) ? ChessCursors.White : ChessCursors.Black;
     }
 
-    private void OnPromotionPieceSelected(PieceType selectedPiece)
-    {
-        Move promotionMove = new Move(
-            _pendingPromotionMove.From,
-            _pendingPromotionMove.To,
-            MoveType.Promotion,
-            selectedPiece
-        );
-
-        if (_gameState.TryMakeMove(promotionMove))
-        {
-            _isAwaitingPromotion = false;
-            ClearHighlights();
-            DrawBoard();
-            SetCursor(_gameState.CurrentPlayer);
-        }
-
-        PromotionMenu.Visibility = Visibility.Collapsed;
-    }
-
     private void OnMoveMade(MoveRecord lastMove)
     {
         ChessSounds.PlaySoundForMove(lastMove.Move, lastMove.CapturedPiece, lastMove.KingInCheck);
-
-        UpdateGameInfo(lastMove.Move);
-    }
-
-    private void UpdateGameInfo(Move move)
-    {
-        MoveCountText.Text = _gameState.Services.FullMoveCounter.ToString();
-
-        if (_gameState.Services.History.MoveHistory.Count > 0)
-            LastMoveText.Text = UI_Utils.ReturnChessNotation(_gameState.Services.History.MoveHistory.Last());
-        else
-            LastMoveText.Text = "-";
+        UpdateGameInfo();
     }
 
     private void OnGameEnded(Result? result) =>
