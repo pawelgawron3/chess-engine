@@ -13,7 +13,6 @@ public class MoveHistoryManager
 
         MoveRecord? last = MoveHistory[^1];
         MoveHistory.RemoveAt(MoveHistory.Count - 1);
-        board.UndoMove(last);
         return last;
     }
 }
