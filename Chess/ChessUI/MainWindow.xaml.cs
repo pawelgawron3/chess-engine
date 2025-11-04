@@ -256,7 +256,10 @@ public partial class MainWindow : Window
         if (_gameState.Services.History.MoveHistory.Count > 0)
             LastMoveText.Text = UI_Utils.ReturnChessNotation(_gameState.Services.History.MoveHistory.Last());
         else
+        {
             LastMoveText.Text = "-";
+            MoveCountText.Text = "0";
+        }
     }
 
     private void SetCursor(Player player)
