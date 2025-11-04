@@ -32,6 +32,17 @@ public partial class MainWindow : Window
         _gameState.OnGameEnded += OnGameEnded;
     }
 
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+
+        if (e.Key == Key.Left)
+        {
+            _gameState.TryUndoMove();
+            RefreshUI();
+        }
+    }
+
     private void DrawBoard()
     {
         PiecesLayer.Children.Clear();

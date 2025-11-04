@@ -39,6 +39,7 @@ public class GameServices
 
         var castlingBefore = Rules.CastlingRights;
         int? enPassantBefore = Rules.EnPassantFile;
+        ulong previousHash = Hasher.CurrentHash;
 
         Rules.UpdateCastlingRights(movedPiece, move);
         _state.Board.MakeMove(move);
@@ -50,7 +51,16 @@ public class GameServices
         Hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
 
         bool opponentKingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer.Opponent());
-        MoveRecord record = new MoveRecord(move, movedPiece, capturedPiece, HalfMoveClock, move.PromotionPiece, opponentKingInCheck);
+        MoveRecord record = new MoveRecord(
+            move,
+            movedPiece,
+            capturedPiece,
+            HalfMoveClock,
+            previousHash,
+            move.PromotionPiece,
+            opponentKingInCheck,
+            castlingBefore,
+            enPassantBefore);
 
         History.Add(record);
         _state.RaiseMoveMade(record);
@@ -70,9 +80,25 @@ public class GameServices
         MoveRecord? last = History.Undo(_state.Board);
         if (last == null) return;
 
-        HalfMoveClock = last.HalfMoveClockBefore;
+        _state.Board.UndoMove(last.Move, last.MovedPiece, last.CapturedPiece);
+
+        if (Hasher.PositionCounts.ContainsKey(Hasher.CurrentHash))
+        {
+            Hasher.PositionCounts[Hasher.CurrentHash]--;
+            if (Hasher.PositionCounts[Hasher.CurrentHash] <= 0)
+                Hasher.PositionCounts.Remove(Hasher.CurrentHash);
+        }
+
+        Hasher.CurrentHash = last.PreviousHash;
+
+        if (last.CastlingRightsBefore != null)
+            Rules.CastlingRights = last.CastlingRightsBefore;
+        Rules.EnPassantFile = last.EnPassantFileBefore;
+
+        RevertClocks(last.HalfMoveClockBefore);
         SwitchPlayer();
         _state.GameResult = null;
+        _state.RaiseMoveMade(last);
     }
 
     private void SwitchPlayer() => _state.CurrentPlayer = _state.CurrentPlayer.Opponent();
@@ -85,5 +111,13 @@ public class GameServices
 
         if (_state.CurrentPlayer == Player.Black)
             FullMoveCounter++;
+    }
+
+    private void RevertClocks(int halfMoveClockBefore)
+    {
+        HalfMoveClock = halfMoveClockBefore;
+
+        if (_state.CurrentPlayer == Player.White && FullMoveCounter >= 1)
+            FullMoveCounter--;
     }
 }

@@ -112,27 +112,27 @@ public class Board
     /// <summary>
     /// Reverts a move previously made on the board, restoring the pieces to their original positions.
     /// </summary>
-    public void UndoMove(MoveRecord last)
+    public void UndoMove(Move move, Piece movedPiece, Piece? capturedPiece)
     {
-        switch (last.Move.Type)
+        switch (move.Type)
         {
             case MoveType.Normal:
-                this[last.Move.From] = last.MovedPiece.Clone();
-                this[last.Move.To] = last.CapturedPiece?.Clone();
+                this[move.From] = movedPiece.Clone();
+                this[move.To] = capturedPiece?.Clone();
                 break;
 
             case MoveType.EnPassant:
-                this[last.Move.From] = last.MovedPiece.Clone();
-                this[last.Move.To] = null;
-                this[last.Move.From.Row, last.Move.To.Column] = last.CapturedPiece!.Clone();
+                this[move.From] = movedPiece.Clone();
+                this[move.To] = null;
+                this[move.From.Row, move.To.Column] = capturedPiece!.Clone();
                 break;
 
             case MoveType.Castling:
-                int fromRow = last.Move.From.Row;
-                int toCol = last.Move.To.Column;
+                int fromRow = move.From.Row;
+                int toCol = move.To.Column;
 
-                this[last.Move.From] = last.MovedPiece.Clone();
-                this[last.Move.To] = null;
+                this[move.From] = movedPiece.Clone();
+                this[move.To] = null;
 
                 if (toCol == 6)
                 {
@@ -147,8 +147,8 @@ public class Board
                 break;
 
             case MoveType.Promotion:
-                this[last.Move.From] = last.MovedPiece?.Clone();
-                this[last.Move.To] = last.CapturedPiece?.Clone();
+                this[move.From] = movedPiece?.Clone();
+                this[move.To] = capturedPiece?.Clone();
                 break;
         }
     }

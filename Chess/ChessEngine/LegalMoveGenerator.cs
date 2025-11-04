@@ -46,10 +46,8 @@ public static class LegalMoveGenerator
         Piece? capturedPiece = GetCapturedPiece(state.Board, move);
 
         state.Board.MakeMove(move);
-
         bool kingInCheck = IsKingInCheck(state.Board, state.CurrentPlayer);
-
-        state.Board.UndoMove(new MoveRecord(move, movedPiece, capturedPiece, 0));
+        state.Board.UndoMove(move, movedPiece, capturedPiece);
 
         return !kingInCheck;
     }
