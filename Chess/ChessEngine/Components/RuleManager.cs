@@ -2,9 +2,9 @@
 
 public class RuleManager
 {
-    public int? EnPassantFile { get; private set; }
+    public int? EnPassantFile { get; internal set; }
 
-    public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; private set; }
+    public Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> CastlingRights { get; internal set; }
 
     public RuleManager(Dictionary<Player, (bool, bool, bool)> castlingRights)
     {

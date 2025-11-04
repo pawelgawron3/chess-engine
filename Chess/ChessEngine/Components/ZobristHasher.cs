@@ -2,7 +2,7 @@
 
 public class ZobristHasher
 {
-    public ulong CurrentHash { get; private set; }
+    public ulong CurrentHash { get; internal set; }
     public Dictionary<ulong, int> PositionCounts { get; } = new();
 
     private readonly Board _board;
