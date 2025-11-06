@@ -14,6 +14,14 @@ public class Evaluator : IEvaluationFunction
 
     public int Evaluate(GameState state)
     {
-        throw new NotImplementedException();
+        int score = 0;
+
+        foreach (var (piece, pos) in state.Board.GetAllPiecesWithPosition())
+        {
+            int value = _pieceValues[piece.Type];
+            score += (int)piece.Owner * value;
+        }
+
+        return score;
     }
 }
