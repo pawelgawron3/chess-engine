@@ -6,6 +6,7 @@ using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ChessEngine;
+using ChessEngine.AI;
 
 namespace ChessUI;
 
@@ -74,6 +75,32 @@ public partial class MainWindow : Window
         ClearHighlights();
         SetCursor(_gameState.CurrentPlayer);
         UpdateGameInfo();
+    }
+
+    private void AiMoveButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            AiMoveButton.IsEnabled = false;
+
+            Evaluator evaluator = new Evaluator();
+            Negamax engine = new Negamax(evaluator);
+
+            var (bestMove, score) = engine.Search(_gameState, 3);
+            if (bestMove != null)
+            {
+                _gameState.TryMakeMove(bestMove.Value);
+                RefreshUI();
+            }
+            else
+            {
+                MessageBox.Show("No legal moves found for AI", "AI Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        finally
+        {
+            AiMoveButton.IsEnabled = true;
+        }
     }
 
     private void BoardGrid_MouseDown(object sender, MouseButtonEventArgs e)
