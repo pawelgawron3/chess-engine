@@ -10,6 +10,7 @@ public class GameServices
     public GameResultEvaluator Evaluator { get; }
     public int HalfMoveClock { get; private set; } = 0;
     public int FullMoveCounter { get; private set; } = 1;
+    public bool SimulationMode { get; set; } = false;
 
     private readonly GameState _state;
 
@@ -60,17 +61,20 @@ public class GameServices
             move.PromotionPiece,
             opponentKingInCheck,
             castlingBefore,
-            enPassantBefore);
+            enPassantBefore
+        );
 
         History.Add(record);
-        _state.RaiseMoveMade(record);
-
         UpdateClocks(movedPiece, capturedPiece);
         SwitchPlayer();
-        _state.ClearSelection();
 
-        _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
-        _state.RaiseGameEnded(_state.GameResult);
+        if (!SimulationMode)
+        {
+            _state.ClearSelection();
+            _state.RaiseMoveMade(record);
+            _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
+            _state.RaiseGameEnded(_state.GameResult);
+        }
 
         return true;
     }
@@ -90,15 +94,17 @@ public class GameServices
         }
 
         Hasher.CurrentHash = last.PreviousHash;
-
-        if (last.CastlingRightsBefore != null)
-            Rules.CastlingRights = last.CastlingRightsBefore;
+        Rules.CastlingRights = last.CastlingRightsBefore!;
         Rules.EnPassantFile = last.EnPassantFileBefore;
 
         RevertClocks(last.HalfMoveClockBefore);
         SwitchPlayer();
-        _state.GameResult = null;
-        _state.RaiseMoveMade(last);
+
+        if (!SimulationMode)
+        {
+            _state.GameResult = null;
+            _state.RaiseMoveMade(last);
+        }
     }
 
     private void SwitchPlayer() => _state.CurrentPlayer = _state.CurrentPlayer.Opponent();

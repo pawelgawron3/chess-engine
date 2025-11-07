@@ -11,6 +11,8 @@ public class Negamax
 
     public (Move? BestMove, int Score) Search(GameState state, int depth)
     {
+        state.Services.SimulationMode = true;
+
         int bestScore = int.MinValue;
         Move? bestMove = null;
 
@@ -27,6 +29,7 @@ public class Negamax
             }
         }
 
+        state.Services.SimulationMode = false;
         return (bestMove, bestScore);
     }
 
