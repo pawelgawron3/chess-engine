@@ -1,4 +1,4 @@
-﻿namespace ChessEngine;
+﻿namespace ChessEngine.Components;
 
 public static class Zobrist
 {
