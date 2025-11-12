@@ -176,7 +176,7 @@ public static class PseudoLegalMoveGenerator
     }
 
     private static IEnumerable<Move> GeneratePseudoLegalKingMoves(MoveContext ctx,
-        Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> castlingRights)
+        CastlingRights castlingRights)
     {
         var (board, pos, piece) = ctx;
 
@@ -204,9 +204,11 @@ public static class PseudoLegalMoveGenerator
         int row = (piece.Owner == Player.White) ? 7 : 0;
         Player player = piece.Owner;
 
-        if (!castlingRights[player].KingMoved)
+        var rights = player == Player.White ? castlingRights.White : castlingRights.Black;
+
+        if (!rights.KingMoved)
         {
-            if (!castlingRights[player].RookHMoved &&
+            if (!rights.RookHMoved &&
                 board[row, 5] == null && board[row, 6] == null &&
                 !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
                 !IsSquareAttacked(board, new Position(row, 5), player.Opponent()) &&
@@ -215,7 +217,7 @@ public static class PseudoLegalMoveGenerator
                 yield return new Move(pos, new Position(row, 6), MoveType.Castling);
             }
 
-            if (!castlingRights[player].RookAMoved &&
+            if (!rights.RookAMoved &&
                 board[row, 1] == null && board[row, 2] == null && board[row, 3] == null &&
                 !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
                 !IsSquareAttacked(board, new Position(row, 3), player.Opponent()) &&
@@ -261,7 +263,7 @@ public static class PseudoLegalMoveGenerator
 
     private static IEnumerable<Move> GenerateMovesFor(MoveContext ctx,
         int? enPassantFile,
-        Dictionary<Player, (bool, bool, bool)> castlingRights)
+        CastlingRights castlingRights)
     {
         return ctx.Piece.Type switch
         {

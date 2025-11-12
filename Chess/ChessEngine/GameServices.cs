@@ -18,11 +18,7 @@ public class GameServices
     {
         _state = state;
 
-        var castlingRights = new Dictionary<Player, (bool, bool, bool)>
-        {
-            {Player.White, (false, false, false)},
-            {Player.Black, (false, false, false)},
-        };
+        var castlingRights = new CastlingRights((false, false, false), (false, false, false));
 
         Rules = new RuleManager(castlingRights);
         History = new MoveHistoryManager();
@@ -38,7 +34,7 @@ public class GameServices
         Piece movedPiece = _state.Board[move.From]!;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
 
-        var castlingBefore = Rules.CastlingRights;
+        var castlingBefore = Rules.CastlingRights.Clone();
         int? enPassantBefore = Rules.EnPassantFile;
         ulong previousHash = Hasher.CurrentHash;
 
@@ -46,7 +42,7 @@ public class GameServices
         _state.Board.MakeMove(move);
         Rules.UpdateEnPassantFile(move, movedPiece);
 
-        var castlingAfter = Rules.CastlingRights;
+        var castlingAfter = Rules.CastlingRights.Clone();
         int? enPassantAfter = Rules.EnPassantFile;
 
         Hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
@@ -58,9 +54,9 @@ public class GameServices
             capturedPiece,
             HalfMoveClock,
             previousHash,
+            castlingBefore,
             move.PromotionPiece,
             opponentKingInCheck,
-            castlingBefore,
             enPassantBefore
         );
 

@@ -7,12 +7,12 @@ public class ZobristHasher
 
     private readonly Board _board;
     private readonly Func<Player> _getCurrentPlayer;
-    private readonly Func<Dictionary<Player, (bool, bool, bool)>> _getCastlingRights;
+    private readonly Func<CastlingRights> _getCastlingRights;
     private readonly Func<int?> _getEnPassantFile;
 
     public ZobristHasher(Board board,
                          Func<Player> getCurrentPlayer,
-                         Func<Dictionary<Player, (bool, bool, bool)>> getCastlingRights,
+                         Func<CastlingRights> getCastlingRights,
                          Func<int?> getEnPassantFile)
     {
         _board = board;
@@ -29,8 +29,8 @@ public class ZobristHasher
         Piece? capturedPiece,
         int? previousEnPassantFile,
         int? newEnPassantFile,
-        Dictionary<Player, (bool, bool, bool)> castlingBefore,
-        Dictionary<Player, (bool, bool, bool)> castlingAfter)
+        CastlingRights castlingBefore,
+        CastlingRights castlingAfter)
     {
         int playerIndex = movedPiece.Owner == Player.White ? 0 : 1;
         int pieceIndex = (int)movedPiece.Type;
@@ -75,20 +75,30 @@ public class ZobristHasher
             PositionCounts[CurrentHash] = 1;
     }
 
-    private static ulong ComputeCastlingRightsHash(Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)> rights)
+    private static ulong ComputeCastlingRightsHash(CastlingRights rights)
     {
         ulong hash = 0;
 
-        foreach (var kv in rights)
-        {
-            int playerIndex = kv.Key == Player.White ? 0 : 1;
-            var (kingMoved, rookAMoved, rookHMoved) = kv.Value;
+        if (!rights.White.KingMoved && !rights.White.RookAMoved)
+            hash ^= Zobrist.CastlingKeys[0, 0];
+        if (!rights.White.KingMoved && !rights.White.RookHMoved)
+            hash ^= Zobrist.CastlingKeys[0, 1];
 
-            if (!kingMoved && !rookAMoved)
-                hash ^= Zobrist.CastlingKeys[playerIndex, 0];
-            if (!kingMoved && !rookHMoved)
-                hash ^= Zobrist.CastlingKeys[playerIndex, 1];
-        }
+        if (!rights.Black.KingMoved && !rights.Black.RookAMoved)
+            hash ^= Zobrist.CastlingKeys[1, 0];
+        if (!rights.Black.KingMoved && !rights.Black.RookHMoved)
+            hash ^= Zobrist.CastlingKeys[1, 1];
+
+        //foreach (var kv in rights)
+        //{
+        //    int playerIndex = kv.Key == Player.White ? 0 : 1;
+        //    var (kingMoved, rookAMoved, rookHMoved) = kv.Value;
+
+        //    if (!kingMoved && !rookAMoved)
+        //        hash ^= Zobrist.CastlingKeys[playerIndex, 0];
+        //    if (!kingMoved && !rookHMoved)
+        //        hash ^= Zobrist.CastlingKeys[playerIndex, 1];
+        //}
 
         return hash;
     }
@@ -112,16 +122,18 @@ public class ZobristHasher
             }
         }
 
-        foreach (var kv in _getCastlingRights())
-        {
-            int playerIndex = kv.Key == Player.White ? 0 : 1;
-            var (king_moved, rookA_moved, rookH_moved) = kv.Value;
+        hash ^= ComputeCastlingRightsHash(_getCastlingRights());
 
-            if (!king_moved && !rookA_moved)
-                hash ^= Zobrist.CastlingKeys[playerIndex, 0];
-            if (!king_moved && !rookH_moved)
-                hash ^= Zobrist.CastlingKeys[playerIndex, 1];
-        }
+        //foreach (var kv in _getCastlingRights())
+        //{
+        //    int playerIndex = kv.Key == Player.White ? 0 : 1;
+        //    var (king_moved, rookA_moved, rookH_moved) = kv.Value;
+
+        //    if (!king_moved && !rookA_moved)
+        //        hash ^= Zobrist.CastlingKeys[playerIndex, 0];
+        //    if (!king_moved && !rookH_moved)
+        //        hash ^= Zobrist.CastlingKeys[playerIndex, 1];
+        //}
 
         if (_getEnPassantFile() is int file)
             hash ^= Zobrist.EnPassantKeys[file];

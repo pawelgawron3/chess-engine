@@ -5,8 +5,8 @@ public record MoveRecord(
     Piece? CapturedPiece,
     int HalfMoveClockBefore,
     ulong PreviousHash,
+    CastlingRights CastlingRightsBefore,
     PieceType? PromotedPieceType = null,
     bool KingInCheck = false,
-    Dictionary<Player, (bool KingMoved, bool RookAMoved, bool RookHMoved)>? CastlingRightsBefore = null,
     int? EnPassantFileBefore = null
 );
