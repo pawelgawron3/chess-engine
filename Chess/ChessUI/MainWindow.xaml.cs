@@ -29,7 +29,7 @@ public partial class MainWindow : Window
         SetCursor(_gameState.CurrentPlayer);
 
         PromotionMenu.PieceSelected += OnPromotionPieceSelected;
-        _gameState.MoveMade += OnMoveMade;
+        _gameState.OnMoveMade += OnMoveMade;
         _gameState.OnGameEnded += OnGameEnded;
     }
 

@@ -8,11 +8,11 @@ public class GameState
     public Result? GameResult { get; internal set; }
     public GameServices Services { get; }
 
-    public event Action<MoveRecord>? MoveMade;
+    public event Action<MoveRecord>? OnMoveMade;
 
     public event Action<Result?>? OnGameEnded;
 
-    internal void RaiseMoveMade(MoveRecord record) => MoveMade?.Invoke(record);
+    internal void RaiseMoveMade(MoveRecord record) => OnMoveMade?.Invoke(record);
 
     internal void RaiseGameEnded(Result? result) => OnGameEnded?.Invoke(result);
 
