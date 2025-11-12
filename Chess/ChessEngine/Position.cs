@@ -22,6 +22,4 @@ public readonly struct Position
     public static bool operator ==(Position a, Position b) => a.Equals(b);
 
     public static bool operator !=(Position a, Position b) => !a.Equals(b);
-
-    public override string ToString() => $"({Row},{Column})";
 }
