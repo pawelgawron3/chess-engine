@@ -301,6 +301,6 @@ public partial class MainWindow : Window
         UpdateGameInfo();
     }
 
-    private void OnGameEnded(Result? result) =>
+    private void OnGameEnded(GameResult? result) =>
         GameStatusText.Text = _gameState.Services.Evaluator.ToDisplayString(result);
 }

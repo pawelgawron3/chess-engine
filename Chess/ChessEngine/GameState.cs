@@ -8,16 +8,16 @@ public class GameState
     public Board Board { get; }
     public Player CurrentPlayer { get; internal set; } = Player.White;
     public Position? SelectedPosition { get; private set; }
-    public Result? GameResult { get; internal set; }
+    public GameResult? GameResult { get; internal set; }
     public GameServices Services { get; }
 
     public event Action<MoveRecord>? OnMoveMade;
 
-    public event Action<Result?>? OnGameEnded;
+    public event Action<GameResult?>? OnGameEnded;
 
     internal void RaiseMoveMade(MoveRecord record) => OnMoveMade?.Invoke(record);
 
-    internal void RaiseGameEnded(Result? result) => OnGameEnded?.Invoke(result);
+    internal void RaiseGameEnded(GameResult? result) => OnGameEnded?.Invoke(result);
 
     public GameState()
     {

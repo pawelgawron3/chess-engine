@@ -11,27 +11,27 @@ public class GameResultEvaluator
         _state = state;
     }
 
-    public Result? Evaluate(ulong currentHash, Dictionary<ulong, int> positions, int halfMoveClock)
+    public GameResult? Evaluate(ulong currentHash, Dictionary<ulong, int> positions, int halfMoveClock)
     {
         if (positions.TryGetValue(currentHash, out int count) && count >= 3)
-            return Result.Draw(GameEndReason.ThreefoldRepetition);
+            return GameResult.Draw(GameEndReason.ThreefoldRepetition);
 
         if (halfMoveClock >= 100)
-            return Result.Draw(GameEndReason.FiftyMovesRule);
+            return GameResult.Draw(GameEndReason.FiftyMovesRule);
 
         if (IsInsufficientMaterial(_state.Board))
-            return Result.Draw(GameEndReason.InsufficientMaterial);
+            return GameResult.Draw(GameEndReason.InsufficientMaterial);
 
         if (_state.GetLegalMoves().Any())
             return null;
 
         bool kingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer);
         return kingInCheck
-            ? Result.Win(_state.CurrentPlayer.Opponent())
-            : Result.Draw(GameEndReason.Stalemate);
+            ? GameResult.Win(_state.CurrentPlayer.Opponent())
+            : GameResult.Draw(GameEndReason.Stalemate);
     }
 
-    public string ToDisplayString(Result? result)
+    public string ToDisplayString(GameResult? result)
     {
         if (result == null)
             return "Game in progress...";
