@@ -10,6 +10,7 @@ using ChessEngine.AI;
 using ChessEngine.Chessboard;
 using ChessEngine.Components;
 using ChessEngine.Game;
+using ChessEngine.Utils;
 
 namespace ChessUI;
 

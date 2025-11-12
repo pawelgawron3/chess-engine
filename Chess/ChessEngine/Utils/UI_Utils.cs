@@ -1,6 +1,6 @@
 ﻿using ChessEngine.Chessboard;
 
-namespace ChessEngine;
+namespace ChessEngine.Utils;
 
 public static class UI_Utils
 {
@@ -12,7 +12,7 @@ public static class UI_Utils
 
         if (move.Type == MoveType.Castling)
         {
-            return (move.To.Column == 6) ? "O-O" : "O-O-O";
+            return move.To.Column == 6 ? "O-O" : "O-O-O";
         }
 
         string pieceLetter = GetPieceLetter(pieceType);

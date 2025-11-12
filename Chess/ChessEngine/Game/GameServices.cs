@@ -1,10 +1,9 @@
 ﻿using ChessEngine.Chessboard;
 using ChessEngine.Components;
-using ChessEngine.Game;
 using ChessEngine.MoveGeneration;
 using ChessEngine.Utils;
 
-namespace ChessEngine;
+namespace ChessEngine.Game;
 
 public class GameServices
 {
