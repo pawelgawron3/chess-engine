@@ -1,4 +1,4 @@
-﻿namespace ChessEngine;
+﻿namespace ChessEngine.Utils;
 
 /// <summary>
 /// Checks whether the position is inside the standard 8x8 chessboard.

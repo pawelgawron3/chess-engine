@@ -1,4 +1,4 @@
-﻿using static ChessEngine.PositionUtils;
+﻿using static ChessEngine.Utils.PositionUtils;
 
 namespace ChessEngine;
 

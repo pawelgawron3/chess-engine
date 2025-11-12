@@ -1,5 +1,5 @@
-﻿using static ChessEngine.AttackUtils;
-using static ChessEngine.PositionUtils;
+﻿using static ChessEngine.Utils.AttackUtils;
+using static ChessEngine.Utils.PositionUtils;
 
 namespace ChessEngine;
 

@@ -1,4 +1,6 @@
-﻿namespace ChessEngine.Components;
+﻿using ChessEngine.Utils;
+
+namespace ChessEngine.Components;
 
 public class GameResultEvaluator
 {

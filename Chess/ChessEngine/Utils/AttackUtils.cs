@@ -1,6 +1,6 @@
-﻿using static ChessEngine.PositionUtils;
+﻿using static ChessEngine.Utils.PositionUtils;
 
-namespace ChessEngine;
+namespace ChessEngine.Utils;
 
 public static class AttackUtils
 {
@@ -31,7 +31,7 @@ public static class AttackUtils
     {
         if (!IsInside(square)) return false;
 
-        int pawnDir = (attacker == Player.White) ? -1 : 1;
+        int pawnDir = attacker == Player.White ? -1 : 1;
         Position[] pawnTargets =
         {
             new Position(square.Row - pawnDir, square.Column - 1),
