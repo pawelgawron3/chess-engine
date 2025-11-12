@@ -89,17 +89,6 @@ public class ZobristHasher
         if (!rights.Black.KingMoved && !rights.Black.RookHMoved)
             hash ^= Zobrist.CastlingKeys[1, 1];
 
-        //foreach (var kv in rights)
-        //{
-        //    int playerIndex = kv.Key == Player.White ? 0 : 1;
-        //    var (kingMoved, rookAMoved, rookHMoved) = kv.Value;
-
-        //    if (!kingMoved && !rookAMoved)
-        //        hash ^= Zobrist.CastlingKeys[playerIndex, 0];
-        //    if (!kingMoved && !rookHMoved)
-        //        hash ^= Zobrist.CastlingKeys[playerIndex, 1];
-        //}
-
         return hash;
     }
 
@@ -123,17 +112,6 @@ public class ZobristHasher
         }
 
         hash ^= ComputeCastlingRightsHash(_getCastlingRights());
-
-        //foreach (var kv in _getCastlingRights())
-        //{
-        //    int playerIndex = kv.Key == Player.White ? 0 : 1;
-        //    var (king_moved, rookA_moved, rookH_moved) = kv.Value;
-
-        //    if (!king_moved && !rookA_moved)
-        //        hash ^= Zobrist.CastlingKeys[playerIndex, 0];
-        //    if (!king_moved && !rookH_moved)
-        //        hash ^= Zobrist.CastlingKeys[playerIndex, 1];
-        //}
 
         if (_getEnPassantFile() is int file)
             hash ^= Zobrist.EnPassantKeys[file];
