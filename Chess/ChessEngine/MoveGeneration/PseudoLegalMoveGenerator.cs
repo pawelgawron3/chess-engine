@@ -1,7 +1,7 @@
 ﻿using static ChessEngine.Utils.AttackUtils;
 using static ChessEngine.Utils.PositionUtils;
 
-namespace ChessEngine;
+namespace ChessEngine.MoveGeneration;
 
 public static class PseudoLegalMoveGenerator
 {
@@ -48,8 +48,8 @@ public static class PseudoLegalMoveGenerator
     private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(MoveContext ctx, int? enPassantFile)
     {
         var (board, pos, piece) = ctx;
-        int direction = (piece.Owner == Player.White) ? -1 : 1;
-        int promotionRow = (piece.Owner == Player.White) ? 0 : 7;
+        int direction = piece.Owner == Player.White ? -1 : 1;
+        int promotionRow = piece.Owner == Player.White ? 0 : 7;
 
         Position oneStep = new Position(pos.Row + direction, pos.Column);
         if (IsInside(oneStep) && board[oneStep] == null)
@@ -66,8 +66,8 @@ public static class PseudoLegalMoveGenerator
                 yield return new Move(pos, oneStep);
             }
 
-            int startRow = (piece.Owner == Player.White) ? 6 : 1;
-            Position twoStep = new Position(pos.Row + (2 * direction), pos.Column);
+            int startRow = piece.Owner == Player.White ? 6 : 1;
+            Position twoStep = new Position(pos.Row + 2 * direction, pos.Column);
             if (pos.Row == startRow && board[twoStep] == null)
                 yield return new Move(pos, twoStep);
         }
@@ -201,7 +201,7 @@ public static class PseudoLegalMoveGenerator
                 yield return new Move(pos, target);
         }
 
-        int row = (piece.Owner == Player.White) ? 7 : 0;
+        int row = piece.Owner == Player.White ? 7 : 0;
         Player player = piece.Owner;
 
         var rights = player == Player.White ? castlingRights.White : castlingRights.Black;

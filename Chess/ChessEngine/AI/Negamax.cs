@@ -1,4 +1,6 @@
-﻿namespace ChessEngine.AI;
+﻿using ChessEngine.MoveGeneration;
+
+namespace ChessEngine.AI;
 
 public class Negamax
 {

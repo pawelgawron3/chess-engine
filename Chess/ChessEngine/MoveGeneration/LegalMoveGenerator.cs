@@ -1,8 +1,8 @@
 ﻿using static ChessEngine.Utils.AttackUtils;
 using static ChessEngine.Utils.PositionUtils;
-using static ChessEngine.PseudoLegalMoveGenerator;
+using static ChessEngine.MoveGeneration.PseudoLegalMoveGenerator;
 
-namespace ChessEngine;
+namespace ChessEngine.MoveGeneration;
 
 public static class LegalMoveGenerator
 {

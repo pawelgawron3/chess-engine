@@ -1,4 +1,5 @@
 ﻿using ChessEngine.Components;
+using ChessEngine.MoveGeneration;
 using ChessEngine.Utils;
 
 namespace ChessEngine;
