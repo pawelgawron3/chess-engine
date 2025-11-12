@@ -1,4 +1,5 @@
-﻿using static ChessEngine.Utils.AttackUtils;
+﻿using ChessEngine.Game;
+using static ChessEngine.Utils.AttackUtils;
 using static ChessEngine.Utils.PositionUtils;
 
 namespace ChessEngine.MoveGeneration;

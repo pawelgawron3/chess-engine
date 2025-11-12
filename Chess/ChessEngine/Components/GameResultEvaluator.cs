@@ -1,4 +1,5 @@
-﻿using ChessEngine.Utils;
+﻿using ChessEngine.Game;
+using ChessEngine.Utils;
 
 namespace ChessEngine.Components;
 

@@ -1,4 +1,6 @@
-﻿namespace ChessEngine.AI;
+﻿using ChessEngine.Game;
+
+namespace ChessEngine.AI;
 
 public class Evaluator : IEvaluationFunction
 {

@@ -1,7 +1,7 @@
 ﻿using ChessEngine.Components;
 using ChessEngine.MoveGeneration;
 
-namespace ChessEngine;
+namespace ChessEngine.Game;
 
 public class GameState
 {
@@ -29,7 +29,7 @@ public class GameState
     public IEnumerable<Move> GetLegalMoves() => LegalMoveGenerator.GenerateLegalMoves(this);
 
     public IEnumerable<Move> GetLegalMovesForPiece() =>
-        (SelectedPosition != null) ? LegalMoveGenerator.GenerateLegalMovesForPiece(this) : Enumerable.Empty<Move>();
+        SelectedPosition != null ? LegalMoveGenerator.GenerateLegalMovesForPiece(this) : Enumerable.Empty<Move>();
 
     public void SelectPosition(Position pos) => SelectedPosition = pos;
 

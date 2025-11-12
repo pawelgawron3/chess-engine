@@ -1,6 +1,7 @@
 ﻿using static ChessEngine.Utils.AttackUtils;
 using static ChessEngine.Utils.PositionUtils;
 using static ChessEngine.MoveGeneration.PseudoLegalMoveGenerator;
+using ChessEngine.Game;
 
 namespace ChessEngine.MoveGeneration;
 

@@ -8,6 +8,7 @@ using System.Windows.Shapes;
 using ChessEngine;
 using ChessEngine.AI;
 using ChessEngine.Components;
+using ChessEngine.Game;
 
 namespace ChessUI;
 
