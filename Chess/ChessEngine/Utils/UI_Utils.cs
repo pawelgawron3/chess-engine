@@ -1,4 +1,6 @@
-﻿namespace ChessEngine;
+﻿using ChessEngine.Chessboard;
+
+namespace ChessEngine;
 
 public static class UI_Utils
 {

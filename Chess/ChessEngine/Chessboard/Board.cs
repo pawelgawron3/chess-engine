@@ -1,6 +1,6 @@
 ﻿using static ChessEngine.Utils.PositionUtils;
 
-namespace ChessEngine;
+namespace ChessEngine.Chessboard;
 
 /// <summary>
 /// Represents the chess board and manages the state of all squares and pieces.

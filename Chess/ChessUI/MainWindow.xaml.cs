@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ChessEngine;
 using ChessEngine.AI;
+using ChessEngine.Chessboard;
 using ChessEngine.Components;
 using ChessEngine.Game;
 

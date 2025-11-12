@@ -1,4 +1,4 @@
-﻿namespace ChessEngine;
+﻿namespace ChessEngine.Chessboard;
 
 public struct CastlingRights
 {

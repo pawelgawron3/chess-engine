@@ -1,4 +1,6 @@
-﻿namespace ChessEngine.Components;
+﻿using ChessEngine.Chessboard;
+
+namespace ChessEngine.Components;
 
 public class RuleManager
 {

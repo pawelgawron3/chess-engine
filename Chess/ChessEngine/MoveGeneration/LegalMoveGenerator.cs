@@ -2,6 +2,7 @@
 using static ChessEngine.Utils.PositionUtils;
 using static ChessEngine.MoveGeneration.PseudoLegalMoveGenerator;
 using ChessEngine.Game;
+using ChessEngine.Chessboard;
 
 namespace ChessEngine.MoveGeneration;
 

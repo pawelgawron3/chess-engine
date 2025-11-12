@@ -1,4 +1,5 @@
-﻿using ChessEngine.Game;
+﻿using ChessEngine.Chessboard;
+using ChessEngine.Game;
 using static ChessEngine.Utils.AttackUtils;
 using static ChessEngine.Utils.PositionUtils;
 

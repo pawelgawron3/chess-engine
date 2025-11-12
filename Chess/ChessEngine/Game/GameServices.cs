@@ -1,4 +1,5 @@
-﻿using ChessEngine.Components;
+﻿using ChessEngine.Chessboard;
+using ChessEngine.Components;
 using ChessEngine.Game;
 using ChessEngine.MoveGeneration;
 using ChessEngine.Utils;

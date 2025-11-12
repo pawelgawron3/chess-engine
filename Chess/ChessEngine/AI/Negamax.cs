@@ -1,4 +1,5 @@
-﻿using ChessEngine.Game;
+﻿using ChessEngine.Chessboard;
+using ChessEngine.Game;
 using ChessEngine.MoveGeneration;
 
 namespace ChessEngine.AI;

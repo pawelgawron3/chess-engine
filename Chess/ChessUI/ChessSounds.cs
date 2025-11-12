@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using System.Media;
-using ChessEngine;
+using ChessEngine.Chessboard;
 
 namespace ChessUI;
 

@@ -1,4 +1,4 @@
-﻿namespace ChessEngine;
+﻿namespace ChessEngine.Chessboard;
 
 /// <summary>
 /// Represents a position on the chessboard using zero-based coordinates.
