@@ -1,4 +1,6 @@
-﻿namespace ChessEngine;
+﻿using ChessEngine.Components;
+
+namespace ChessEngine;
 
 public class GameState
 {

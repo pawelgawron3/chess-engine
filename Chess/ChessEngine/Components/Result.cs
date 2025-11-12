@@ -1,4 +1,4 @@
-﻿namespace ChessEngine;
+﻿namespace ChessEngine.Components;
 
 /// <summary>
 /// Specifies the reason why a chess game ended.
