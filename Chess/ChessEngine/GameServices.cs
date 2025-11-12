@@ -34,7 +34,7 @@ public class GameServices
         Piece movedPiece = _state.Board[move.From]!;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
 
-        var castlingBefore = Rules.CastlingRights.Clone();
+        CastlingRights castlingBefore = Rules.CastlingRights.Clone();
         int? enPassantBefore = Rules.EnPassantFile;
         ulong previousHash = Hasher.CurrentHash;
 
@@ -90,7 +90,7 @@ public class GameServices
         }
 
         Hasher.CurrentHash = last.PreviousHash;
-        Rules.CastlingRights = last.CastlingRightsBefore!;
+        Rules.CastlingRights = last.CastlingRightsBefore;
         Rules.EnPassantFile = last.EnPassantFileBefore;
 
         RevertClocks(last.HalfMoveClockBefore);
