@@ -112,18 +112,16 @@ public static class PseudoLegalMoveGenerator
 
     private static IEnumerable<Move> GeneratePseudoLegalKnightMoves(Board board, Position pos, Piece piece)
     {
-        int[][] jumps =
-        [
-            [-2, -1], [-2, 1],
-            [-1, 2], [1, 2],
-            [2, 1], [2, -1],
-            [1, -2], [-1, -2],
-        ];
-
-        foreach (var jump in jumps)
+        (int dr, int dc)[] jumps =
         {
-            int row = pos.Row + jump[0];
-            int col = pos.Column + jump[1];
+            (-2, -1), (-2, 1), (-1, 2), (1, 2),
+            (2, 1), (2, -1), (1, -2), (-1, -2)
+        };
+
+        foreach (var (dr, dc) in jumps)
+        {
+            int row = pos.Row + dr;
+            int col = pos.Column + dc;
 
             if (!IsInside(row, col)) continue;
 
@@ -136,35 +134,35 @@ public static class PseudoLegalMoveGenerator
 
     private static IEnumerable<Move> GeneratePseudoLegalBishopMoves(Board board, Position pos, Piece piece)
     {
-        int[][] directions =
-        [
-            [-1, -1], [-1, 1],
-            [1, -1], [1, 1],
-        ];
+        (int dr, int dc)[] directions =
+        {
+            (-1, -1), (-1, 1),
+            (1, -1), (1, 1)
+        };
 
         return GenerateSlidingMoves(board, pos, piece, directions);
     }
 
     private static IEnumerable<Move> GeneratePseudoLegalRookMoves(Board board, Position pos, Piece piece)
     {
-        int[][] directions =
-        [
-            [-1, 0], [1, 0],
-            [0, -1], [0, 1],
-        ];
+        (int dr, int dc)[] directions =
+        {
+            (-1, 0), (1, 0),
+            (0, -1), (0, 1)
+        };
 
         return GenerateSlidingMoves(board, pos, piece, directions);
     }
 
     private static IEnumerable<Move> GeneratePseudoLegalQueenMoves(Board board, Position pos, Piece piece)
     {
-        int[][] directions =
-        [
-            [-1, 0], [1, 0],
-            [0, -1], [0, 1],
-            [-1, -1], [-1, 1],
-            [1, -1], [1, 1],
-        ];
+        (int dr, int dc)[] directions =
+        {
+            (-1, 0), (1, 0),
+            (0, -1), (0, 1),
+            (-1, -1), (-1 ,1),
+            (1, -1), (1, 1),
+        };
 
         return GenerateSlidingMoves(board, pos, piece, directions);
     }
@@ -218,12 +216,12 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GenerateSlidingMoves(Board board, Position pos, Piece piece, int[][] directions)
+    private static IEnumerable<Move> GenerateSlidingMoves(Board board, Position pos, Piece piece, (int, int)[] directions)
     {
-        foreach (var dir in directions)
+        foreach (var (dr, dc) in directions)
         {
-            int row = pos.Row + dir[0];
-            int col = pos.Column + dir[1];
+            int row = pos.Row + dr;
+            int col = pos.Column + dc;
 
             while (IsInside(row, col))
             {
@@ -241,8 +239,8 @@ public static class PseudoLegalMoveGenerator
                     break;
                 }
 
-                row += dir[0];
-                col += dir[1];
+                row += dr;
+                col += dc;
             }
         }
     }
