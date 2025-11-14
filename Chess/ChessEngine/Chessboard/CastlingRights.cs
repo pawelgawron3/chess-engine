@@ -9,6 +9,4 @@ public struct CastlingRights
     {
         White = white; Black = black;
     }
-
-    public CastlingRights Clone() => new(White, Black);
 }

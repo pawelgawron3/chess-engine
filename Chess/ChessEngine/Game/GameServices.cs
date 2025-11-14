@@ -37,7 +37,7 @@ public class GameServices
         Piece movedPiece = _state.Board[move.From]!;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
 
-        CastlingRights castlingBefore = Rules.CastlingRights.Clone();
+        CastlingRights castlingBefore = Rules.CastlingRights;
         int? enPassantBefore = Rules.EnPassantFile;
         ulong previousHash = Hasher.CurrentHash;
 
@@ -45,7 +45,7 @@ public class GameServices
         _state.Board.MakeMove(move);
         Rules.UpdateEnPassantFile(move, movedPiece);
 
-        var castlingAfter = Rules.CastlingRights.Clone();
+        var castlingAfter = Rules.CastlingRights;
         int? enPassantAfter = Rules.EnPassantFile;
 
         Hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
