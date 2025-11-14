@@ -17,43 +17,36 @@ public class Negamax
     {
         state.Services.SimulationMode = true;
 
-        int bestScore = int.MinValue;
         Move? bestMove = null;
-
-        foreach (var move in LegalMoveGenerator.GenerateLegalMoves(state))
-        {
-            state.TryMakeMove(move);
-            int score = -NegamaxSearch(state, depth - 1);
-            state.TryUndoMove();
-
-            if (score > bestScore)
-            {
-                bestScore = score;
-                bestMove = move;
-            }
-        }
+        int score = NegamaxSearch(state, depth, int.MinValue + 1, int.MaxValue - 1, true, ref bestMove);
 
         state.Services.SimulationMode = false;
-        return (bestMove, bestScore);
+        return (bestMove, score);
     }
 
-    private int NegamaxSearch(GameState state, int depth)
+    private int NegamaxSearch(GameState state, int depth, int alpha, int beta, bool isRootMove, ref Move? bestRootMove)
     {
         if (depth == 0 || state.GameResult != null)
             return _evaluator.Evaluate(state) * (int)state.CurrentPlayer;
 
-        int bestScore = int.MinValue;
-
         foreach (var move in LegalMoveGenerator.GenerateLegalMoves(state))
         {
             state.TryMakeMove(move);
-            int score = -NegamaxSearch(state, depth - 1);
+            int score = -NegamaxSearch(state, depth - 1, -beta, -alpha, false, ref bestRootMove);
             state.TryUndoMove();
 
-            if (score > bestScore)
-                bestScore = score;
+            if (score > alpha)
+            {
+                alpha = score;
+
+                if (isRootMove)
+                    bestRootMove = move;
+            }
+
+            if (alpha >= beta)
+                break;
         }
 
-        return bestScore;
+        return alpha;
     }
 }
