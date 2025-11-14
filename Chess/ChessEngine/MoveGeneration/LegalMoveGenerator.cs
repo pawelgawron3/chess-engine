@@ -1,8 +1,7 @@
-﻿using static ChessEngine.Utils.AttackUtils;
-using static ChessEngine.Utils.PositionUtils;
-using static ChessEngine.MoveGeneration.PseudoLegalMoveGenerator;
+﻿using ChessEngine.Chessboard;
 using ChessEngine.Game;
-using ChessEngine.Chessboard;
+using static ChessEngine.MoveGeneration.PseudoLegalMoveGenerator;
+using static ChessEngine.Utils.AttackUtils;
 
 namespace ChessEngine.MoveGeneration;
 
@@ -41,9 +40,6 @@ public static class LegalMoveGenerator
     /// </summary>
     public static bool IsMoveLegal(GameState state, Move move)
     {
-        if (!IsMovePseudoLegal(state, move))
-            return false;
-
         Piece movedPiece = state.Board[move.From]!;
         Piece? capturedPiece = GetCapturedPiece(state.Board, move);
 
@@ -52,28 +48,5 @@ public static class LegalMoveGenerator
         state.Board.UndoMove(move, movedPiece, capturedPiece);
 
         return !kingInCheck;
-    }
-
-    /// <summary>
-    /// Checks whether a given move is pseudo-legal on the board.
-    /// </summary>
-    private static bool IsMovePseudoLegal(GameState state, Move move)
-    {
-        if (!IsInside(move.From) || !IsInside(move.To))
-            return false;
-
-        Piece? piece = state.Board[move.From];
-        if (piece?.Owner != state.CurrentPlayer)
-            return false;
-
-        Piece? targetPiece = state.Board[move.To];
-        if (targetPiece?.Owner == state.CurrentPlayer)
-            return false;
-
-        if (!GeneratePseudoLegalMovesForPiece(state, move.From)
-            .Any(m => m.To.Equals(move.To)))
-            return false;
-
-        return true;
     }
 }
