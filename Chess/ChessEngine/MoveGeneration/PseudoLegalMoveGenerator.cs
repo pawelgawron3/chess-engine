@@ -14,9 +14,10 @@ public static class PseudoLegalMoveGenerator
     {
         Piece? piece = state.Board[from];
         if (piece == null)
-            return Enumerable.Empty<Move>();
+            yield break;
 
-        return GenerateMovesFor(state.Board, from, piece, state.Services.Rules.EnPassantFile, state.Services.Rules.CastlingRights);
+        foreach (var move in GenerateMovesFor(state.Board, from, piece, state.Services.Rules.EnPassantFile, state.Services.Rules.CastlingRights))
+            yield return move;
     }
 
     /// <summary>
@@ -36,7 +37,6 @@ public static class PseudoLegalMoveGenerator
                 if (piece == null || piece.Owner != player) continue;
 
                 Position from = new Position(row, col);
-
                 foreach (var move in GenerateMovesFor(state.Board, from, piece, enPassantFile, castlingRights))
                     yield return move;
             }
@@ -192,11 +192,11 @@ public static class PseudoLegalMoveGenerator
         int row = piece.Owner == Player.White ? 7 : 0;
         Player player = piece.Owner;
 
-        var rights = player == Player.White ? castlingRights.White : castlingRights.Black;
+        var (KingMoved, RookAMoved, RookHMoved) = (player == Player.White) ? castlingRights.White : castlingRights.Black;
 
-        if (!rights.KingMoved)
+        if (!KingMoved)
         {
-            if (!rights.RookHMoved &&
+            if (!RookHMoved &&
                 board[row, 5] == null && board[row, 6] == null &&
                 !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
                 !IsSquareAttacked(board, new Position(row, 5), player.Opponent()) &&
@@ -205,7 +205,7 @@ public static class PseudoLegalMoveGenerator
                 yield return new Move(pos, new Position(row, 6), MoveType.Castling);
             }
 
-            if (!rights.RookAMoved &&
+            if (!RookAMoved &&
                 board[row, 1] == null && board[row, 2] == null && board[row, 3] == null &&
                 !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
                 !IsSquareAttacked(board, new Position(row, 3), player.Opponent()) &&
@@ -245,13 +245,8 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GenerateMovesFor(Board board,
-        Position from,
-        Piece piece,
-        int? enPassantFile,
-        CastlingRights castlingRights)
-    {
-        return piece.Type switch
+    private static IEnumerable<Move> GenerateMovesFor(Board board, Position from, Piece piece, int? enPassantFile, CastlingRights castlingRights)
+        => piece.Type switch
         {
             PieceType.Pawn => GeneratePseudoLegalPawnMoves(board, from, piece, enPassantFile),
             PieceType.Knight => GeneratePseudoLegalKnightMoves(board, from, piece),
@@ -261,5 +256,4 @@ public static class PseudoLegalMoveGenerator
             PieceType.King => GeneratePseudoLegalKingMoves(board, from, piece, castlingRights),
             _ => Enumerable.Empty<Move>()
         };
-    }
 }
