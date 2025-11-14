@@ -161,8 +161,7 @@ public partial class MainWindow : Window
             _pendingPromotionMove = move;
             _isAwaitingPromotion = true;
 
-            Piece piece = _gameState.Board[move.From]!;
-            PromotionMenu.ShowForPlayer(piece.Owner);
+            PromotionMenu.ShowForPlayer(_gameState.CurrentPlayer);
             return;
         }
 
@@ -198,8 +197,6 @@ public partial class MainWindow : Window
     private void HighlightMovesForSelectedPiece()
     {
         ClearHighlights();
-        if (_gameState.SelectedPosition == null) return;
-
         HighlightSelectedSquare();
 
         var moves = _gameState.GetLegalMovesForPiece()
