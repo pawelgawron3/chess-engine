@@ -7,8 +7,6 @@ namespace ChessEngine.MoveGeneration;
 
 public static class PseudoLegalMoveGenerator
 {
-    public readonly record struct MoveContext(Board Board, Position From, Piece Piece);
-
     /// <summary>
     /// Generates all pseudo-legal moves for the currently selected piece.
     /// </summary>
@@ -18,8 +16,7 @@ public static class PseudoLegalMoveGenerator
         if (piece == null)
             return Enumerable.Empty<Move>();
 
-        var ctx = new MoveContext(state.Board, from, piece);
-        return GenerateMovesFor(ctx, state.Services.Rules.EnPassantFile, state.Services.Rules.CastlingRights);
+        return GenerateMovesFor(state.Board, from, piece, state.Services.Rules.EnPassantFile, state.Services.Rules.CastlingRights);
     }
 
     /// <summary>
@@ -39,17 +36,15 @@ public static class PseudoLegalMoveGenerator
                 if (piece == null || piece.Owner != player) continue;
 
                 Position from = new Position(row, col);
-                var ctx = new MoveContext(state.Board, from, piece);
 
-                foreach (var move in GenerateMovesFor(ctx, enPassantFile, castlingRights))
+                foreach (var move in GenerateMovesFor(state.Board, from, piece, enPassantFile, castlingRights))
                     yield return move;
             }
         }
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(MoveContext ctx, int? enPassantFile)
+    private static IEnumerable<Move> GeneratePseudoLegalPawnMoves(Board board, Position pos, Piece piece, int? enPassantFile)
     {
-        var (board, pos, piece) = ctx;
         int direction = piece.Owner == Player.White ? -1 : 1;
         int promotionRow = piece.Owner == Player.White ? 0 : 7;
 
@@ -115,10 +110,8 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalKnightMoves(MoveContext ctx)
+    private static IEnumerable<Move> GeneratePseudoLegalKnightMoves(Board board, Position pos, Piece piece)
     {
-        var (board, pos, piece) = ctx;
-
         int[][] jumps =
         [
             [-2, -1], [-2, 1],
@@ -134,15 +127,14 @@ public static class PseudoLegalMoveGenerator
 
             if (!IsInside(row, col)) continue;
 
-            Position target = new Position(row, col);
-            Piece? targetPiece = board[target];
+            Piece? targetPiece = board[row, col];
 
             if (targetPiece == null || targetPiece.Owner != piece.Owner)
-                yield return new Move(pos, target);
+                yield return new Move(pos, new Position(row, col));
         }
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalBishopMoves(MoveContext ctx)
+    private static IEnumerable<Move> GeneratePseudoLegalBishopMoves(Board board, Position pos, Piece piece)
     {
         int[][] directions =
         [
@@ -150,10 +142,10 @@ public static class PseudoLegalMoveGenerator
             [1, -1], [1, 1],
         ];
 
-        return GenerateSlidingMoves(ctx, directions);
+        return GenerateSlidingMoves(board, pos, piece, directions);
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalRookMoves(MoveContext ctx)
+    private static IEnumerable<Move> GeneratePseudoLegalRookMoves(Board board, Position pos, Piece piece)
     {
         int[][] directions =
         [
@@ -161,10 +153,10 @@ public static class PseudoLegalMoveGenerator
             [0, -1], [0, 1],
         ];
 
-        return GenerateSlidingMoves(ctx, directions);
+        return GenerateSlidingMoves(board, pos, piece, directions);
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalQueenMoves(MoveContext ctx)
+    private static IEnumerable<Move> GeneratePseudoLegalQueenMoves(Board board, Position pos, Piece piece)
     {
         int[][] directions =
         [
@@ -174,33 +166,29 @@ public static class PseudoLegalMoveGenerator
             [1, -1], [1, 1],
         ];
 
-        return GenerateSlidingMoves(ctx, directions);
+        return GenerateSlidingMoves(board, pos, piece, directions);
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalKingMoves(MoveContext ctx,
+    private static IEnumerable<Move> GeneratePseudoLegalKingMoves(Board board,
+        Position pos,
+        Piece piece,
         CastlingRights castlingRights)
     {
-        var (board, pos, piece) = ctx;
-
-        Position[] directions =
+        (int dr, int dc)[] kingDirections =
         {
-            new Position(pos.Row - 1, pos.Column),
-            new Position(pos.Row + 1, pos.Column),
-            new Position(pos.Row, pos.Column - 1),
-            new Position(pos.Row, pos.Column + 1),
-            new Position(pos.Row - 1, pos.Column - 1),
-            new Position(pos.Row - 1, pos.Column + 1),
-            new Position(pos.Row + 1, pos.Column - 1),
-            new Position(pos.Row + 1, pos.Column + 1)
+            (-1,0), (1,0), (0,-1), (0,1),
+            (-1,-1), (-1,1), (1,-1), (1,1)
         };
 
-        foreach (var target in directions)
+        foreach (var (dr, dc) in kingDirections)
         {
-            if (!IsInside(target)) continue;
-            Piece? targetPiece = board[target];
+            int r = pos.Row + dr;
+            int c = pos.Column + dc;
+            if (!IsInside(r, c)) continue;
+            Piece? targetPiece = board[r, c];
 
             if (targetPiece == null || targetPiece.Owner != piece.Owner)
-                yield return new Move(pos, target);
+                yield return new Move(pos, new Position(r, c));
         }
 
         int row = piece.Owner == Player.White ? 7 : 0;
@@ -230,10 +218,8 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GenerateSlidingMoves(MoveContext ctx, int[][] directions)
+    private static IEnumerable<Move> GenerateSlidingMoves(Board board, Position pos, Piece piece, int[][] directions)
     {
-        var (board, pos, piece) = ctx;
-
         foreach (var dir in directions)
         {
             int row = pos.Row + dir[0];
@@ -241,18 +227,16 @@ public static class PseudoLegalMoveGenerator
 
             while (IsInside(row, col))
             {
-                Position target = new Position(row, col);
-                Piece? targetPiece = board[target];
-
+                Piece? targetPiece = board[row, col];
                 if (targetPiece == null)
                 {
-                    yield return new Move(pos, target);
+                    yield return new Move(pos, new Position(row, col));
                 }
                 else
                 {
                     if (targetPiece.Owner != piece.Owner)
                     {
-                        yield return new Move(pos, target);
+                        yield return new Move(pos, new Position(row, col));
                     }
                     break;
                 }
@@ -263,18 +247,20 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GenerateMovesFor(MoveContext ctx,
+    private static IEnumerable<Move> GenerateMovesFor(Board board,
+        Position from,
+        Piece piece,
         int? enPassantFile,
         CastlingRights castlingRights)
     {
-        return ctx.Piece.Type switch
+        return piece.Type switch
         {
-            PieceType.Pawn => GeneratePseudoLegalPawnMoves(ctx, enPassantFile),
-            PieceType.Knight => GeneratePseudoLegalKnightMoves(ctx),
-            PieceType.Bishop => GeneratePseudoLegalBishopMoves(ctx),
-            PieceType.Rook => GeneratePseudoLegalRookMoves(ctx),
-            PieceType.Queen => GeneratePseudoLegalQueenMoves(ctx),
-            PieceType.King => GeneratePseudoLegalKingMoves(ctx, castlingRights),
+            PieceType.Pawn => GeneratePseudoLegalPawnMoves(board, from, piece, enPassantFile),
+            PieceType.Knight => GeneratePseudoLegalKnightMoves(board, from, piece),
+            PieceType.Bishop => GeneratePseudoLegalBishopMoves(board, from, piece),
+            PieceType.Rook => GeneratePseudoLegalRookMoves(board, from, piece),
+            PieceType.Queen => GeneratePseudoLegalQueenMoves(board, from, piece),
+            PieceType.King => GeneratePseudoLegalKingMoves(board, from, piece, castlingRights),
             _ => Enumerable.Empty<Move>()
         };
     }
