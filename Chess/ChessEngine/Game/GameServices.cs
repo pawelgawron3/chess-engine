@@ -67,11 +67,12 @@ public class GameServices
         UpdateClocks(movedPiece, capturedPiece);
         SwitchPlayer();
 
+        _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
+
         if (!SimulationMode)
         {
             _state.ClearSelection();
             _state.RaiseMoveMade(record);
-            _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
             _state.RaiseGameEnded(_state.GameResult);
         }
 
@@ -99,9 +100,9 @@ public class GameServices
         RevertClocks(last.HalfMoveClockBefore);
         SwitchPlayer();
 
+        _state.GameResult = null;
         if (!SimulationMode)
         {
-            _state.GameResult = null;
             _state.RaiseMoveMade(last);
         }
     }
