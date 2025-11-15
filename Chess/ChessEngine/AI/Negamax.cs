@@ -1,4 +1,5 @@
 ﻿using ChessEngine.Chessboard;
+using ChessEngine.Components;
 using ChessEngine.Game;
 using ChessEngine.MoveGeneration;
 
@@ -6,6 +7,7 @@ namespace ChessEngine.AI;
 
 public class Negamax
 {
+    private const int MATE_SCORE = 1_000_000;
     private readonly IEvaluationFunction _evaluator;
 
     public Negamax(IEvaluationFunction evaluator)
@@ -26,7 +28,16 @@ public class Negamax
 
     private int NegamaxSearch(GameState state, int depth, int alpha, int beta, bool isRootMove, ref Move? bestRootMove)
     {
-        if (depth == 0 || state.GameResult != null)
+        if (state.GameResult != null)
+        {
+            return state.GameResult.Reason switch
+            {
+                GameEndReason.Checkmate => -MATE_SCORE - depth,
+                _ => 0
+            };
+        }
+
+        if (depth == 0)
             return _evaluator.Evaluate(state) * (int)state.CurrentPlayer;
 
         foreach (var move in LegalMoveGenerator.GenerateLegalMoves(state))
