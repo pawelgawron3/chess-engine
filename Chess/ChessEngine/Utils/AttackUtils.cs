@@ -11,6 +11,23 @@ public static class AttackUtils
         return IsSquareAttacked(board, kingPos, player.Opponent());
     }
 
+    public static bool IsSquareAttacked(Board board, Position square, Player attacker)
+    {
+        if (!IsInside(square)) return false;
+
+        return IsAttackedByPawn(board, square, attacker) || IsAttackedByKnight(board, square, attacker) ||
+               IsAttackedByKing(board, square, attacker) || OrthAttacks(board, square, attacker) ||
+               DiagAttacks(board, square, attacker);
+    }
+
+    public static Piece? GetCapturedPiece(Board board, Move move) =>
+        move.Type switch
+        {
+            MoveType.Normal or MoveType.Promotion => board[move.To],
+            MoveType.EnPassant => board[move.From.Row, move.To.Column],
+            _ => null
+        };
+
     private static Position GetKingPosition(Board board, Player player)
     {
         for (int row = 0; row < 8; row++)
@@ -18,7 +35,7 @@ public static class AttackUtils
             for (int col = 0; col < 8; col++)
             {
                 Piece? piece = board[row, col];
-                if (piece != null && piece.Type == PieceType.King && piece.Owner == player)
+                if (piece?.Type == PieceType.King && piece.Owner == player)
                 {
                     return new Position(row, col);
                 }
@@ -28,50 +45,65 @@ public static class AttackUtils
         throw new InvalidOperationException($"Error! King not found for player {player}!");
     }
 
-    public static bool IsSquareAttacked(Board board, Position square, Player attacker)
+    private static bool IsAttackedByPawn(Board board, Position square, Player attacker)
     {
-        if (!IsInside(square)) return false;
+        int dir = (attacker == Player.White) ? -1 : 1;
 
-        int pawnDir = attacker == Player.White ? -1 : 1;
-        Position[] pawnTargets =
+        (int dr, int dc)[] pawnTargets =
         {
-            new Position(square.Row - pawnDir, square.Column - 1),
-            new Position(square.Row - pawnDir, square.Column + 1)
+            (square.Row - dir, square.Column - 1),
+            (square.Row - dir, square.Column + 1)
         };
 
-        foreach (var pos in pawnTargets)
+        foreach (var (dr, dc) in pawnTargets)
         {
-            if (!IsInside(pos)) continue;
-            Piece? piece = board[pos];
-            if (piece != null && piece.Type == PieceType.Pawn && piece.Owner == attacker)
+            if (!IsInside(dr, dc)) continue;
+            Piece? piece = board[dr, dc];
+            if (piece?.Type == PieceType.Pawn && piece.Owner == attacker)
                 return true;
         }
 
-        int[][] knightJumps =
-        [
-            [-2, -1], [-2, 1], [-1, -2], [-1, 2],
-            [1, -2],  [1, 2],  [2, -1],  [2, 1]
-        ];
+        return false;
+    }
 
-        foreach (var jump in knightJumps)
+    private static bool IsAttackedByKnight(Board board, Position square, Player attacker)
+    {
+        foreach (var (dr, dc) in KnightJumps)
         {
-            int row = square.Row + jump[0];
-            int col = square.Column + jump[1];
+            int row = square.Row + dr;
+            int col = square.Column + dc;
+
             if (!IsInside(row, col)) continue;
             Piece? piece = board[row, col];
-            if (piece != null && piece.Type == PieceType.Knight && piece.Owner == attacker)
+            if (piece?.Type == PieceType.Knight && piece.Owner == attacker)
                 return true;
         }
 
-        int[][] orthDirs =
-        [
-            [-1, 0], [1, 0], [0, -1], [0, 1]
-        ];
+        return false;
+    }
 
-        foreach (var direction in orthDirs)
+    private static bool IsAttackedByKing(Board board, Position square, Player attacker)
+    {
+        foreach (var (dr, dc) in KingDirections)
         {
-            int row = square.Row + direction[0];
-            int col = square.Column + direction[1];
+            int row = square.Row + dr;
+            int col = square.Column + dc;
+
+            if (!IsInside(row, col)) continue;
+            Piece? piece = board[row, col];
+            if (piece?.Type == PieceType.King && piece.Owner == attacker)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool OrthAttacks(Board board, Position square, Player attacker)
+    {
+        foreach (var (dr, dc) in OrthDirections)
+        {
+            int row = square.Row + dr;
+            int col = square.Column + dc;
 
             while (IsInside(row, col))
             {
@@ -82,20 +114,20 @@ public static class AttackUtils
                         return true;
                     break;
                 }
-                row += direction[0];
-                col += direction[1];
+                row += dr;
+                col += dc;
             }
         }
 
-        int[][] diagDirs =
-        [
-            [-1, -1], [-1, 1], [1, -1], [1, 1]
-        ];
+        return false;
+    }
 
-        foreach (var direction in diagDirs)
+    private static bool DiagAttacks(Board board, Position square, Player attacker)
+    {
+        foreach (var (dr, dc) in DiagDirections)
         {
-            int row = square.Row + direction[0];
-            int col = square.Column + direction[1];
+            int row = square.Row + dr;
+            int col = square.Column + dc;
 
             while (IsInside(row, col))
             {
@@ -106,39 +138,35 @@ public static class AttackUtils
                         return true;
                     break;
                 }
-                row += direction[0];
-                col += direction[1];
+                row += dr;
+                col += dc;
             }
-        }
-
-        Position[] kingAdjacency =
-        {
-                new Position(square.Row - 1, square.Column),
-                new Position(square.Row + 1, square.Column),
-                new Position(square.Row, square.Column - 1),
-                new Position(square.Row, square.Column + 1),
-                new Position(square.Row - 1, square.Column - 1),
-                new Position(square.Row - 1, square.Column + 1),
-                new Position(square.Row + 1, square.Column - 1),
-                new Position(square.Row + 1, square.Column + 1)
-        };
-
-        foreach (var pos in kingAdjacency)
-        {
-            if (!IsInside(pos)) continue;
-            Piece? piece = board[pos];
-            if (piece != null && piece.Type == PieceType.King && piece.Owner == attacker)
-                return true;
         }
 
         return false;
     }
 
-    public static Piece? GetCapturedPiece(Board board, Move move) =>
-        move.Type switch
-        {
-            MoveType.Normal or MoveType.Promotion => board[move.To],
-            MoveType.EnPassant => board[move.From.Row, move.To.Column],
-            _ => null
-        };
+    private static readonly (int dr, int dc)[] KnightJumps =
+    {
+        (-2, -1), (-2, 1), (-1, 2), (1, 2),
+        (2, 1), (2, -1), (1, -2), (-1, -2)
+    };
+
+    private static readonly (int dr, int dc)[] KingDirections =
+    {
+        (-1,0), (1,0), (0,-1), (0,1),
+        (-1,-1), (-1,1), (1,-1), (1,1)
+    };
+
+    private static readonly (int dr, int dc)[] OrthDirections =
+    {
+        (-1, 0), (1, 0),
+        (0, -1), (0, 1)
+    };
+
+    private static readonly (int dr, int dc)[] DiagDirections =
+    {
+        (-1, -1), (-1, 1),
+        (1, -1), (1, 1)
+    };
 }
