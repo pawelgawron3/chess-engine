@@ -1,6 +1,4 @@
-﻿using ChessEngine.Chessboard;
-
-namespace ChessEngine.AI;
+﻿namespace ChessEngine.AI;
 
 public enum BoundType
 {
@@ -15,14 +13,12 @@ public struct TTEntry
     public int Depth;
     public int Score;
     public BoundType Bound;
-    public Move? BestMove;
 
-    public TTEntry(ulong hash, int depth, int score, BoundType bound, Move? bestMove)
+    public TTEntry(ulong hash, int depth, int score, BoundType bound)
     {
         Hash = hash;
         Depth = depth;
         Score = score;
         Bound = bound;
-        BestMove = bestMove;
     }
 }
