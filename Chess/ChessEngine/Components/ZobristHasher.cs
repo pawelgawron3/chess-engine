@@ -46,16 +46,17 @@ public class ZobristHasher
         {
             int capturedPlayerIndex = capturedPiece.Owner == Player.White ? 0 : 1;
             int capturedPieceIndex = (int)capturedPiece.Type;
-            int capturedSquare = (movedPiece.Type == PieceType.Pawn && move.Type == MoveType.EnPassant)
+            int capturedSquare = (move.Type == MoveType.EnPassant)
                 ? move.From.Row * 8 + move.To.Column
                 : move.To.Row * 8 + move.To.Column;
 
             CurrentHash ^= Zobrist.PieceKeys[capturedPlayerIndex, capturedPieceIndex, capturedSquare];
         }
 
-        PieceType newType = move.PromotionPiece ?? movedPiece.Type;
-        int newPieceIndex = (int)newType;
-        CurrentHash ^= Zobrist.PieceKeys[playerIndex, newPieceIndex, toIndex];
+        if (move.PromotionPiece != null)
+            CurrentHash ^= Zobrist.PieceKeys[playerIndex, (int)move.PromotionPiece.Value, toIndex];
+        else
+            CurrentHash ^= Zobrist.PieceKeys[playerIndex, pieceIndex, toIndex];
 
         if (previousEnPassantFile.HasValue)
             CurrentHash ^= Zobrist.EnPassantKeys[previousEnPassantFile.Value];
