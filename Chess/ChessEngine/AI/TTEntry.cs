@@ -15,14 +15,14 @@ public struct TTEntry
     public int Depth;
     public int Score;
     public BoundType Bound;
-    // public Move? BestMove;
+    public Move? BestMove;
 
-    public TTEntry(ulong hash, int depth, int score, BoundType bound) // Move? bestMove
+    public TTEntry(ulong hash, int depth, int score, BoundType bound, Move? bestMove)
     {
         Hash = hash;
         Depth = depth;
         Score = score;
         Bound = bound;
-        // BestMove = bestMove;
+        BestMove = bestMove;
     }
 }
