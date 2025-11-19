@@ -40,6 +40,33 @@ public class Negamax
         if (depth == 0)
             return _evaluator.Evaluate(state) * (int)state.CurrentPlayer;
 
+        ulong hash = state.Services.Hasher.CurrentHash;
+        ref TTEntry entry = ref TranspositionTable.Probe(hash);
+
+        int alphaOrig = alpha;
+
+        if (!isRootMove && entry.Hash == hash && entry.Depth >= depth)
+        {
+            switch (entry.Bound)
+            {
+                case BoundType.Exact:
+                    return entry.Score;
+
+                case BoundType.LowerBound:
+                    if (entry.Score > alpha)
+                        alpha = entry.Score;
+                    break;
+
+                case BoundType.UpperBound:
+                    if (entry.Score < beta)
+                        beta = entry.Score;
+                    break;
+            }
+
+            if (alpha >= beta)
+                return entry.Score;
+        }
+
         foreach (var move in LegalMoveGenerator.GenerateLegalMoves(state))
         {
             state.TryMakeMove(move);
@@ -57,6 +84,16 @@ public class Negamax
             if (alpha >= beta)
                 break;
         }
+
+        BoundType bound;
+        if (alpha <= alphaOrig)
+            bound = BoundType.UpperBound;
+        else if (alpha >= beta)
+            bound = BoundType.LowerBound;
+        else
+            bound = BoundType.Exact;
+
+        TranspositionTable.Store(hash, depth, alpha, bound);
 
         return alpha;
     }
