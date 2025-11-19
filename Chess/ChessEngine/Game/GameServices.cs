@@ -21,11 +21,11 @@ public class GameServices
     {
         _state = state;
 
-        var castlingRights = new CastlingRights((false, false, false), (false, false, false));
+        var initialRights = new CastlingRights((false, false, false), (false, false, false));
 
-        Rules = new RuleManager(castlingRights);
+        Rules = new RuleManager(initialRights);
         History = new MoveHistoryManager();
-        Hasher = new ZobristHasher(state.Board, () => state.CurrentPlayer, () => castlingRights, () => Rules.EnPassantFile);
+        Hasher = new ZobristHasher(state.Board, () => state.CurrentPlayer, () => Rules.CastlingRights, () => Rules.EnPassantFile);
         Evaluator = new GameResultEvaluator(state);
     }
 
