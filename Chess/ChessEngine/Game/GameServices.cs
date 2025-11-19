@@ -81,7 +81,7 @@ public class GameServices
 
     public void UndoMove()
     {
-        MoveRecord? last = History.Undo(_state.Board);
+        MoveRecord? last = History.Undo();
         if (last == null) return;
 
         _state.Board.UndoMove(last.Move, last.MovedPiece, last.CapturedPiece);

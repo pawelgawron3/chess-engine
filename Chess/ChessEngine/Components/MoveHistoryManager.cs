@@ -8,7 +8,7 @@ public class MoveHistoryManager
 
     public void Add(MoveRecord record) => MoveHistory.Add(record);
 
-    public MoveRecord? Undo(Board board)
+    public MoveRecord? Undo()
     {
         if (MoveHistory.Count == 0)
             return null;
