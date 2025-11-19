@@ -70,6 +70,28 @@ public class ZobristHasher
         CurrentHash ^= beforeHash;
         CurrentHash ^= afterHash;
 
+        if (move.Type == MoveType.Castling)
+        {
+            int fromRow = move.From.Row;
+            int rookPieceIndex = (int)PieceType.Rook;
+            if (move.To.Column == 6)
+            {
+                int rookFrom = fromRow * 8 + 7;
+                int rookTo = fromRow * 8 + 5;
+
+                CurrentHash ^= Zobrist.PieceKeys[playerIndex, rookPieceIndex, rookFrom];
+                CurrentHash ^= Zobrist.PieceKeys[playerIndex, rookPieceIndex, rookTo];
+            }
+            else if (move.To.Column == 2)
+            {
+                int rookFrom = fromRow * 8 + 0;
+                int rookTo = fromRow * 8 + 3;
+
+                CurrentHash ^= Zobrist.PieceKeys[playerIndex, rookPieceIndex, rookFrom];
+                CurrentHash ^= Zobrist.PieceKeys[playerIndex, rookPieceIndex, rookTo];
+            }
+        }
+
         CurrentHash ^= Zobrist.SideToMoveKey;
 
         if (PositionCounts.ContainsKey(CurrentHash))
