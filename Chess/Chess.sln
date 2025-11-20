@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessEngine", "ChessEngine\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessUI", "ChessUI\ChessUI.csproj", "{C7FE6F43-8AB3-4EB7-9EA2-D738E77E929E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessEngine.Tests", "ChessEngine.Tests\ChessEngine.Tests.csproj", "{3981CE85-E43A-4700-9A78-443A7AF5E334}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C7FE6F43-8AB3-4EB7-9EA2-D738E77E929E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7FE6F43-8AB3-4EB7-9EA2-D738E77E929E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7FE6F43-8AB3-4EB7-9EA2-D738E77E929E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3981CE85-E43A-4700-9A78-443A7AF5E334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3981CE85-E43A-4700-9A78-443A7AF5E334}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3981CE85-E43A-4700-9A78-443A7AF5E334}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3981CE85-E43A-4700-9A78-443A7AF5E334}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
