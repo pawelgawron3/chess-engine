@@ -13,7 +13,7 @@ public enum PieceType
 /// <summary>
 /// Represents a chess piece with a specific type and owner (player).
 /// </summary>
-public struct Piece
+public readonly struct Piece
 {
     public PieceType Type { get; }
     public Player Owner { get; }
