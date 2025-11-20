@@ -34,7 +34,7 @@ public class GameServices
         if (_state.GameResult != null || !LegalMoveGenerator.IsMoveLegal(_state, move))
             return false;
 
-        Piece movedPiece = _state.Board[move.From]!;
+        Piece movedPiece = _state.Board[move.From]!.Value;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
 
         CastlingRights castlingBefore = Rules.CastlingRights;

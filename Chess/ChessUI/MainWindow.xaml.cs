@@ -63,7 +63,8 @@ public partial class MainWindow : Window
                 {
                     Width = _squareSize,
                     Height = _squareSize,
-                    Source = new BitmapImage(new Uri($"/Assets/Images/{piece.Type}{(piece.Owner == Player.White ? "W" : "B")}.png", UriKind.Relative))
+                    Source = new BitmapImage(new Uri($"/Assets/Images/{piece.Value.Type}{(piece.Value.Owner == Player.White ? "W" : "B")}.png",
+                                             UriKind.Relative))
                 };
 
                 Canvas.SetLeft(img, col * _squareSize);
@@ -137,7 +138,7 @@ public partial class MainWindow : Window
     private void TrySelectPiece(Position pos)
     {
         Piece? piece = _gameState.Board[pos];
-        if (piece != null && piece.Owner == _gameState.CurrentPlayer)
+        if (piece != null && piece.Value.Owner == _gameState.CurrentPlayer)
         {
             _gameState.SelectPosition(pos);
             HighlightMovesForSelectedPiece();

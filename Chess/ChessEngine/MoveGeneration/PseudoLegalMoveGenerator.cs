@@ -16,7 +16,7 @@ public static class PseudoLegalMoveGenerator
         if (piece == null)
             yield break;
 
-        foreach (var move in GenerateMovesFor(state.Board, from, piece, state.Services.Rules.EnPassantFile, state.Services.Rules.CastlingRights))
+        foreach (var move in GenerateMovesFor(state.Board, from, piece.Value, state.Services.Rules.EnPassantFile, state.Services.Rules.CastlingRights))
             yield return move;
     }
 
@@ -34,10 +34,10 @@ public static class PseudoLegalMoveGenerator
             for (int col = 0; col < 8; col++)
             {
                 Piece? piece = state.Board[row, col];
-                if (piece == null || piece.Owner != player) continue;
+                if (piece == null || piece.Value.Owner != player) continue;
 
                 Position from = new Position(row, col);
-                foreach (var move in GenerateMovesFor(state.Board, from, piece, enPassantFile, castlingRights))
+                foreach (var move in GenerateMovesFor(state.Board, from, piece.Value, enPassantFile, castlingRights))
                     yield return move;
             }
         }
@@ -80,7 +80,7 @@ public static class PseudoLegalMoveGenerator
             if (!IsInside(target)) continue;
             Piece? targetPiece = board[target];
 
-            if (targetPiece != null && targetPiece.Owner != piece.Owner)
+            if (targetPiece != null && targetPiece.Value.Owner != piece.Owner)
             {
                 if (target.Row == promotionRow)
                 {
@@ -102,7 +102,7 @@ public static class PseudoLegalMoveGenerator
             int targetCol = epFile;
 
             var sidePawn = board[pos.Row, targetCol];
-            if (sidePawn?.Type == PieceType.Pawn && sidePawn.Owner != piece.Owner)
+            if (sidePawn?.Type == PieceType.Pawn && sidePawn.Value.Owner != piece.Owner)
             {
                 if (IsInside(targetRow, targetCol) && board[targetRow, targetCol] == null)
                     yield return new Move(pos, new Position(targetRow, targetCol), MoveType.EnPassant);
@@ -127,7 +127,7 @@ public static class PseudoLegalMoveGenerator
 
             Piece? targetPiece = board[row, col];
 
-            if (targetPiece == null || targetPiece.Owner != piece.Owner)
+            if (targetPiece == null || targetPiece.Value.Owner != piece.Owner)
                 yield return new Move(pos, new Position(row, col));
         }
     }
@@ -185,7 +185,7 @@ public static class PseudoLegalMoveGenerator
             if (!IsInside(r, c)) continue;
             Piece? targetPiece = board[r, c];
 
-            if (targetPiece == null || targetPiece.Owner != piece.Owner)
+            if (targetPiece == null || targetPiece.Value.Owner != piece.Owner)
                 yield return new Move(pos, new Position(r, c));
         }
 
@@ -232,7 +232,7 @@ public static class PseudoLegalMoveGenerator
                 }
                 else
                 {
-                    if (targetPiece.Owner != piece.Owner)
+                    if (targetPiece.Value.Owner != piece.Owner)
                     {
                         yield return new Move(pos, new Position(row, col));
                     }

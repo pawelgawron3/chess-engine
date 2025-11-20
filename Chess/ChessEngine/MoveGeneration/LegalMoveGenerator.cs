@@ -40,7 +40,7 @@ public static class LegalMoveGenerator
     /// </summary>
     public static bool IsMoveLegal(GameState state, Move move)
     {
-        Piece movedPiece = state.Board[move.From]!;
+        Piece movedPiece = state.Board[move.From]!.Value;
         Piece? capturedPiece = GetCapturedPiece(state.Board, move);
 
         state.Board.MakeMove(move);

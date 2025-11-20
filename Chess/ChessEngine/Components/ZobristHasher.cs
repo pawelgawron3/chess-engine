@@ -44,8 +44,8 @@ public class ZobristHasher
 
         if (capturedPiece != null)
         {
-            int capturedPlayerIndex = capturedPiece.Owner == Player.White ? 0 : 1;
-            int capturedPieceIndex = (int)capturedPiece.Type;
+            int capturedPlayerIndex = capturedPiece.Value.Owner == Player.White ? 0 : 1;
+            int capturedPieceIndex = (int)capturedPiece.Value.Type;
             int capturedSquare = (move.Type == MoveType.EnPassant)
                 ? move.From.Row * 8 + move.To.Column
                 : move.To.Row * 8 + move.To.Column;
@@ -128,8 +128,8 @@ public class ZobristHasher
                 Piece? piece = _board[row, col];
                 if (piece == null) continue;
 
-                int playerIndex = piece.Owner == Player.White ? 0 : 1;
-                int typeIndex = (int)piece.Type;
+                int playerIndex = piece.Value.Owner == Player.White ? 0 : 1;
+                int typeIndex = (int)piece.Value.Type;
                 int squareIndex = row * 8 + col;
 
                 hash ^= Zobrist.PieceKeys[playerIndex, typeIndex, squareIndex];

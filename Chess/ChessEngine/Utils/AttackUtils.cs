@@ -35,7 +35,7 @@ public static class AttackUtils
             for (int col = 0; col < 8; col++)
             {
                 Piece? piece = board[row, col];
-                if (piece?.Type == PieceType.King && piece.Owner == player)
+                if (piece?.Type == PieceType.King && piece.Value.Owner == player)
                 {
                     return new Position(row, col);
                 }
@@ -59,7 +59,7 @@ public static class AttackUtils
         {
             if (!IsInside(dr, dc)) continue;
             Piece? piece = board[dr, dc];
-            if (piece?.Type == PieceType.Pawn && piece.Owner == attacker)
+            if (piece?.Type == PieceType.Pawn && piece.Value.Owner == attacker)
                 return true;
         }
 
@@ -75,7 +75,7 @@ public static class AttackUtils
 
             if (!IsInside(row, col)) continue;
             Piece? piece = board[row, col];
-            if (piece?.Type == PieceType.Knight && piece.Owner == attacker)
+            if (piece?.Type == PieceType.Knight && piece.Value.Owner == attacker)
                 return true;
         }
 
@@ -91,7 +91,7 @@ public static class AttackUtils
 
             if (!IsInside(row, col)) continue;
             Piece? piece = board[row, col];
-            if (piece?.Type == PieceType.King && piece.Owner == attacker)
+            if (piece?.Type == PieceType.King && piece.Value.Owner == attacker)
                 return true;
         }
 
@@ -110,7 +110,7 @@ public static class AttackUtils
                 Piece? piece = board[row, col];
                 if (piece != null)
                 {
-                    if (piece.Owner == attacker && (piece.Type == PieceType.Rook || piece.Type == PieceType.Queen))
+                    if (piece.Value.Owner == attacker && (piece.Value.Type == PieceType.Rook || piece.Value.Type == PieceType.Queen))
                         return true;
                     break;
                 }
@@ -134,7 +134,7 @@ public static class AttackUtils
                 Piece? piece = board[row, col];
                 if (piece != null)
                 {
-                    if (piece.Owner == attacker && (piece.Type == PieceType.Bishop || piece.Type == PieceType.Queen))
+                    if (piece.Value.Owner == attacker && (piece.Value.Type == PieceType.Bishop || piece.Value.Type == PieceType.Queen))
                         return true;
                     break;
                 }
