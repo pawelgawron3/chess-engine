@@ -28,6 +28,11 @@ public static class AttackUtils
             _ => null
         };
 
+    public static bool IsCapture(Board board, Move move)
+    {
+        return GetCapturedPiece(board, move) != null;
+    }
+
     private static Position GetKingPosition(Board board, Player player)
     {
         for (int row = 0; row < 8; row++)
