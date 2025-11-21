@@ -86,7 +86,7 @@ public class Negamax
 
             if (alpha >= beta)
             {
-                if (!AttackUtils.IsCapture(state.Board, move))
+                if (AttackUtils.IsQuietMove(state.Board, move))
                     KillerMoves.AddKillerMove(depth, move);
 
                 break;

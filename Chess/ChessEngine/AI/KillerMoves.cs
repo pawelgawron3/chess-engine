@@ -5,25 +5,23 @@ namespace ChessEngine.AI;
 public static class KillerMoves
 {
     public const int MaxKillerMoves = 2;
-
-    public static readonly Move?[] Killer1 = new Move?[8];
-    public static readonly Move?[] Killer2 = new Move?[8];
+    public static readonly Move?[,] KillerMovesTable = new Move?[6, MaxKillerMoves];
 
     public static void AddKillerMove(int depth, Move move)
     {
-        if (Killer1[depth] == null)
+        if (KillerMovesTable[depth, 0] == null)
         {
-            Killer1[depth] = move;
+            KillerMovesTable[depth, 0] = move;
             return;
         }
 
-        if (Killer2[depth] == null)
+        if (KillerMovesTable[depth, 1] == null)
         {
-            Killer2[depth] = move;
+            KillerMovesTable[depth, 1] = move;
             return;
         }
 
-        Killer2[depth] = Killer1[depth];
-        Killer1[depth] = move;
+        KillerMovesTable[depth, 1] = KillerMovesTable[depth, 0];
+        KillerMovesTable[depth, 0] = move;
     }
 }

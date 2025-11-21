@@ -25,31 +25,44 @@ public class MovePicker
         SortMoves();
     }
 
+    public bool TryGetNext(out Move move)
+    {
+        if (_index >= _moves.Length)
+        {
+            move = default;
+            return false;
+        }
+
+        move = _moves[_index++];
+        return true;
+    }
+
     private void ScoreMoves(GameState state)
     {
         for (int i = 0; i < _moves.Length; i++)
         {
             var move = _moves[i];
-            Piece? capturedPiece = AttackUtils.GetCapturedPiece(state.Board, move);
 
-            if (capturedPiece != null)
+            if (AttackUtils.IsCapture(state.Board, move))
             {
-                int victim = PieceValues.Value[(int)capturedPiece.Value.Type];
+                Piece? capturedPiece = AttackUtils.GetCapturedPiece(state.Board, move);
+
+                int victim = PieceValues.Value[(int)capturedPiece!.Value.Type];
                 int attacker = PieceValues.Value[(int)state.Board[move.From]!.Value.Type];
 
                 _scores[i] = CAPTURE_BASE + victim * 10 - attacker;
                 continue;
             }
 
-            if (KillerMoves.Killer1[_depth] != null &&
-                KillerMoves.Killer1[_depth]!.Value.Equals(move))
+            if (KillerMoves.KillerMovesTable[_depth, 0] != null &&
+                KillerMoves.KillerMovesTable[_depth, 0]!.Value.Equals(move))
             {
                 _scores[i] = KILLER_SCORE1;
                 continue;
             }
 
-            if (KillerMoves.Killer2[_depth] != null &&
-                KillerMoves.Killer2[_depth]!.Value.Equals(move))
+            if (KillerMoves.KillerMovesTable[_depth, 1] != null &&
+                KillerMoves.KillerMovesTable[_depth, 1]!.Value.Equals(move))
             {
                 _scores[i] = KILLER_SCORE2;
                 continue;
@@ -77,17 +90,5 @@ public class MovePicker
             _scores[j + 1] = score;
             _moves[j + 1] = move;
         }
-    }
-
-    public bool TryGetNext(out Move move)
-    {
-        if (_index >= _moves.Length)
-        {
-            move = default;
-            return false;
-        }
-
-        move = _moves[_index++];
-        return true;
     }
 }
