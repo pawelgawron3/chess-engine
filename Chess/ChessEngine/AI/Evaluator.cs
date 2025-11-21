@@ -5,16 +5,6 @@ namespace ChessEngine.AI;
 
 public class Evaluator : IEvaluationFunction
 {
-    private static readonly Dictionary<PieceType, int> _pieceValues = new()
-    {
-        { PieceType.Pawn, 100},
-        { PieceType.Knight, 320},
-        { PieceType.Bishop, 330},
-        { PieceType.Rook, 500},
-        { PieceType.Queen, 900},
-        { PieceType.King, 20_000}
-    };
-
     public int Evaluate(GameState state)
     {
         int score = 0;
@@ -22,7 +12,7 @@ public class Evaluator : IEvaluationFunction
 
         foreach (var (piece, pos) in state.Board.GetAllPiecesWithPosition())
         {
-            int baseValue = _pieceValues[piece.Type];
+            int baseValue = PieceValues.Value[(int)piece.Type];
             int positionalBonus = GetPieceSquareValue(piece, pos, isEndgame);
 
             score += (int)piece.Owner * (baseValue + positionalBonus);
