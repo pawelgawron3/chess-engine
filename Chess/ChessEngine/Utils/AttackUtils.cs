@@ -28,10 +28,9 @@ public static class AttackUtils
             _ => null
         };
 
-    public static bool IsCapture(Board board, Move move)
-    {
-        return GetCapturedPiece(board, move) != null;
-    }
+    public static bool IsCapture(Board board, Move move) => GetCapturedPiece(board, move) != null;
+
+    public static bool IsQuietMove(Board board, Move move) => GetCapturedPiece(board, move) == null;
 
     private static Position GetKingPosition(Board board, Player player)
     {
