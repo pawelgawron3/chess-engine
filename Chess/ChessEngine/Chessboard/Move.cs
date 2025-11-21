@@ -11,7 +11,7 @@ public enum MoveType
 /// <summary>
 /// Represents a move from one position to another on the chessboard.
 /// </summary>
-public readonly struct Move
+public readonly struct Move : IEquatable<Move>
 {
     public Position From { get; }
     public Position To { get; }
@@ -25,4 +25,18 @@ public readonly struct Move
         Type = type;
         PromotionPiece = promotionPiece;
     }
+
+    public bool Equals(Move other) =>
+        From.Equals(other.From) &&
+        To.Equals(other.To) &&
+        Type == other.Type &&
+        PromotionPiece == other.PromotionPiece;
+
+    public override bool Equals(object? obj) => obj is Move m && Equals(m);
+
+    public override int GetHashCode() => HashCode.Combine(From, To, Type, PromotionPiece);
+
+    public static bool operator ==(Move left, Move right) => left.Equals(right);
+
+    public static bool operator !=(Move left, Move right) => !left.Equals(right);
 }
