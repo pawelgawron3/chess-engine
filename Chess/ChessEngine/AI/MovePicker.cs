@@ -6,14 +6,20 @@ namespace ChessEngine.AI;
 
 public class MovePicker
 {
+    private const int CAPTURE_BASE = 10_000;
+    private const int KILLER_SCORE1 = 5_000;
+    private const int KILLER_SCORE2 = 4_000;
+
     private readonly Move[] _moves;
     private readonly int[] _scores;
+    private readonly int _depth;
     private int _index = 0;
 
-    public MovePicker(IEnumerable<Move> moves, GameState state)
+    public MovePicker(IEnumerable<Move> moves, GameState state, int depth)
     {
         _moves = moves.ToArray();
         _scores = new int[_moves.Length];
+        _depth = depth;
 
         ScoreMoves(state);
         SortMoves();
@@ -29,15 +35,27 @@ public class MovePicker
             if (capturedPiece != null)
             {
                 int victim = PieceValues.Value[(int)capturedPiece.Value.Type];
-                int attacker = PieceValues.Value[(int)state.Board[move.From.Row, move.From.Column]!.Value.Type];
+                int attacker = PieceValues.Value[(int)state.Board[move.From]!.Value.Type];
 
-                // MVV-LVA
-                _scores[i] = victim * 10 - attacker;
+                _scores[i] = CAPTURE_BASE + victim * 10 - attacker;
+                continue;
             }
-            else
+
+            if (KillerMoves.Killer1[_depth] != null &&
+                KillerMoves.Killer1[_depth]!.Value.Equals(move))
             {
-                _scores[i] = 0;
+                _scores[i] = KILLER_SCORE1;
+                continue;
             }
+
+            if (KillerMoves.Killer2[_depth] != null &&
+                KillerMoves.Killer2[_depth]!.Value.Equals(move))
+            {
+                _scores[i] = KILLER_SCORE2;
+                continue;
+            }
+
+            _scores[i] = 0;
         }
     }
 
