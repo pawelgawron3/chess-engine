@@ -67,7 +67,9 @@ public class Negamax
                 return entry.Score;
         }
 
-        foreach (var move in LegalMoveGenerator.GenerateLegalMoves(state))
+        var movePicker = new MovePicker(LegalMoveGenerator.GenerateLegalMoves(state), state);
+
+        while (movePicker.TryGetNext(out var move))
         {
             state.TryMakeMove(move);
             int score = -NegamaxSearch(state, depth - 1, -beta, -alpha, false, ref bestRootMove);
