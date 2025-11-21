@@ -9,19 +9,10 @@ public static class KillerMoves
 
     public static void AddKillerMove(int depth, Move move)
     {
-        if (KillerMovesTable[depth, 0] == null)
+        if (KillerMovesTable[depth, 0] != move)
         {
+            KillerMovesTable[depth, 1] = KillerMovesTable[depth, 0];
             KillerMovesTable[depth, 0] = move;
-            return;
         }
-
-        if (KillerMovesTable[depth, 1] == null)
-        {
-            KillerMovesTable[depth, 1] = move;
-            return;
-        }
-
-        KillerMovesTable[depth, 1] = KillerMovesTable[depth, 0];
-        KillerMovesTable[depth, 0] = move;
     }
 }
