@@ -2,6 +2,7 @@
 using ChessEngine.Components;
 using ChessEngine.Game;
 using ChessEngine.MoveGeneration;
+using ChessEngine.Utils;
 
 namespace ChessEngine.AI;
 
@@ -67,7 +68,7 @@ public class Negamax
                 return entry.Score;
         }
 
-        var movePicker = new MovePicker(LegalMoveGenerator.GenerateLegalMoves(state), state);
+        var movePicker = new MovePicker(LegalMoveGenerator.GenerateLegalMoves(state), state, depth);
 
         while (movePicker.TryGetNext(out var move))
         {
@@ -84,7 +85,12 @@ public class Negamax
             }
 
             if (alpha >= beta)
+            {
+                if (!AttackUtils.IsCapture(state.Board, move))
+                    KillerMoves.AddKillerMove(depth, move);
+
                 break;
+            }
         }
 
         BoundType bound;
