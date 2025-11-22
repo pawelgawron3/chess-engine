@@ -45,6 +45,7 @@ public class Negamax
         ref TTEntry entry = ref TranspositionTable.Probe(hash);
 
         int alphaOrig = alpha;
+        Move? bestMoveLocal = null;
 
         if (!isRootMove && entry.Hash == hash && entry.Depth >= depth)
         {
@@ -68,7 +69,7 @@ public class Negamax
                 return entry.Score;
         }
 
-        var movePicker = new MovePicker(LegalMoveGenerator.GenerateLegalMoves(state), state, depth);
+        var movePicker = new MovePicker(LegalMoveGenerator.GenerateLegalMoves(state), state, depth, entry.BestMove);
 
         while (movePicker.TryGetNext(out var move))
         {
@@ -79,6 +80,7 @@ public class Negamax
             if (score > alpha)
             {
                 alpha = score;
+                bestMoveLocal = move;
 
                 if (isRootMove)
                     bestRootMove = move;
@@ -101,7 +103,7 @@ public class Negamax
         else
             bound = BoundType.Exact;
 
-        TranspositionTable.Store(hash, depth, alpha, bound);
+        TranspositionTable.Store(hash, depth, alpha, bound, bestMoveLocal);
 
         return alpha;
     }
