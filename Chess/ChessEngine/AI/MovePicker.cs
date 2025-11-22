@@ -13,13 +13,15 @@ public class MovePicker
     private readonly Move[] _moves;
     private readonly int[] _scores;
     private readonly int _depth;
+    private readonly Move? _ttMove;
     private int _index = 0;
 
-    public MovePicker(IEnumerable<Move> moves, GameState state, int depth)
+    public MovePicker(IEnumerable<Move> moves, GameState state, int depth, Move? ttMove)
     {
         _moves = moves.ToArray();
         _scores = new int[_moves.Length];
         _depth = depth;
+        _ttMove = ttMove;
 
         ScoreMoves(state);
         SortMoves();
@@ -42,6 +44,12 @@ public class MovePicker
         for (int i = 0; i < _moves.Length; i++)
         {
             var move = _moves[i];
+
+            if (_ttMove != null && move == _ttMove.Value)
+            {
+                _scores[i] = int.MaxValue;
+                continue;
+            }
 
             if (AttackUtils.IsCapture(state.Board, move))
             {
