@@ -1,4 +1,6 @@
-﻿namespace ChessEngine.AI;
+﻿using ChessEngine.Chessboard;
+
+namespace ChessEngine.AI;
 
 public static class TranspositionTable
 {
@@ -10,11 +12,11 @@ public static class TranspositionTable
         return ref Table[hash & (Size - 1)];
     }
 
-    public static void Store(ulong hash, int depth, int score, BoundType bound)
+    public static void Store(ulong hash, int depth, int score, BoundType bound, Move? bestMove)
     {
         ref TTEntry entry = ref Probe(hash);
 
         if (entry.Hash != hash || depth >= entry.Depth)
-            entry = new TTEntry(hash, depth, score, bound);
+            entry = new TTEntry(hash, depth, score, bound, bestMove);
     }
 }
