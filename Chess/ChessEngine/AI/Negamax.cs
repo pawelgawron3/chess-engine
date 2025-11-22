@@ -20,6 +20,7 @@ public class Negamax
     {
         state.Services.SimulationMode = true;
 
+        KillerMoves.Init(depth);
         Move? bestMove = null;
         int score = NegamaxSearch(state, depth, int.MinValue + 1, int.MaxValue - 1, true, ref bestMove);
 

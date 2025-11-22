@@ -62,13 +62,13 @@ public class MovePicker
                 continue;
             }
 
-            if (KillerMoves.KillerMovesTable[_depth, 0] == move)
+            if (KillerMoves.Get(_depth, 0) == move)
             {
                 _scores[i] = KILLER_SCORE1;
                 continue;
             }
 
-            if (KillerMoves.KillerMovesTable[_depth, 1] == move)
+            if (KillerMoves.Get(_depth, 1) == move)
             {
                 _scores[i] = KILLER_SCORE2;
                 continue;
