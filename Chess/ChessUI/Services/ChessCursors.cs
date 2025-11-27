@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 
-namespace ChessUI;
+namespace ChessUI.Services;
 
 public static class ChessCursors
 {

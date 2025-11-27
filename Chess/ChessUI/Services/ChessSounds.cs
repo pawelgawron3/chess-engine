@@ -2,7 +2,7 @@
 using System.Media;
 using ChessEngine.Chessboard;
 
-namespace ChessUI;
+namespace ChessUI.Services;
 
 public static class ChessSounds
 {
