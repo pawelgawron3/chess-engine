@@ -18,6 +18,9 @@ public class Negamax
 
     public (Move? BestMove, int Score) Search(GameState state, int depth)
     {
+        if (depth <= 0)
+            throw new ArgumentOutOfRangeException(nameof(depth), "Initial search depth must be greater than 0.");
+
         state.Services.SimulationMode = true;
 
         KillerMoves.Init(depth);
