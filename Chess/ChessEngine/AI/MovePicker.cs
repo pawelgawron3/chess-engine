@@ -74,7 +74,8 @@ public class MovePicker
                 continue;
             }
 
-            _scores[i] = 0;
+            _scores[i] = HistoryHeuristicTable.Get(move);
+            //_scores[i] = 0;
         }
     }
 
