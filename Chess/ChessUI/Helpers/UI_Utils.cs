@@ -1,6 +1,6 @@
 ﻿using ChessEngine.Chessboard;
 
-namespace ChessEngine.Utils;
+namespace ChessUI.Helpers;
 
 public static class UI_Utils
 {
