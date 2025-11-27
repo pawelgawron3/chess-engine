@@ -8,11 +8,11 @@ public static class ChessSounds
 {
     private static readonly string BasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets/Sounds");
 
-    private static readonly SoundPlayer MoveSound = new SoundPlayer(Path.Combine(BasePath, "move-self.wav"));
-    private static readonly SoundPlayer CaptureSound = new SoundPlayer(Path.Combine(BasePath, "capture.wav"));
-    private static readonly SoundPlayer PromoteSound = new SoundPlayer(Path.Combine(BasePath, "promote.wav"));
-    private static readonly SoundPlayer CastleSound = new SoundPlayer(Path.Combine(BasePath, "castle.wav"));
-    private static readonly SoundPlayer CheckSound = new SoundPlayer(Path.Combine(BasePath, "move-check.wav"));
+    private static readonly SoundPlayer MoveSound = new(Path.Combine(BasePath, "move-self.wav"));
+    private static readonly SoundPlayer CaptureSound = new(Path.Combine(BasePath, "capture.wav"));
+    private static readonly SoundPlayer PromoteSound = new(Path.Combine(BasePath, "promote.wav"));
+    private static readonly SoundPlayer CastleSound = new(Path.Combine(BasePath, "castle.wav"));
+    private static readonly SoundPlayer CheckSound = new(Path.Combine(BasePath, "move-check.wav"));
 
     static ChessSounds()
     {
