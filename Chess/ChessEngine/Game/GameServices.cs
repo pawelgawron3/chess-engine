@@ -112,10 +112,9 @@ public class GameServices
         SwitchPlayer();
 
         _state.GameResult = null;
+
         if (!SimulationMode)
-        {
             _state.RaiseMoveMade(last);
-        }
     }
 
     public void RedoMove()
@@ -136,6 +135,7 @@ public class GameServices
 
         HalfMoveClock = next.HalfMoveClockAfter;
         FullMoveCounter = next.FullMoveCounterAfter;
+
         SwitchPlayer();
 
         _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
