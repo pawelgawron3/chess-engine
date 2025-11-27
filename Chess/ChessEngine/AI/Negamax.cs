@@ -23,6 +23,7 @@ public class Negamax
 
         state.Services.SimulationMode = true;
 
+        HistoryHeuristicTable.Reset();
         KillerMoves.Init(depth);
         Move? bestMove = null;
         int score = NegamaxSearch(state, depth, int.MinValue + 1, int.MaxValue - 1, true, ref bestMove);
@@ -93,7 +94,10 @@ public class Negamax
             if (alpha >= beta)
             {
                 if (AttackUtils.IsQuietMove(state.Board, move))
+                {
                     KillerMoves.AddKillerMove(depth, move);
+                    HistoryHeuristicTable.Add(move, depth);
+                }
 
                 break;
             }
