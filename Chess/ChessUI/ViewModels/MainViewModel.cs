@@ -8,8 +8,8 @@ using ChessEngine;
 using ChessEngine.AI;
 using ChessEngine.Chessboard;
 using ChessEngine.Game;
-using ChessEngine.Utils;
 using ChessUI.Commands;
+using ChessUI.Helpers;
 using ChessUI.Services;
 
 namespace ChessUI.ViewModels;
