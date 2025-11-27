@@ -1,24 +1,40 @@
-﻿using ChessEngine.Chessboard;
+﻿using System.ComponentModel;
+using ChessEngine.Chessboard;
 using ChessEngine.Components;
 using ChessEngine.MoveGeneration;
 
 namespace ChessEngine.Game;
 
-public class GameState
+public class GameState : INotifyPropertyChanged
 {
+    private Player _currentPlayer = Player.White;
     public Board Board { get; }
-    public Player CurrentPlayer { get; internal set; } = Player.White;
+
+    public Player CurrentPlayer
+    {
+        get => _currentPlayer;
+        set
+        {
+            if (_currentPlayer != value)
+            {
+                _currentPlayer = value;
+                OnPropertyChanged(nameof(CurrentPlayer));
+            }
+        }
+    }
+
     public Position? SelectedPosition { get; private set; }
     public GameResult? GameResult { get; internal set; }
     public GameServices Services { get; }
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public event Action<MoveRecord>? OnMoveMade;
 
-    public event Action<GameResult?>? OnGameEnded;
+    private void OnPropertyChanged(string propertyName)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     internal void RaiseMoveMade(MoveRecord record) => OnMoveMade?.Invoke(record);
-
-    internal void RaiseGameEnded(GameResult? result) => OnGameEnded?.Invoke(result);
 
     public GameState()
     {
