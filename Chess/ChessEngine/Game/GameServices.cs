@@ -73,7 +73,6 @@ public class GameServices
         {
             _state.ClearSelection();
             _state.RaiseMoveMade(record);
-            _state.RaiseGameEnded(_state.GameResult);
         }
 
         return true;
