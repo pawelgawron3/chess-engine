@@ -1,11 +1,13 @@
 ﻿<Application x:Class="ChessUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             StartupUri="MainWindow.xaml">
+             StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <SolidColorBrush x:Key="StrokeColor">#260000</SolidColorBrush>
         <SolidColorBrush x:Key="FillColor">#cc380404</SolidColorBrush>
         <SolidColorBrush x:Key="TextColor">#ffa274</SolidColorBrush>
+
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
         <Style TargetType="Border" x:Key="BorderStyle">
             <Setter Property="BorderThickness" Value="4" />
