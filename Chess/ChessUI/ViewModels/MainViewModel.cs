@@ -59,6 +59,7 @@ public class MainViewModel : INotifyPropertyChanged
     public ICommand AiMoveCommand { get; }
 
     public ICommand UndoCommand { get; }
+    public ICommand RedoCommand { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -66,6 +67,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         AiMoveCommand = new RelayCommand(_ => DoAiMove(), _ => true);
         UndoCommand = new RelayCommand(_ => { _gameState.TryUndoMove(); RefreshUI(); }, _ => true);
+        RedoCommand = new RelayCommand(_ => { _gameState.TryRedoMove(); RefreshUI(); }, _ => true);
 
         PromotionVM.OnPieceSelected = OnPromotionPieceSelected;
         _gameState.OnMoveMade += OnMoveMade;
