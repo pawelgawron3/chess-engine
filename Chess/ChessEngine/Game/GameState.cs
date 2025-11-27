@@ -55,4 +55,6 @@ public class GameState : INotifyPropertyChanged
     public bool TryMakeMove(Move move) => Services.MakeMove(move);
 
     public void TryUndoMove() => Services.UndoMove();
+
+    public void TryRedoMove() => Services.RedoMove();
 }
