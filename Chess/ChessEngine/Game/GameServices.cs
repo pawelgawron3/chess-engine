@@ -37,6 +37,9 @@ public class GameServices
         Piece movedPiece = _state.Board[move.From]!.Value;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
 
+        int halfMoveClockBefore = HalfMoveClock;
+        int fullMoveCounterBefore = FullMoveCounter;
+
         CastlingRights castlingBefore = Rules.CastlingRights;
         int? enPassantBefore = Rules.EnPassantFile;
         ulong previousHash = Hasher.CurrentHash;
@@ -50,6 +53,8 @@ public class GameServices
 
         Hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
 
+        ulong currentHash = Hasher.CurrentHash;
+
         bool opponentKingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer.Opponent());
         UpdateClocks(movedPiece, capturedPiece);
 
@@ -57,12 +62,18 @@ public class GameServices
             move,
             movedPiece,
             capturedPiece,
+            halfMoveClockBefore,
+            fullMoveCounterBefore,
             HalfMoveClock,
+            FullMoveCounter,
             previousHash,
+            currentHash,
             castlingBefore,
+            castlingAfter,
             move.PromotionPiece,
             opponentKingInCheck,
-            enPassantBefore
+            enPassantBefore,
+            enPassantAfter
         );
 
         History.Add(record);
@@ -105,6 +116,30 @@ public class GameServices
         {
             _state.RaiseMoveMade(last);
         }
+    }
+
+    public void RedoMove()
+    {
+        MoveRecord? next = History.Redo();
+        if (next == null) return;
+
+        _state.Board.MakeMove(next.Move);
+
+        Hasher.CurrentHash = next.HashAfter;
+        Rules.CastlingRights = next.CastlingRightsAfter;
+        Rules.EnPassantFile = next.EnPassantFileAfter;
+
+        if (!Hasher.PositionCounts.ContainsKey(Hasher.CurrentHash))
+            Hasher.PositionCounts.Add(Hasher.CurrentHash, 1);
+        else
+            Hasher.PositionCounts[Hasher.CurrentHash]++;
+
+        HalfMoveClock = next.HalfMoveClockAfter;
+        FullMoveCounter = next.FullMoveCounterAfter;
+        SwitchPlayer();
+
+        _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
+        _state.RaiseMoveMade(next);
     }
 
     private void SwitchPlayer() => _state.CurrentPlayer = _state.CurrentPlayer.Opponent();
