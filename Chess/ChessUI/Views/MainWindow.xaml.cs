@@ -44,5 +44,9 @@ public partial class MainWindow : Window
         {
             _vm.UndoCommand.Execute(null);
         }
+        else if (e.Key == Key.Right)
+        {
+            _vm.RedoCommand.Execute(null);
+        }
     }
 }
