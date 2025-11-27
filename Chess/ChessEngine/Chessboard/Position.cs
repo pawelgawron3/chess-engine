@@ -15,6 +15,8 @@ public readonly struct Position
         Column = column;
     }
 
+    public int ToIndex() => Row * 8 + Column;
+
     public override bool Equals(object? obj) => obj is Position position && position.Row == Row && position.Column == Column;
 
     public override int GetHashCode() => HashCode.Combine(Row, Column);
