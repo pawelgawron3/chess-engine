@@ -51,6 +51,8 @@ public class GameServices
         Hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
 
         bool opponentKingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer.Opponent());
+        UpdateClocks(movedPiece, capturedPiece);
+
         MoveRecord record = new MoveRecord(
             move,
             movedPiece,
@@ -64,7 +66,6 @@ public class GameServices
         );
 
         History.Add(record);
-        UpdateClocks(movedPiece, capturedPiece);
         SwitchPlayer();
 
         _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
