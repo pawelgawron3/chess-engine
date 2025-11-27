@@ -265,7 +265,7 @@ public class MainViewModel : INotifyPropertyChanged
             MoveCountText = _gameState.Services.FullMoveCounter.ToString();
 
         if (_gameState.Services.History.MoveHistory.Count > 0)
-            LastMoveText = UI_Utils.ReturnChessNotation(_gameState.Services.History.MoveHistory.Last());
+            LastMoveText = MoveNotationFormatter.ReturnChessNotation(_gameState.Services.History.MoveHistory.Last());
         else
         {
             LastMoveText = "-";

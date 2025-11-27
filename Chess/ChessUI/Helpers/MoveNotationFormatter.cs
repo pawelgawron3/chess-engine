@@ -2,7 +2,7 @@
 
 namespace ChessUI.Helpers;
 
-public static class UI_Utils
+public static class MoveNotationFormatter
 {
     public static string ReturnChessNotation(MoveRecord moveRecord)
     {
