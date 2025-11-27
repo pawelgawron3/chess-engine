@@ -37,49 +37,49 @@ public class GameServices
         Piece movedPiece = _state.Board[move.From]!.Value;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
 
-        int halfMoveClockBefore = HalfMoveClock;
-        int fullMoveCounterBefore = FullMoveCounter;
-
-        CastlingRights castlingBefore = Rules.CastlingRights;
-        int? enPassantBefore = Rules.EnPassantFile;
-        ulong previousHash = Hasher.CurrentHash;
+        MoveRecord record = new MoveRecord(
+            Move: move,
+            MovedPiece: movedPiece,
+            CapturedPiece: capturedPiece,
+            HalfMoveClockBefore: HalfMoveClock,
+            FullMoveCounterBefore: FullMoveCounter,
+            HalfMoveClockAfter: 0,                          // updated after the move
+            FullMoveCounterAfter: 0,                        // updated after the move
+            PreviousHash: Hasher.CurrentHash,
+            HashAfter: 0,                                   // updated after the move
+            CastlingRightsBefore: Rules.CastlingRights,
+            CastlingRightsAfter: default,                   // updated after the move
+            PromotedPieceType: move.PromotionPiece,
+            KingInCheck: false,                             // updated after the move
+            EnPassantFileBefore: Rules.EnPassantFile,
+            EnPassantFileAfter: null                        // updated after the move
+        );
 
         Rules.UpdateCastlingRights(movedPiece, move);
         _state.Board.MakeMove(move);
         Rules.UpdateEnPassantFile(move, movedPiece);
 
-        var castlingAfter = Rules.CastlingRights;
-        int? enPassantAfter = Rules.EnPassantFile;
+        Hasher.ApplyMove(move, movedPiece, capturedPiece,
+                         record.EnPassantFileBefore,
+                         Rules.EnPassantFile,
+                         record.CastlingRightsBefore,
+                         Rules.CastlingRights);
 
-        Hasher.ApplyMove(move, movedPiece, capturedPiece, enPassantBefore, enPassantAfter, castlingBefore, castlingAfter);
-
-        ulong currentHash = Hasher.CurrentHash;
-
-        bool opponentKingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer.Opponent());
         UpdateClocks(movedPiece, capturedPiece);
+        SwitchPlayer();
+        _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
 
-        MoveRecord record = new MoveRecord(
-            move,
-            movedPiece,
-            capturedPiece,
-            halfMoveClockBefore,
-            fullMoveCounterBefore,
-            HalfMoveClock,
-            FullMoveCounter,
-            previousHash,
-            currentHash,
-            castlingBefore,
-            castlingAfter,
-            move.PromotionPiece,
-            opponentKingInCheck,
-            enPassantBefore,
-            enPassantAfter
-        );
+        record = record with
+        {
+            HalfMoveClockAfter = HalfMoveClock,
+            FullMoveCounterAfter = FullMoveCounter,
+            HashAfter = Hasher.CurrentHash,
+            CastlingRightsAfter = Rules.CastlingRights,
+            KingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer),
+            EnPassantFileAfter = Rules.EnPassantFile,
+        };
 
         History.Add(record);
-        SwitchPlayer();
-
-        _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
 
         if (!SimulationMode)
         {
