@@ -2,9 +2,11 @@
 
 public struct MoveStruct
 {
-    public CastlingRights CastlingRightsBefore;
-    public int? EnPassantFileBefore;
+    public Piece MovedPiece;
+    public Piece? CapturedPiece;
     public int HalfMoveClockBefore;
     public ulong HashBefore;
-    public Piece? CapturedPiece;
+    public CastlingRights CastlingRightsBefore;
+    public PieceType? PromotedPieceType;
+    public int? EnPassantFileBefore;
 }
