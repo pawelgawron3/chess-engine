@@ -16,15 +16,21 @@ public class Negamax
         _evaluator = evaluator;
     }
 
-    public (Move? BestMove, int Score) Search(GameStateEngine state, int depth)
+    public (Move? BestMove, int Score) IterativeDeepeningSearch(GameStateEngine state, int maxDepth)
     {
-        if (depth <= 0)
-            throw new ArgumentOutOfRangeException(nameof(depth), "Initial search depth must be greater than 0.");
+        if (maxDepth <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxDepth), "Initial search depth must be greater than 0.");
 
         HistoryHeuristicTable.Reset();
-        KillerMoves.Init(depth);
+        KillerMoves.Init(maxDepth);
+
         Move? bestMove = null;
-        int score = NegamaxSearch(state, depth, int.MinValue + 1, int.MaxValue - 1, true, ref bestMove);
+        int score = 0;
+
+        for (int depth = 1; depth <= maxDepth; depth++)
+        {
+            score = NegamaxSearch(state, depth, int.MinValue + 1, int.MaxValue - 1, true, ref bestMove);
+        }
 
         return (bestMove, score);
     }
