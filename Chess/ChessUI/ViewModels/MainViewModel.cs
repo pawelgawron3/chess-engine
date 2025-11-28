@@ -295,9 +295,7 @@ public class MainViewModel : INotifyPropertyChanged
         Evaluator evaluator = new Evaluator();
         Negamax engine = new Negamax(evaluator);
 
-        var result = await Task.Run(() => engine.Search(_gameState, depth));
-        var bestMove = result.BestMove;
-        //var (bestMove, score) = engine.Search(_gameState, depth);
+        var (bestMove, score) = await Task.Run(() => engine.Search(_gameState, depth));
         if (bestMove != null)
         {
             _gameState.TryMakeMove(bestMove.Value);
