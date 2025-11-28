@@ -137,7 +137,13 @@ public class GameStateUI
 
         GameStateEngine.Services.SwitchPlayer();
 
-        GameStateEngine.GameResult = GameStateEngine.Services.Evaluator.Evaluate(GameStateEngine.Services.Hasher.CurrentHash, GameStateEngine.Services.Hasher.PositionCounts, GameStateEngine.Services.HalfMoveClock);
+        GameStateEngine.GameResult = GameStateEngine
+                                    .Services
+                                    .Evaluator
+                                    .Evaluate(GameStateEngine.Services.Hasher.CurrentHash,
+                                              GameStateEngine.Services.Hasher.PositionCounts,
+                                              GameStateEngine.Services.HalfMoveClock
+                                    );
         RaiseMoveMade(next);
     }
 }
