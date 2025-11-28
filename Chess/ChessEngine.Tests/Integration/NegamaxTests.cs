@@ -17,7 +17,7 @@ public class NegamaxTests
 
         Evaluator evaluator = new Evaluator();
         Negamax negamax = new Negamax(evaluator);
-        var (bestMove, score) = negamax.Search(state, 5);
+        var (bestMove, score) = negamax.IterativeDeepeningSearch(state, 5);
 
         Assert.NotNull(bestMove);
         Assert.InRange(score, 999_999, 1_000_010);

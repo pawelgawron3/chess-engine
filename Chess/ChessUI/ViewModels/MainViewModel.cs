@@ -290,12 +290,12 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async void DoAiMove()
     {
-        int depth = 6;
+        int maxDepth = 6;
 
         Evaluator evaluator = new Evaluator();
         Negamax engine = new Negamax(evaluator);
 
-        var (bestMove, score) = await Task.Run(() => engine.Search(_gameState.GameStateEngine, depth));
+        var (bestMove, score) = await Task.Run(() => engine.IterativeDeepeningSearch(_gameState.GameStateEngine, maxDepth));
         if (bestMove != null)
         {
             _gameState.TryMakeMove(bestMove.Value);
