@@ -78,9 +78,11 @@ public class Negamax
 
         while (movePicker.TryGetNext(out var move))
         {
-            state.TryMakeMove(move);
+            //state.TryMakeMove(move);
+            state.Services.EngineMakeMove(move, out var undo);
             int score = -NegamaxSearch(state, depth - 1, -beta, -alpha, false, ref bestRootMove);
-            state.TryUndoMove();
+            state.Services.EngineUndoMove(move, undo);
+            //state.TryUndoMove();
 
             if (score > alpha)
             {
