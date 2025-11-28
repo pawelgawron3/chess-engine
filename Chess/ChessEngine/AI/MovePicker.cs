@@ -16,7 +16,7 @@ public class MovePicker
     private readonly Move? _ttMove;
     private int _index = 0;
 
-    public MovePicker(IEnumerable<Move> moves, GameState state, int depth, Move? ttMove)
+    public MovePicker(IEnumerable<Move> moves, GameStateEngine state, int depth, Move? ttMove)
     {
         _moves = moves.ToArray();
         _scores = new int[_moves.Length];
@@ -39,7 +39,7 @@ public class MovePicker
         return true;
     }
 
-    private void ScoreMoves(GameState state)
+    private void ScoreMoves(GameStateEngine state)
     {
         for (int i = 0; i < _moves.Length; i++)
         {
@@ -75,7 +75,6 @@ public class MovePicker
             }
 
             _scores[i] = HistoryHeuristicTable.Get(move);
-            //_scores[i] = 0;
         }
     }
 

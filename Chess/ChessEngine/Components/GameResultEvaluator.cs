@@ -6,9 +6,9 @@ namespace ChessEngine.Components;
 
 public class GameResultEvaluator
 {
-    private readonly GameState _state;
+    private readonly GameStateEngine _state;
 
-    public GameResultEvaluator(GameState state)
+    public GameResultEvaluator(GameStateEngine state)
     {
         _state = state;
     }

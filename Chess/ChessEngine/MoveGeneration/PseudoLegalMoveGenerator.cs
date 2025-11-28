@@ -10,7 +10,7 @@ public static class PseudoLegalMoveGenerator
     /// <summary>
     /// Generates all pseudo-legal moves for the currently selected piece.
     /// </summary>
-    public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameState state, Position from)
+    public static IEnumerable<Move> GeneratePseudoLegalMovesForPiece(GameStateEngine state, Position from)
     {
         Piece? piece = state.Board[from];
         if (piece == null)
@@ -23,7 +23,7 @@ public static class PseudoLegalMoveGenerator
     /// <summary>
     /// Generates all pseudo-legal moves for the current player.
     /// </summary>
-    public static IEnumerable<Move> GeneratePseudoLegalMoves(GameState state)
+    public static IEnumerable<Move> GeneratePseudoLegalMoves(GameStateEngine state)
     {
         Player player = state.CurrentPlayer;
         var castlingRights = state.Services.Rules.CastlingRights;

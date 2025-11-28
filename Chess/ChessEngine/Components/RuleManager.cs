@@ -4,9 +4,9 @@ namespace ChessEngine.Components;
 
 public class RuleManager
 {
-    public int? EnPassantFile { get; internal set; }
+    public int? EnPassantFile { get; set; }
 
-    public CastlingRights CastlingRights { get; internal set; }
+    public CastlingRights CastlingRights { get; set; }
 
     public RuleManager(CastlingRights initialRights)
     {

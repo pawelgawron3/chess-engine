@@ -5,7 +5,7 @@ namespace ChessEngine.AI;
 
 public class Evaluator : IEvaluationFunction
 {
-    public int Evaluate(GameState state)
+    public int Evaluate(GameStateEngine state)
     {
         int score = 0;
         bool isEndgame = IsEndgame(state.Board);

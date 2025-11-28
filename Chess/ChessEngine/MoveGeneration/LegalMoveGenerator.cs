@@ -10,13 +10,9 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Generates all legal moves for the currently selected piece.
     /// </summary>
-    public static IEnumerable<Move> GenerateLegalMovesForPiece(GameState state)
+    public static IEnumerable<Move> GenerateLegalMovesForPiece(GameStateEngine state, Position pos)
     {
-        if (state.SelectedPosition == null)
-            yield break;
-
-        Position from = state.SelectedPosition.Value;
-        foreach (var move in GeneratePseudoLegalMovesForPiece(state, from))
+        foreach (var move in GeneratePseudoLegalMovesForPiece(state, pos))
         {
             if (IsMoveLegal(state, move))
                 yield return move;
@@ -26,7 +22,7 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Generates all legal moves for the current player.
     /// </summary>
-    public static IEnumerable<Move> GenerateLegalMoves(GameState state)
+    public static IEnumerable<Move> GenerateLegalMoves(GameStateEngine state)
     {
         foreach (var move in GeneratePseudoLegalMoves(state))
         {
@@ -38,7 +34,7 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Tests if a move is legal without modifying the actual game history.
     /// </summary>
-    public static bool IsMoveLegal(GameState state, Move move)
+    public static bool IsMoveLegal(GameStateEngine state, Move move)
     {
         Piece movedPiece = state.Board[move.From]!.Value;
         Piece? capturedPiece = GetCapturedPiece(state.Board, move);

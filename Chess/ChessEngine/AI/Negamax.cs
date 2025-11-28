@@ -16,23 +16,20 @@ public class Negamax
         _evaluator = evaluator;
     }
 
-    public (Move? BestMove, int Score) Search(GameState state, int depth)
+    public (Move? BestMove, int Score) Search(GameStateEngine state, int depth)
     {
         if (depth <= 0)
             throw new ArgumentOutOfRangeException(nameof(depth), "Initial search depth must be greater than 0.");
-
-        state.Services.SimulationMode = true;
 
         HistoryHeuristicTable.Reset();
         KillerMoves.Init(depth);
         Move? bestMove = null;
         int score = NegamaxSearch(state, depth, int.MinValue + 1, int.MaxValue - 1, true, ref bestMove);
 
-        state.Services.SimulationMode = false;
         return (bestMove, score);
     }
 
-    private int NegamaxSearch(GameState state, int depth, int alpha, int beta, bool isRootMove, ref Move? bestRootMove)
+    private int NegamaxSearch(GameStateEngine state, int depth, int alpha, int beta, bool isRootMove, ref Move? bestRootMove)
     {
         if (state.GameResult != null)
         {
@@ -78,11 +75,9 @@ public class Negamax
 
         while (movePicker.TryGetNext(out var move))
         {
-            //state.TryMakeMove(move);
             state.Services.EngineMakeMove(move, out var undo);
             int score = -NegamaxSearch(state, depth - 1, -beta, -alpha, false, ref bestRootMove);
             state.Services.EngineUndoMove(move, undo);
-            //state.TryUndoMove();
 
             if (score > alpha)
             {

@@ -4,7 +4,7 @@ namespace ChessEngine.Components;
 
 public class ZobristHasher
 {
-    public ulong CurrentHash { get; internal set; }
+    public ulong CurrentHash { get; set; }
     public Dictionary<ulong, int> PositionCounts { get; } = new();
 
     private readonly Board _board;
