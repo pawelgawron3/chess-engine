@@ -164,4 +164,18 @@ public class Board
             }
         }
     }
+
+    /// <summary>
+    /// Clears the entire board, removing all pieces.
+    /// </summary>
+    public void Clear()
+    {
+        for (int row = 0; row < 8; row++)
+        {
+            for (int col = 0; col < 8; col++)
+            {
+                _squares[row, col] = null;
+            }
+        }
+    }
 }
