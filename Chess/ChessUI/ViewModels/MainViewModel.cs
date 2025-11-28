@@ -290,7 +290,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async void DoAiMove()
     {
-        int depth = 3;
+        int depth = 6;
 
         Evaluator evaluator = new Evaluator();
         Negamax engine = new Negamax(evaluator);
