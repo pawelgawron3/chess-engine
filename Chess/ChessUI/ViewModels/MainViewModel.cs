@@ -7,16 +7,16 @@ using System.Windows.Media.Imaging;
 using ChessEngine;
 using ChessEngine.AI;
 using ChessEngine.Chessboard;
-using ChessEngine.Game;
 using ChessUI.Commands;
 using ChessUI.Helpers;
+using ChessUI.Models;
 using ChessUI.Services;
 
 namespace ChessUI.ViewModels;
 
 public class MainViewModel : INotifyPropertyChanged
 {
-    private readonly GameState _gameState = new GameState();
+    private readonly GameStateUI _gameState = new();
     private Move _pendingPromotionMove;
     private bool _isAwaitingPromotion = false;
     private bool _isPromotionVisible = false;
@@ -25,7 +25,7 @@ public class MainViewModel : INotifyPropertyChanged
     private string _gameStatusText = "Game in progress...";
     private const int _squareSize = 75;
 
-    public GameState GameState => _gameState;
+    public GameStateUI GameState => _gameState;
 
     public bool IsPromotionVisible
     {
@@ -66,8 +66,8 @@ public class MainViewModel : INotifyPropertyChanged
     public MainViewModel()
     {
         AiMoveCommand = new RelayCommand(_ => DoAiMove(), _ => true);
-        UndoCommand = new RelayCommand(_ => { _gameState.TryUndoMove(); RefreshUI(); }, _ => true);
-        RedoCommand = new RelayCommand(_ => { _gameState.TryRedoMove(); RefreshUI(); }, _ => true);
+        UndoCommand = new RelayCommand(_ => { _gameState.UndoMove(); RefreshUI(); }, _ => true);
+        RedoCommand = new RelayCommand(_ => { _gameState.RedoMove(); RefreshUI(); }, _ => true);
 
         PromotionVM.OnPieceSelected = OnPromotionPieceSelected;
         _gameState.OnMoveMade += OnMoveMade;
@@ -91,7 +91,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             for (int col = 0; col < 8; col++)
             {
-                Piece? piece = _gameState.Board[row, col];
+                Piece? piece = _gameState.GameStateEngine.Board[row, col];
                 if (piece == null) continue;
 
                 string suffix = (piece.Value.Owner == Player.White) ? "W" : "B";
@@ -131,8 +131,8 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void TrySelectPiece(Position pos)
     {
-        Piece? piece = _gameState.Board[pos];
-        if (piece != null && piece.Value.Owner == _gameState.CurrentPlayer)
+        Piece? piece = _gameState.GameStateEngine.Board[pos];
+        if (piece != null && piece.Value.Owner == _gameState.GameStateEngine.CurrentPlayer)
         {
             _gameState.SelectPosition(pos);
             HighlightMovesForSelectedPiece();
@@ -155,7 +155,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             _pendingPromotionMove = move;
             _isAwaitingPromotion = true;
-            ShowPromotionForPlayer(_gameState.CurrentPlayer);
+            ShowPromotionForPlayer(_gameState.GameStateEngine.CurrentPlayer);
             return;
         }
 
@@ -180,7 +180,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         foreach (var move in moves)
         {
-            Piece? targetPiece = _gameState.Board[move.To];
+            Piece? targetPiece = _gameState.GameStateEngine.Board[move.To];
 
             if (targetPiece == null)
             {
@@ -261,18 +261,18 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void UpdateGameInfo()
     {
-        if (_gameState.CurrentPlayer == Player.Black)
-            MoveCountText = _gameState.Services.FullMoveCounter.ToString();
+        if (_gameState.GameStateEngine.CurrentPlayer == Player.Black)
+            MoveCountText = _gameState.GameStateEngine.Services.FullMoveCounter.ToString();
 
-        if (_gameState.Services.History.MoveHistory.Count > 0)
-            LastMoveText = MoveNotationFormatter.ReturnChessNotation(_gameState.Services.History.MoveHistory.Last());
+        if (_gameState.GameStateEngine.Services.History.MoveHistory.Count > 0)
+            LastMoveText = MoveNotationFormatter.ReturnChessNotation(_gameState.GameStateEngine.Services.History.MoveHistory.Last());
         else
         {
             LastMoveText = "-";
             MoveCountText = "0";
         }
 
-        GameStatusText = _gameState.Services.Evaluator.ToDisplayString(_gameState.GameResult);
+        GameStatusText = _gameState.GameStateEngine.Services.Evaluator.ToDisplayString(_gameState.GameStateEngine.GameResult);
     }
 
     private void OnMoveMade(MoveRecord lastMove)
@@ -295,7 +295,7 @@ public class MainViewModel : INotifyPropertyChanged
         Evaluator evaluator = new Evaluator();
         Negamax engine = new Negamax(evaluator);
 
-        var (bestMove, score) = await Task.Run(() => engine.Search(_gameState, depth));
+        var (bestMove, score) = await Task.Run(() => engine.Search(_gameState.GameStateEngine, depth));
         if (bestMove != null)
         {
             _gameState.TryMakeMove(bestMove.Value);
