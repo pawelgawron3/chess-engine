@@ -288,14 +288,16 @@ public class MainViewModel : INotifyPropertyChanged
         UpdateGameInfo();
     }
 
-    private void DoAiMove()
+    private async void DoAiMove()
     {
         int depth = 3;
 
         Evaluator evaluator = new Evaluator();
         Negamax engine = new Negamax(evaluator);
 
-        var (bestMove, score) = engine.Search(_gameState, depth);
+        var result = await Task.Run(() => engine.Search(_gameState, depth));
+        var bestMove = result.BestMove;
+        //var (bestMove, score) = engine.Search(_gameState, depth);
         if (bestMove != null)
         {
             _gameState.TryMakeMove(bestMove.Value);
