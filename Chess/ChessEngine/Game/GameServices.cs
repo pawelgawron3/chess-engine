@@ -142,6 +142,62 @@ public class GameServices
         _state.RaiseMoveMade(next);
     }
 
+    public void EngineMakeMove(Move move, out MoveStruct undo)
+    {
+        undo = new MoveStruct
+        {
+            CastlingRightsBefore = Rules.CastlingRights,
+            EnPassantFileBefore = Rules.EnPassantFile,
+            HalfMoveClockBefore = HalfMoveClock,
+            HashBefore = Hasher.CurrentHash,
+            CapturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move)
+        };
+
+        Piece movedPiece = _state.Board[move.From]!.Value;
+
+        Rules.UpdateCastlingRights(movedPiece, move);
+        _state.Board.MakeMove(move);
+        Rules.UpdateEnPassantFile(move, movedPiece);
+
+        UpdateClocks(movedPiece, undo.CapturedPiece);
+
+        Hasher.ApplyMove(
+            move,
+            movedPiece,
+            undo.CapturedPiece,
+            undo.EnPassantFileBefore,
+            Rules.EnPassantFile,
+            undo.CastlingRightsBefore,
+            Rules.CastlingRights
+        );
+
+        SwitchPlayer();
+        _state.GameResult = Evaluator.Evaluate(Hasher.CurrentHash, Hasher.PositionCounts, HalfMoveClock);
+    }
+
+    public void EngineUndoMove(Move move, MoveStruct undo)
+    {
+        Piece movedPiece = _state.Board[move.To]!.Value;
+
+        _state.Board.UndoMove(move, movedPiece, undo.CapturedPiece);
+
+        if (Hasher.PositionCounts.ContainsKey(Hasher.CurrentHash))
+        {
+            Hasher.PositionCounts[Hasher.CurrentHash]--;
+            if (Hasher.PositionCounts[Hasher.CurrentHash] <= 0)
+                Hasher.PositionCounts.Remove(Hasher.CurrentHash);
+        }
+
+        Hasher.CurrentHash = undo.HashBefore;
+
+        Rules.CastlingRights = undo.CastlingRightsBefore;
+        Rules.EnPassantFile = undo.EnPassantFileBefore;
+
+        RevertClocks(undo.HalfMoveClockBefore);
+        SwitchPlayer();
+        _state.GameResult = null;
+    }
+
     private void SwitchPlayer() => _state.CurrentPlayer = _state.CurrentPlayer.Opponent();
 
     private void UpdateClocks(Piece movedPiece, Piece? capturedPiece)
