@@ -117,7 +117,7 @@ public class ZobristHasher
         return hash;
     }
 
-    private ulong ComputeZobristHash()
+    internal ulong ComputeZobristHash()
     {
         ulong hash = 0;
 
