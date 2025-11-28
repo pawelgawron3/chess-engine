@@ -18,7 +18,8 @@ public class GameState : INotifyPropertyChanged
             if (_currentPlayer != value)
             {
                 _currentPlayer = value;
-                OnPropertyChanged(nameof(CurrentPlayer));
+                if (!Services.SimulationMode)
+                    OnPropertyChanged(nameof(CurrentPlayer));
             }
         }
     }
