@@ -19,4 +19,19 @@ public class ZobristIntegrationTests
             Assert.Equal(initialHash, state.Services.Hasher.CurrentHash);
         }
     }
+
+    [Fact]
+    public void MakeUndoEngine_MustRestoreZobristHash()
+    {
+        GameState state = new GameState();
+        var initialHash = state.Services.Hasher.CurrentHash;
+
+        foreach (var move in LegalMoveGenerator.GenerateLegalMoves(state))
+        {
+            state.Services.EngineMakeMove(move, out var undo);
+            state.Services.EngineUndoMove(move, undo);
+
+            Assert.Equal(initialHash, state.Services.Hasher.CurrentHash);
+        }
+    }
 }
