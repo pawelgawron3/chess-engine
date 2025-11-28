@@ -12,6 +12,8 @@ public static class FenLoader
         string sideToMove = parts[1];
         string castling = parts[2];
         string enPassant = parts[3];
+        int halfMoveClock = parts.Length > 4 ? int.Parse(parts[4]) : 0;
+        int fullMoveNumber = parts.Length > 5 ? int.Parse(parts[5]) : 1;
 
         int row = 0;
         int col = 0;
@@ -63,6 +65,9 @@ public static class FenLoader
             state.Services.Rules.EnPassantFile = null;
         else
             state.Services.Rules.EnPassantFile = enPassant[0] - 'a';
+
+        state.Services.HalfMoveClock = halfMoveClock;
+        state.Services.FullMoveCounter = fullMoveNumber;
 
         state.Services.Hasher.ComputeZobristHash();
     }
