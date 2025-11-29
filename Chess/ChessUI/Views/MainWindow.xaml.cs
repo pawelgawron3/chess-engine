@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using ChessUI.Services;
 using ChessUI.ViewModels;
 
 namespace ChessUI.Views;
@@ -12,6 +13,8 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _vm = (MainViewModel)DataContext;
+
+        Cursor = ChessCursors.White;
     }
 
     private void BoardGrid_MouseDown(object sender, MouseButtonEventArgs e)
