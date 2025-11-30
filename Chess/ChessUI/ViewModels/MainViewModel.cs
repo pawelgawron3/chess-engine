@@ -91,7 +91,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public void OnBoardClick(Point point)
     {
-        if (_isAwaitingPromotion) return;
+        if (IsBusy || _isAwaitingPromotion) return;
 
         Position pos = GetBoardPositionFromClick(point);
         HandleBoardClick(pos);
@@ -304,8 +304,9 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async void DoAiMove()
     {
-        int maxDepth = 6;
+        IsBusy = true;
 
+        int maxDepth = 6;
         Evaluator evaluator = new Evaluator();
         Negamax engine = new Negamax(evaluator);
 
@@ -319,5 +320,7 @@ public class MainViewModel : INotifyPropertyChanged
         {
             MessageBox.Show("No legal moves found for AI", "AI Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
+        IsBusy = false;
     }
 }
