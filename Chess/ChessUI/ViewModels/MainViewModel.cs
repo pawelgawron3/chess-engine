@@ -32,7 +32,7 @@ public class MainViewModel : INotifyPropertyChanged
     public bool IsBusy
     {
         get => _isBusy;
-        set { _isBusy = value; Raise(nameof(IsBusy)); }
+        set { _isBusy = value; }
     }
 
     public bool IsPromotionVisible
@@ -89,6 +89,8 @@ public class MainViewModel : INotifyPropertyChanged
         RefreshUI();
     }
 
+    private void Raise(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
     public void OnBoardClick(Point point)
     {
         if (IsBusy || _isAwaitingPromotion) return;
@@ -125,8 +127,6 @@ public class MainViewModel : INotifyPropertyChanged
             }
         }
     }
-
-    private void Raise(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     private static Position GetBoardPositionFromClick(Point point)
     {
@@ -295,6 +295,15 @@ public class MainViewModel : INotifyPropertyChanged
         ChessSounds.PlaySoundForMove(lastMove.Move, lastMove.CapturedPiece, lastMove.KingInCheck);
     }
 
+    private void SetBusy(bool value)
+    {
+        IsBusy = value;
+
+        (AiMoveCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (UndoCommand as RelayCommand)?.RaiseCanExecuteChanged();
+        (RedoCommand as RelayCommand)?.RaiseCanExecuteChanged();
+    }
+
     private void RefreshUI()
     {
         DrawBoard();
@@ -304,7 +313,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private async void DoAiMove()
     {
-        IsBusy = true;
+        SetBusy(true);
 
         int maxDepth = 6;
         Evaluator evaluator = new Evaluator();
@@ -321,6 +330,6 @@ public class MainViewModel : INotifyPropertyChanged
             MessageBox.Show("No legal moves found for AI", "AI Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        IsBusy = false;
+        SetBusy(false);
     }
 }
