@@ -23,6 +23,7 @@ public class MainViewModel : INotifyPropertyChanged
     private string _moveCountText = "0";
     private string _lastMoveText = "—";
     private string _gameStatusText = "Game in progress...";
+    private string _sideToMove = "White";
     private const int _squareSize = 75;
 
     public GameStateUI GameState => _gameState;
@@ -49,6 +50,12 @@ public class MainViewModel : INotifyPropertyChanged
     {
         get => _moveCountText;
         set { _moveCountText = value; Raise(nameof(MoveCountText)); }
+    }
+
+    public string SideToMove
+    {
+        get => _sideToMove;
+        set { _sideToMove = value; Raise(nameof(SideToMove)); }
     }
 
     public ObservableCollection<PieceViewModel> Pieces { get; } = new();
@@ -273,6 +280,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
 
         GameStatusText = _gameState.GameStateEngine.Services.Evaluator.ToDisplayString(_gameState.GameStateEngine.GameResult);
+        SideToMove = _gameState.GameStateEngine.CurrentPlayer.ToString();
     }
 
     private void OnMoveMade(MoveRecord lastMove)
