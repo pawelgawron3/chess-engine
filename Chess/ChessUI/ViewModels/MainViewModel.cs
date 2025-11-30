@@ -20,6 +20,7 @@ public class MainViewModel : INotifyPropertyChanged
     private Move _pendingPromotionMove;
     private bool _isAwaitingPromotion = false;
     private bool _isPromotionVisible = false;
+    private bool _isBusy = false;
     private string _moveCountText = "0";
     private string _lastMoveText = "—";
     private string _gameStatusText = "Game in progress...";
@@ -27,6 +28,12 @@ public class MainViewModel : INotifyPropertyChanged
     private const int _squareSize = 75;
 
     public GameStateUI GameState => _gameState;
+
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set { _isBusy = value; Raise(nameof(IsBusy)); }
+    }
 
     public bool IsPromotionVisible
     {
@@ -72,9 +79,9 @@ public class MainViewModel : INotifyPropertyChanged
 
     public MainViewModel()
     {
-        AiMoveCommand = new RelayCommand(_ => DoAiMove(), _ => true);
-        UndoCommand = new RelayCommand(_ => { _gameState.UndoMove(); RefreshUI(); }, _ => true);
-        RedoCommand = new RelayCommand(_ => { _gameState.RedoMove(); RefreshUI(); }, _ => true);
+        AiMoveCommand = new RelayCommand(_ => DoAiMove(), _ => !IsBusy);
+        UndoCommand = new RelayCommand(_ => { _gameState.UndoMove(); RefreshUI(); }, _ => !IsBusy);
+        RedoCommand = new RelayCommand(_ => { _gameState.RedoMove(); RefreshUI(); }, _ => !IsBusy);
 
         PromotionVM.OnPieceSelected = OnPromotionPieceSelected;
         _gameState.OnMoveMade += OnMoveMade;
