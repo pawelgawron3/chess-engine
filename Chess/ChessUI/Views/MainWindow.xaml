@@ -137,8 +137,7 @@
                             BorderThickness="0"
                             FontWeight="Bold"
                             Cursor="Hand"
-                            Command="{Binding AiMoveCommand}">
-                    </Button>
+                            Command="{Binding AiMoveCommand}" />
 
                     <Button Content="Undo (Left Arrow)"
                             Width="140"
@@ -151,6 +150,20 @@
                             Height="30"
                             Margin="0,6,0,0"
                             Command="{Binding RedoCommand}" />
+
+                    <ListBox ItemsSource="{Binding MoveHistoryDisplay}"
+                             Margin="0,6,0,0"
+                             Height="280"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             SelectionMode="Single">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="IsHitTestVisible" Value="False" />
+                                <Setter Property="Focusable" Value="False" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
                 </StackPanel>
             </Border>
         </Grid>
