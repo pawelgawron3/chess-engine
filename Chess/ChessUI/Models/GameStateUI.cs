@@ -1,4 +1,5 @@
 ﻿using ChessEngine.Chessboard;
+using ChessEngine.Components;
 using ChessEngine.Game;
 using ChessEngine.MoveGeneration;
 using ChessEngine.Utils;
@@ -51,6 +52,7 @@ public class GameStateUI
             CastlingRightsAfter: default,
             PromotedPieceType: move.PromotionPiece,
             KingInCheck: false,
+            IsCheckmate: false,
             EnPassantFileBefore: GameStateEngine.Services.Rules.EnPassantFile,
             EnPassantFileAfter: null
         );
@@ -79,6 +81,7 @@ public class GameStateUI
             HashAfter = GameStateEngine.Services.Hasher.CurrentHash,
             CastlingRightsAfter = GameStateEngine.Services.Rules.CastlingRights,
             KingInCheck = AttackUtils.IsKingInCheck(GameStateEngine.Board, GameStateEngine.CurrentPlayer),
+            IsCheckmate = (GameStateEngine.GameResult?.Reason == GameEndReason.Checkmate),
             EnPassantFileAfter = GameStateEngine.Services.Rules.EnPassantFile,
         };
 

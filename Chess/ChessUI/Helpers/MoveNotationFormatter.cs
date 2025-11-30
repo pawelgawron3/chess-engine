@@ -40,7 +40,9 @@ public static class MoveNotationFormatter
         if (moveRecord.PromotedPieceType is PieceType promoted)
             notation += $"={GetPieceLetter(promoted)}";
 
-        if (moveRecord.KingInCheck)
+        if (moveRecord.IsCheckmate)
+            notation += "#";
+        else if (moveRecord.KingInCheck)
             notation += "+";
 
         return notation;

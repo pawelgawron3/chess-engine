@@ -13,6 +13,7 @@ public record MoveRecord(
     CastlingRights CastlingRightsAfter,
     PieceType? PromotedPieceType = null,
     bool KingInCheck = false,
+    bool IsCheckmate = false,
     int? EnPassantFileBefore = null,
     int? EnPassantFileAfter = null
 );
