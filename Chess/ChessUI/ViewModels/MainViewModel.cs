@@ -65,6 +65,7 @@ public class MainViewModel : INotifyPropertyChanged
         set { _sideToMove = value; Raise(nameof(SideToMove)); }
     }
 
+    public ObservableCollection<string> MoveHistoryDisplay { get; } = new();
     public ObservableCollection<PieceViewModel> Pieces { get; } = new();
     public ObservableCollection<HighlightViewModel> Highlights { get; } = new();
 
@@ -304,11 +305,33 @@ public class MainViewModel : INotifyPropertyChanged
         (RedoCommand as RelayCommand)?.RaiseCanExecuteChanged();
     }
 
+    private void UpdateMoveHistoryDisplay()
+    {
+        MoveHistoryDisplay.Clear();
+
+        var moveHistory = _gameState.GameStateEngine.Services.History.MoveHistory;
+        for (int i = 0; i < moveHistory.Count; i += 2)
+        {
+            string whiteMove = MoveNotationFormatter.ReturnChessNotation(moveHistory[i]);
+            string blackMove = (i + 1 < moveHistory.Count) ?
+                MoveNotationFormatter.ReturnChessNotation(moveHistory[i + 1]) :
+                "";
+
+            int moveNumber = (i / 2) + 1;
+            string line = (string.IsNullOrEmpty(blackMove)) ?
+                $"{moveNumber}. {whiteMove}" :
+                $"{moveNumber}. {whiteMove} {blackMove}";
+
+            MoveHistoryDisplay.Add(line);
+        }
+    }
+
     private void RefreshUI()
     {
         DrawBoard();
         ClearHighlights();
         UpdateGameInfo();
+        UpdateMoveHistoryDisplay();
     }
 
     private async void DoAiMove()
