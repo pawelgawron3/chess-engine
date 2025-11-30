@@ -286,7 +286,6 @@ public class MainViewModel : INotifyPropertyChanged
     private void OnMoveMade(MoveRecord lastMove)
     {
         ChessSounds.PlaySoundForMove(lastMove.Move, lastMove.CapturedPiece, lastMove.KingInCheck);
-        UpdateGameInfo();
     }
 
     private void RefreshUI()
