@@ -1,14 +1,15 @@
 ﻿using ChessEngine.Chessboard;
+using ChessEngine.Game;
 using static ChessEngine.Utils.PositionUtils;
 
 namespace ChessEngine.Utils;
 
 public static class AttackUtils
 {
-    public static bool IsKingInCheck(Board board, Player player)
+    public static bool IsKingInCheck(GameStateEngine state, Player player)
     {
-        Position kingPos = GetKingPosition(board, player);
-        return IsSquareAttacked(board, kingPos, player.Opponent());
+        Position kingPos = (player == Player.White) ? state.WhiteKingPos : state.BlackKingPos;
+        return IsSquareAttacked(state.Board, kingPos, player.Opponent());
     }
 
     public static bool IsSquareAttacked(Board board, Position square, Player attacker)
@@ -31,23 +32,6 @@ public static class AttackUtils
     public static bool IsCapture(Board board, Move move) => GetCapturedPiece(board, move) != null;
 
     public static bool IsQuietMove(Board board, Move move) => GetCapturedPiece(board, move) == null;
-
-    private static Position GetKingPosition(Board board, Player player)
-    {
-        for (int row = 0; row < 8; row++)
-        {
-            for (int col = 0; col < 8; col++)
-            {
-                Piece? piece = board[row, col];
-                if (piece?.Type == PieceType.King && piece.Value.Owner == player)
-                {
-                    return new Position(row, col);
-                }
-            }
-        }
-
-        throw new InvalidOperationException($"Error! King not found for player {player}!");
-    }
 
     private static bool IsAttackedByPawn(Board board, Position square, Player attacker)
     {
