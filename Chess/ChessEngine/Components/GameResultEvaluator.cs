@@ -27,7 +27,7 @@ public class GameResultEvaluator
         if (_state.GetLegalMoves().Any())
             return null;
 
-        bool kingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer);
+        bool kingInCheck = AttackUtils.IsKingInCheck(_state, _state.CurrentPlayer);
         return kingInCheck
             ? GameResult.Win(_state.CurrentPlayer.Opponent())
             : GameResult.Draw(GameEndReason.Stalemate);
