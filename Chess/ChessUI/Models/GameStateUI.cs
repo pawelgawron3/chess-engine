@@ -1,8 +1,5 @@
 ﻿using ChessEngine.Chessboard;
-using ChessEngine.Components;
 using ChessEngine.Game;
-using ChessEngine.MoveGeneration;
-using ChessEngine.Utils;
 
 namespace ChessUI.Models;
 
@@ -32,65 +29,17 @@ public class GameStateUI
 
     public bool TryMakeMove(Move move)
     {
-        if (GameStateEngine.GameResult != null || !LegalMoveGenerator.IsMoveLegal(GameStateEngine, move))
-            return false;
+        var command = new MoveCommand(GameStateEngine, move);
+        command.Execute();
 
-        Piece movedPiece = GameStateEngine.Board[move.From]!.Value;
-        Piece? capturedPiece = AttackUtils.GetCapturedPiece(GameStateEngine.Board, move);
-
-        MoveRecord record = new MoveRecord(
-            Move: move,
-            MovedPiece: movedPiece,
-            CapturedPiece: capturedPiece,
-            HalfMoveClockBefore: GameStateEngine.Services.HalfMoveClock,
-            FullMoveCounterBefore: GameStateEngine.Services.FullMoveCounter,
-            HalfMoveClockAfter: 0,
-            FullMoveCounterAfter: 0,
-            PreviousHash: GameStateEngine.Services.Hasher.CurrentHash,
-            HashAfter: 0,
-            CastlingRightsBefore: GameStateEngine.Services.Rules.CastlingRights,
-            CastlingRightsAfter: default,
-            PromotedPieceType: move.PromotionPiece,
-            KingInCheck: false,
-            IsCheckmate: false,
-            EnPassantFileBefore: GameStateEngine.Services.Rules.EnPassantFile,
-            EnPassantFileAfter: null
-        );
-
-        GameStateEngine.Services.Rules.UpdateCastlingRights(movedPiece, move);
-        GameStateEngine.Board.MakeMove(move);
-        GameStateEngine.Services.Rules.UpdateEnPassantFile(move, movedPiece);
-
-        GameStateEngine.Services.Hasher.ApplyMove(move, movedPiece, capturedPiece,
-                         record.EnPassantFileBefore,
-                         GameStateEngine.Services.Rules.EnPassantFile,
-                         record.CastlingRightsBefore,
-                         GameStateEngine.Services.Rules.CastlingRights);
-
-        GameStateEngine.Services.UpdateClocks(movedPiece, capturedPiece);
-        GameStateEngine.Services.SwitchPlayer();
-        GameStateEngine.GameResult = GameStateEngine.Services.Evaluator.Evaluate(GameStateEngine.Services.Hasher.CurrentHash,
-                                                                                 GameStateEngine.Services.Hasher.PositionCounts,
-                                                                                 GameStateEngine.Services.HalfMoveClock
-        );
-
-        record = record with
+        if (GameStateEngine.Services.History.MoveHistory.LastOrDefault()?.Move == move)
         {
-            HalfMoveClockAfter = GameStateEngine.Services.HalfMoveClock,
-            FullMoveCounterAfter = GameStateEngine.Services.FullMoveCounter,
-            HashAfter = GameStateEngine.Services.Hasher.CurrentHash,
-            CastlingRightsAfter = GameStateEngine.Services.Rules.CastlingRights,
-            KingInCheck = AttackUtils.IsKingInCheck(GameStateEngine.Board, GameStateEngine.CurrentPlayer),
-            IsCheckmate = (GameStateEngine.GameResult?.Reason == GameEndReason.Checkmate),
-            EnPassantFileAfter = GameStateEngine.Services.Rules.EnPassantFile,
-        };
+            ClearSelection();
+            RaiseMoveMade(GameStateEngine.Services.History.MoveHistory.Last());
+            return true;
+        }
 
-        GameStateEngine.Services.History.Add(record);
-
-        ClearSelection();
-        RaiseMoveMade(record);
-
-        return true;
+        return false;
     }
 
     public void UndoMove()
@@ -98,23 +47,8 @@ public class GameStateUI
         MoveRecord? last = GameStateEngine.Services.History.Undo();
         if (last == null) return;
 
-        GameStateEngine.Board.UndoMove(last.Move, last.MovedPiece, last.CapturedPiece);
-
-        if (GameStateEngine.Services.Hasher.PositionCounts.ContainsKey(GameStateEngine.Services.Hasher.CurrentHash))
-        {
-            GameStateEngine.Services.Hasher.PositionCounts[GameStateEngine.Services.Hasher.CurrentHash]--;
-            if (GameStateEngine.Services.Hasher.PositionCounts[GameStateEngine.Services.Hasher.CurrentHash] <= 0)
-                GameStateEngine.Services.Hasher.PositionCounts.Remove(GameStateEngine.Services.Hasher.CurrentHash);
-        }
-
-        GameStateEngine.Services.Hasher.CurrentHash = last.PreviousHash;
-        GameStateEngine.Services.Rules.CastlingRights = last.CastlingRightsBefore;
-        GameStateEngine.Services.Rules.EnPassantFile = last.EnPassantFileBefore;
-
-        GameStateEngine.Services.RevertClocks(last.HalfMoveClockBefore);
-        GameStateEngine.Services.SwitchPlayer();
-
-        GameStateEngine.GameResult = null;
+        var command = new MoveCommand(GameStateEngine, last.Move, last);
+        command.Undo();
 
         RaiseMoveMade(last);
     }
