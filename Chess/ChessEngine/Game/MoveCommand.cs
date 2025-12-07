@@ -46,6 +46,13 @@ public class MoveCommand : ICommand
         );
 
         _state.Services.Rules.UpdateCastlingRights(movedPiece, _move);
+        if (movedPiece.Type == PieceType.King)
+        {
+            if (movedPiece.Owner == Player.White)
+                _state.WhiteKingPos = _move.To;
+            else
+                _state.BlackKingPos = _move.To;
+        }
         _state.Board.MakeMove(_move);
         _state.Services.Rules.UpdateEnPassantFile(_move, movedPiece);
 
@@ -74,7 +81,7 @@ public class MoveCommand : ICommand
             FullMoveCounterAfter = _state.Services.FullMoveCounter,
             HashAfter = _state.Services.Hasher.CurrentHash,
             CastlingRightsAfter = _state.Services.Rules.CastlingRights,
-            KingInCheck = AttackUtils.IsKingInCheck(_state.Board, _state.CurrentPlayer),
+            KingInCheck = AttackUtils.IsKingInCheck(_state, _state.CurrentPlayer),
             IsCheckmate = (_state.GameResult?.Reason == GameEndReason.Checkmate),
             EnPassantFileAfter = _state.Services.Rules.EnPassantFile,
         };
@@ -87,6 +94,14 @@ public class MoveCommand : ICommand
         if (_record == null) return;
 
         _state.Board.UndoMove(_record.Move, _record.MovedPiece, _record.CapturedPiece);
+
+        if (_record.MovedPiece.Type == PieceType.King)
+        {
+            if (_record.MovedPiece.Owner == Player.White)
+                _state.WhiteKingPos = _move.From;
+            else
+                _state.BlackKingPos = _move.From;
+        }
 
         if (_state.Services.Hasher.PositionCounts.ContainsKey(_state.Services.Hasher.CurrentHash))
         {

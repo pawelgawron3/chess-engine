@@ -1,4 +1,5 @@
-﻿using ChessEngine.Chessboard;
+﻿using ChessEngine;
+using ChessEngine.Chessboard;
 using ChessEngine.Game;
 
 namespace ChessUI.Models;
@@ -59,6 +60,14 @@ public class GameStateUI
         if (next == null) return;
 
         GameStateEngine.Board.MakeMove(next.Move);
+
+        if (next.MovedPiece.Type == PieceType.King)
+        {
+            if (next.MovedPiece.Owner == Player.White)
+                GameStateEngine.WhiteKingPos = next.Move.To;
+            else
+                GameStateEngine.BlackKingPos = next.Move.To;
+        }
 
         GameStateEngine.Services.Hasher.CurrentHash = next.HashAfter;
         GameStateEngine.Services.Rules.CastlingRights = next.CastlingRightsAfter;

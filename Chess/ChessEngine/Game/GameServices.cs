@@ -41,6 +41,13 @@ public class GameServices
         };
 
         Rules.UpdateCastlingRights(undo.MovedPiece, move);
+        if (undo.MovedPiece.Type == PieceType.King)
+        {
+            if (undo.MovedPiece.Owner == Player.White)
+                _state.WhiteKingPos = move.To;
+            else
+                _state.BlackKingPos = move.To;
+        }
         _state.Board.MakeMove(move);
         Rules.UpdateEnPassantFile(move, undo.MovedPiece);
 
@@ -63,6 +70,14 @@ public class GameServices
     public void EngineUndoMove(Move move, MoveStruct undo)
     {
         _state.Board.UndoMove(move, undo.MovedPiece, undo.CapturedPiece);
+
+        if (undo.MovedPiece.Type == PieceType.King)
+        {
+            if (undo.MovedPiece.Owner == Player.White)
+                _state.WhiteKingPos = move.From;
+            else
+                _state.BlackKingPos = move.From;
+        }
 
         if (Hasher.PositionCounts.ContainsKey(Hasher.CurrentHash))
         {
