@@ -39,9 +39,25 @@ public static class LegalMoveGenerator
         Piece movedPiece = state.Board[move.From]!.Value;
         Piece? capturedPiece = GetCapturedPiece(state.Board, move);
 
+        if (movedPiece.Type == PieceType.King)
+        {
+            if (movedPiece.Owner == Player.White)
+                state.WhiteKingPos = move.To;
+            else
+                state.BlackKingPos = move.To;
+        }
+
         state.Board.MakeMove(move);
-        bool kingInCheck = IsKingInCheck(state.Board, state.CurrentPlayer);
+        bool kingInCheck = IsKingInCheck(state, state.CurrentPlayer);
         state.Board.UndoMove(move, movedPiece, capturedPiece);
+
+        if (movedPiece.Type == PieceType.King)
+        {
+            if (movedPiece.Owner == Player.White)
+                state.WhiteKingPos = move.From;
+            else
+                state.BlackKingPos = move.From;
+        }
 
         return !kingInCheck;
     }
