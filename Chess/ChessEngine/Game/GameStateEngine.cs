@@ -11,6 +11,8 @@ public class GameStateEngine
 
     public GameResult? GameResult { get; set; }
     public GameServices Services { get; }
+    public Position WhiteKingPos { get; set; } = new(7, 4);
+    public Position BlackKingPos { get; set; } = new(0, 4);
 
     public GameStateEngine()
     {
