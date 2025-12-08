@@ -143,12 +143,14 @@
                             Width="140"
                             Height="30"
                             Margin="0,6,0,0"
+                            Cursor="Hand"
                             Command="{Binding UndoCommand}" />
 
                     <Button Content="Redo (Right Arrow)"
                             Width="140"
                             Height="30"
                             Margin="0,6,0,0"
+                            Cursor="Hand"
                             Command="{Binding RedoCommand}" />
 
                     <ListBox ItemsSource="{Binding MoveHistoryDisplay}"
