@@ -6,7 +6,7 @@ using ChessEngine.Game;
 
 namespace ChessEngine.Search.Ordering;
 
-public class MovePicker
+public sealed class MovePicker
 {
     private const int CAPTURE_BASE = 10_000;
     private const int KILLER_SCORE1 = 5_000;
