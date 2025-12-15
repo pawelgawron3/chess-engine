@@ -28,12 +28,36 @@ public class Negamax
 
         Move? bestMove = null;
         int score = 0;
-        int alpha = int.MinValue + 1;
-        int beta = int.MaxValue - 1;
+        int aspirationWindow = 50;
+        int alpha, beta;
 
         for (int depth = 1; depth <= maxDepth; depth++)
         {
-            score = NegamaxSearch(state, depth, alpha, beta, true, ref bestMove);
+            if (depth == 1)
+            {
+                alpha = int.MinValue + 1;
+                beta = int.MaxValue - 1;
+            }
+            else
+            {
+                alpha = score - aspirationWindow;
+                beta = score + aspirationWindow;
+            }
+
+            while (true)
+            {
+                int currentScore = NegamaxSearch(state, depth, alpha, beta, true, ref bestMove);
+
+                if (currentScore > alpha && currentScore < beta)
+                {
+                    score = currentScore;
+                    break;
+                }
+
+                aspirationWindow *= 2;
+                alpha = score - aspirationWindow;
+                beta = score + aspirationWindow;
+            }
         }
 
         return (bestMove, score);
