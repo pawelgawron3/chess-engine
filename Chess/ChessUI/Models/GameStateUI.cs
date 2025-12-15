@@ -1,6 +1,8 @@
-﻿using ChessEngine;
-using ChessEngine.Chessboard;
+﻿using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Moves;
+using ChessEngine.Core.Players;
 using ChessEngine.Game;
+using ChessEngine.Game.Commands;
 
 namespace ChessUI.Models;
 

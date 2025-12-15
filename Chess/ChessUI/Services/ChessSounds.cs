@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Media;
-using ChessEngine.Chessboard;
+using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Moves;
 
 namespace ChessUI.Services;
 

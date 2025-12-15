@@ -1,6 +1,9 @@
-﻿using ChessEngine.Chessboard;
-using ChessEngine.Components;
-using ChessEngine.Utils;
+﻿using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Moves;
+using ChessEngine.Core.Players;
+using ChessEngine.Core.Rules;
+using ChessEngine.Evaluation;
+using ChessEngine.Infrastructure.Hashing;
 
 namespace ChessEngine.Game;
 

@@ -1,6 +1,7 @@
-﻿using ChessEngine.AI;
+﻿using ChessEngine.Evaluation;
 using ChessEngine.Game;
-using ChessEngine.Utils;
+using ChessEngine.Infrastructure.IO;
+using ChessEngine.Search;
 
 namespace ChessEngine.Tests.Integration;
 

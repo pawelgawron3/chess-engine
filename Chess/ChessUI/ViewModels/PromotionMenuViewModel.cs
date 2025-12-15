@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Input;
-using ChessEngine;
-using ChessEngine.Chessboard;
+using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Players;
 using ChessUI.Commands;
 
 namespace ChessUI.ViewModels;

@@ -1,4 +1,5 @@
-﻿using ChessEngine.Chessboard;
+﻿using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Players;
 
 namespace ChessEngine.Tests.Unit;
 

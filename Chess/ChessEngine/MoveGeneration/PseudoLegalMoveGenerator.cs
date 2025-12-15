@@ -1,7 +1,9 @@
-﻿using ChessEngine.Chessboard;
+﻿using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Moves;
+using ChessEngine.Core.Players;
 using ChessEngine.Game;
-using static ChessEngine.Utils.AttackUtils;
-using static ChessEngine.Utils.PositionUtils;
+using static ChessEngine.Core.Rules.AttackUtils;
+using static ChessEngine.Infrastructure.Utils.PositionUtils;
 
 namespace ChessEngine.MoveGeneration;
 

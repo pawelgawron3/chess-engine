@@ -1,5 +1,5 @@
 ﻿using ChessEngine.Game;
-using ChessEngine.Utils;
+using ChessEngine.Infrastructure.IO;
 
 namespace ChessEngine.Tests.Integration;
 

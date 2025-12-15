@@ -1,0 +1,125 @@
+﻿using ChessEngine.Core.Moves;
+using ChessEngine.Core.Rules;
+using ChessEngine.Evaluation;
+using ChessEngine.Game;
+using ChessEngine.MoveGeneration;
+using ChessEngine.Search.Ordering;
+using ChessEngine.Search.Transposition;
+
+namespace ChessEngine.Search;
+
+public class Negamax
+{
+    private const int MATE_SCORE = 1_000_000;
+    private readonly IEvaluationFunction _evaluator;
+
+    public Negamax(IEvaluationFunction evaluator)
+    {
+        _evaluator = evaluator;
+    }
+
+    public (Move? BestMove, int Score) IterativeDeepeningSearch(GameStateEngine state, int maxDepth)
+    {
+        if (maxDepth <= 0)
+            throw new ArgumentOutOfRangeException(nameof(maxDepth), "Initial search depth must be greater than 0.");
+
+        HistoryHeuristicTable.Reset();
+        KillerMoves.Init(maxDepth);
+
+        Move? bestMove = null;
+        int score = 0;
+        int alpha = int.MinValue + 1;
+        int beta = int.MaxValue - 1;
+
+        for (int depth = 1; depth <= maxDepth; depth++)
+        {
+            score = NegamaxSearch(state, depth, alpha, beta, true, ref bestMove);
+        }
+
+        return (bestMove, score);
+    }
+
+    private int NegamaxSearch(GameStateEngine state, int depth, int alpha, int beta, bool isRootMove, ref Move? bestRootMove)
+    {
+        if (state.GameResult != null)
+        {
+            return state.GameResult.Reason switch
+            {
+                GameEndReason.Checkmate => -MATE_SCORE - depth,
+                _ => 0
+            };
+        }
+
+        if (depth == 0)
+            return _evaluator.Evaluate(state) * (int)state.CurrentPlayer;
+
+        ulong hash = state.Services.Hasher.CurrentHash;
+        ref TTEntry entry = ref TranspositionTable.Probe(hash);
+
+        int alphaOrig = alpha;
+        Move? bestMoveLocal = null;
+
+        if (!isRootMove && entry.Hash == hash && entry.Depth >= depth)
+        {
+            switch (entry.Bound)
+            {
+                case BoundType.Exact:
+                    return entry.Score;
+
+                case BoundType.LowerBound:
+                    if (entry.Score > alpha)
+                        alpha = entry.Score;
+                    break;
+
+                case BoundType.UpperBound:
+                    if (entry.Score < beta)
+                        beta = entry.Score;
+                    break;
+            }
+
+            if (alpha >= beta)
+                return entry.Score;
+        }
+
+        var movePicker = new MovePicker(LegalMoveGenerator.GenerateLegalMoves(state), state, depth, entry.BestMove);
+
+        while (movePicker.TryGetNext(out var move))
+        {
+            state.Services.EngineMakeMove(move, out var undo);
+            int score = -NegamaxSearch(state, depth - 1, -beta, -alpha, false, ref bestRootMove);
+            state.Services.EngineUndoMove(move, undo);
+
+            if (score > alpha)
+            {
+                alpha = score;
+                bestMoveLocal = move;
+
+                if (isRootMove)
+                    bestRootMove = move;
+            }
+
+            if (alpha >= beta)
+            {
+                if (AttackUtils.IsQuietMove(state.Board, move))
+                {
+                    KillerMoves.AddKillerMove(depth, move);
+                    HistoryHeuristicTable.Add(move, depth);
+                }
+
+                break;
+            }
+        }
+
+        BoundType bound;
+        if (alpha <= alphaOrig)
+            bound = BoundType.UpperBound;
+        else if (alpha >= beta)
+            bound = BoundType.LowerBound;
+        else
+            bound = BoundType.Exact;
+
+        TranspositionTable.Store(hash, depth, alpha, bound, bestMoveLocal);
+
+        return alpha;
+    }
+}

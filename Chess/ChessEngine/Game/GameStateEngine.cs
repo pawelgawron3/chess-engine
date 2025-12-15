@@ -1,5 +1,7 @@
-﻿using ChessEngine.Chessboard;
-using ChessEngine.Components;
+﻿using ChessEngine.Core.Chessboard;
+using ChessEngine.Core.Moves;
+using ChessEngine.Core.Players;
+using ChessEngine.Core.Rules;
 using ChessEngine.MoveGeneration;
 
 namespace ChessEngine.Game;

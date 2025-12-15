@@ -1,6 +1,7 @@
-﻿using ChessEngine.Components;
+﻿using ChessEngine.Core.Players;
+using ChessEngine.Core.Rules;
 using ChessEngine.Game;
-using ChessEngine.Utils;
+using ChessEngine.Infrastructure.IO;
 
 namespace ChessEngine.Tests.Integration;
 
