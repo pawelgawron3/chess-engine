@@ -21,8 +21,6 @@ public class GameStateUI
         GameStateEngine = new GameStateEngine();
     }
 
-    public IEnumerable<Move> GetLegalMoves() => GameStateEngine.GetLegalMoves();
-
     public IEnumerable<Move> GetLegalMovesForPiece() =>
         SelectedPosition != null ? GameStateEngine.GetLegalMovesForPiece(SelectedPosition.Value) : Enumerable.Empty<Move>();
 
