@@ -12,11 +12,11 @@ public class MoveCommand : ICommand
     private readonly Move _move;
     private MoveRecord? _record;
 
-    public MoveCommand(GameStateEngine state, Move move, MoveRecord? last = null)
+    public MoveCommand(GameStateEngine state, Move move, MoveRecord? record = null)
     {
         _state = state;
         _move = move;
-        _record = last;
+        _record = record;
     }
 
     public void Execute()
@@ -119,5 +119,42 @@ public class MoveCommand : ICommand
         _state.Services.SwitchPlayer();
 
         _state.GameResult = null;
+    }
+
+    public void Redo()
+    {
+        if (_record == null) return;
+
+        _state.Board.MakeMove(_record.Move);
+
+        if (_record.MovedPiece.Type == PieceType.King)
+        {
+            if (_record.MovedPiece.Owner == Player.White)
+                _state.WhiteKingPos = _record.Move.To;
+            else
+                _state.BlackKingPos = _record.Move.To;
+        }
+
+        _state.Services.Hasher.CurrentHash = _record.HashAfter;
+        _state.Services.Rules.CastlingRights = _record.CastlingRightsAfter;
+        _state.Services.Rules.EnPassantFile = _record.EnPassantFileAfter;
+
+        if (!_state.Services.Hasher.PositionCounts.ContainsKey(_state.Services.Hasher.CurrentHash))
+            _state.Services.Hasher.PositionCounts.Add(_state.Services.Hasher.CurrentHash, 1);
+        else
+            _state.Services.Hasher.PositionCounts[_state.Services.Hasher.CurrentHash]++;
+
+        _state.Services.HalfMoveClock = _record.HalfMoveClockAfter;
+        _state.Services.FullMoveCounter = _record.FullMoveCounterAfter;
+
+        _state.Services.SwitchPlayer();
+
+        _state.GameResult = _state
+                                  .Services
+                                  .Evaluator
+                                  .Evaluate(_state.Services.Hasher.CurrentHash,
+                                            _state.Services.Hasher.PositionCounts,
+                                            _state.Services.HalfMoveClock
+                                  );
     }
 }

@@ -1,6 +1,5 @@
 ﻿using ChessEngine.Core.Chessboard;
 using ChessEngine.Core.Moves;
-using ChessEngine.Core.Players;
 using ChessEngine.Game;
 using ChessEngine.Game.Commands;
 
@@ -59,37 +58,9 @@ public class GameStateUI
         MoveRecord? next = GameStateEngine.Services.History.Redo();
         if (next == null) return;
 
-        GameStateEngine.Board.MakeMove(next.Move);
+        var command = new MoveCommand(GameStateEngine, next.Move, next);
+        command.Redo();
 
-        if (next.MovedPiece.Type == PieceType.King)
-        {
-            if (next.MovedPiece.Owner == Player.White)
-                GameStateEngine.WhiteKingPos = next.Move.To;
-            else
-                GameStateEngine.BlackKingPos = next.Move.To;
-        }
-
-        GameStateEngine.Services.Hasher.CurrentHash = next.HashAfter;
-        GameStateEngine.Services.Rules.CastlingRights = next.CastlingRightsAfter;
-        GameStateEngine.Services.Rules.EnPassantFile = next.EnPassantFileAfter;
-
-        if (!GameStateEngine.Services.Hasher.PositionCounts.ContainsKey(GameStateEngine.Services.Hasher.CurrentHash))
-            GameStateEngine.Services.Hasher.PositionCounts.Add(GameStateEngine.Services.Hasher.CurrentHash, 1);
-        else
-            GameStateEngine.Services.Hasher.PositionCounts[GameStateEngine.Services.Hasher.CurrentHash]++;
-
-        GameStateEngine.Services.HalfMoveClock = next.HalfMoveClockAfter;
-        GameStateEngine.Services.FullMoveCounter = next.FullMoveCounterAfter;
-
-        GameStateEngine.Services.SwitchPlayer();
-
-        GameStateEngine.GameResult = GameStateEngine
-                                    .Services
-                                    .Evaluator
-                                    .Evaluate(GameStateEngine.Services.Hasher.CurrentHash,
-                                              GameStateEngine.Services.Hasher.PositionCounts,
-                                              GameStateEngine.Services.HalfMoveClock
-                                    );
         RaiseMoveMade(next);
     }
 }
