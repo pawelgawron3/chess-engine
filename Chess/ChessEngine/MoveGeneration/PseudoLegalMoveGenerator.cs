@@ -133,40 +133,25 @@ public static class PseudoLegalMoveGenerator
         }
     }
 
-    private static IEnumerable<Move> GeneratePseudoLegalBishopMoves(Board board, Position pos, Piece piece)
+    private static readonly (int dr, int dc)[] _bishopDirections =
     {
-        (int dr, int dc)[] directions =
-        {
-            (-1, -1), (-1, 1),
-            (1, -1), (1, 1)
-        };
+        (-1, -1), (-1, 1),
+        (1, -1), (1, 1)
+    };
 
-        return GenerateSlidingMoves(board, pos, piece, directions);
-    }
-
-    private static IEnumerable<Move> GeneratePseudoLegalRookMoves(Board board, Position pos, Piece piece)
+    private static readonly (int dr, int dc)[] _rookDirections =
     {
-        (int dr, int dc)[] directions =
-        {
-            (-1, 0), (1, 0),
-            (0, -1), (0, 1)
-        };
+        (-1, 0), (1, 0),
+        (0, -1), (0, 1)
+    };
 
-        return GenerateSlidingMoves(board, pos, piece, directions);
-    }
-
-    private static IEnumerable<Move> GeneratePseudoLegalQueenMoves(Board board, Position pos, Piece piece)
+    private static readonly (int dr, int dc)[] _queenDirections =
     {
-        (int dr, int dc)[] directions =
-        {
-            (-1, 0), (1, 0),
-            (0, -1), (0, 1),
-            (-1, -1), (-1 ,1),
-            (1, -1), (1, 1),
-        };
-
-        return GenerateSlidingMoves(board, pos, piece, directions);
-    }
+        (-1, 0), (1, 0),
+        (0, -1), (0, 1),
+        (-1, -1), (-1 ,1),
+        (1, -1), (1, 1)
+    };
 
     private static IEnumerable<Move> GeneratePseudoLegalKingMoves(Board board,
         Position pos,
@@ -251,9 +236,9 @@ public static class PseudoLegalMoveGenerator
         {
             PieceType.Pawn => GeneratePseudoLegalPawnMoves(board, from, piece, enPassantFile),
             PieceType.Knight => GeneratePseudoLegalKnightMoves(board, from, piece),
-            PieceType.Bishop => GeneratePseudoLegalBishopMoves(board, from, piece),
-            PieceType.Rook => GeneratePseudoLegalRookMoves(board, from, piece),
-            PieceType.Queen => GeneratePseudoLegalQueenMoves(board, from, piece),
+            PieceType.Bishop => GenerateSlidingMoves(board, from, piece, _bishopDirections),
+            PieceType.Rook => GenerateSlidingMoves(board, from, piece, _rookDirections),
+            PieceType.Queen => GenerateSlidingMoves(board, from, piece, _queenDirections),
             PieceType.King => GeneratePseudoLegalKingMoves(board, from, piece, castlingRights),
             _ => Enumerable.Empty<Move>()
         };
