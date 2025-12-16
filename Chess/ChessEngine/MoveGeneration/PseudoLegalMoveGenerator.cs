@@ -38,8 +38,7 @@ public static class PseudoLegalMoveGenerator
                 Piece? piece = state.Board[row, col];
                 if (piece == null || piece.Value.Owner != player) continue;
 
-                Position from = new Position(row, col);
-                foreach (var move in GenerateMovesFor(state.Board, from, piece.Value, enPassantFile, castlingRights))
+                foreach (var move in GenerateMovesFor(state.Board, new Position(row, col), piece.Value, enPassantFile, castlingRights))
                     yield return move;
             }
         }
