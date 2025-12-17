@@ -31,8 +31,6 @@ public static class AttackUtils
             _ => null
         };
 
-    public static bool IsCapture(Board board, Move move) => GetCapturedPiece(board, move) != null;
-
     public static bool IsQuietMove(Board board, Move move) => GetCapturedPiece(board, move) == null;
 
     private static bool IsAttackedByPawn(Board board, Position square, Player attacker)
