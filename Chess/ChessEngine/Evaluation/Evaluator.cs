@@ -5,7 +5,7 @@ using ChessEngine.Game;
 
 namespace ChessEngine.Evaluation;
 
-public class Evaluator : IEvaluationFunction
+public sealed class Evaluator : IEvaluationFunction
 {
     public int Evaluate(GameStateEngine state)
     {
@@ -23,7 +23,7 @@ public class Evaluator : IEvaluationFunction
         return score;
     }
 
-    private int GetPieceSquareValue(Piece piece, Position pos, bool isEndgame)
+    private static int GetPieceSquareValue(Piece piece, Position pos, bool isEndgame)
     {
         int index = pos.Row * 8 + pos.Column;
         if (piece.Owner == Player.Black)
@@ -41,33 +41,32 @@ public class Evaluator : IEvaluationFunction
         };
     }
 
-    private bool IsEndgame(Board board)
+    private static bool IsEndgame(Board board)
     {
         bool whiteHasQueen = false;
         bool blackHasQueen = false;
-        int whiteMinorPieces = 0;
-        int blackMinorPieces = 0;
+        int whiteMinors = 0;
+        int blackMinors = 0;
 
         foreach (var (piece, _) in board.GetAllPiecesWithPosition())
         {
-            switch (piece.Type)
+            if (piece.Type == PieceType.Queen)
             {
-                case PieceType.Queen:
-                    if (piece.Owner == Player.White) whiteHasQueen = true;
-                    else blackHasQueen = true;
-                    break;
-
-                case PieceType.Bishop:
-                case PieceType.Knight:
-                    if (piece.Owner == Player.White) whiteMinorPieces++;
-                    else blackMinorPieces++;
-                    break;
+                if (piece.Owner == Player.White) whiteHasQueen = true;
+                else blackHasQueen = true;
             }
+            else if (piece.Type == PieceType.Bishop || piece.Type == PieceType.Knight)
+            {
+                if (piece.Owner == Player.White) whiteMinors++;
+                else blackMinors++;
+            }
+
+            if (whiteHasQueen && blackHasQueen &&
+                whiteMinors > 1 && blackMinors > 1)
+                return false;
         }
 
-        bool whiteEndgame = !whiteHasQueen || whiteHasQueen && whiteMinorPieces <= 1;
-        bool blackEndgame = !blackHasQueen || blackHasQueen && blackMinorPieces <= 1;
-
-        return whiteEndgame && blackEndgame;
+        return (!whiteHasQueen || whiteMinors <= 1)
+            && (!blackHasQueen || blackMinors <= 1);
     }
 }
