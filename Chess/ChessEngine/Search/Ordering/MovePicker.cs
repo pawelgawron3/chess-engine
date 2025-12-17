@@ -6,7 +6,7 @@ using ChessEngine.Game;
 
 namespace ChessEngine.Search.Ordering;
 
-public sealed class MovePicker
+public struct MovePicker
 {
     private const int CAPTURE_BASE = 10_000;
     private const int KILLER_SCORE1 = 5_000;
@@ -16,6 +16,7 @@ public sealed class MovePicker
     private readonly int[] _scores;
     private readonly int _depth;
     private readonly Move? _ttMove;
+    private readonly GameStateEngine _state;
     private int _index = 0;
 
     public MovePicker(IEnumerable<Move> moves, GameStateEngine state, int depth, Move? ttMove)
@@ -24,6 +25,7 @@ public sealed class MovePicker
         _scores = new int[_moves.Length];
         _depth = depth;
         _ttMove = ttMove;
+        _state = state;
 
         ScoreMoves(state);
         SortMoves();
@@ -41,7 +43,7 @@ public sealed class MovePicker
         return true;
     }
 
-    private void ScoreMoves(GameStateEngine state)
+    private readonly void ScoreMoves(GameStateEngine state)
     {
         for (int i = 0; i < _moves.Length; i++)
         {
@@ -55,12 +57,12 @@ public sealed class MovePicker
 
             if (AttackUtils.IsCapture(state.Board, move))
             {
-                Piece? capturedPiece = AttackUtils.GetCapturedPiece(state.Board, move);
+                Piece victim = AttackUtils.GetCapturedPiece(_state.Board, move)!.Value;
+                Piece attacker = _state.Board[move.From]!.Value;
 
-                int victim = PieceValues.Value[(int)capturedPiece!.Value.Type];
-                int attacker = PieceValues.Value[(int)state.Board[move.From]!.Value.Type];
-
-                _scores[i] = CAPTURE_BASE + victim * 10 - attacker;
+                _scores[i] = CAPTURE_BASE
+                    + PieceValues.Value[(int)victim.Type] * 10
+                    - PieceValues.Value[(int)attacker.Type];
                 continue;
             }
 
@@ -80,7 +82,7 @@ public sealed class MovePicker
         }
     }
 
-    private void SortMoves()
+    private readonly void SortMoves()
     {
         for (int i = 1; i < _moves.Length; i++)
         {
