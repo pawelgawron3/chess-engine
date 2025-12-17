@@ -55,9 +55,10 @@ public struct MovePicker
                 continue;
             }
 
-            if (AttackUtils.IsCapture(state.Board, move))
+            Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, move);
+            if (capturedPiece != null)
             {
-                Piece victim = AttackUtils.GetCapturedPiece(_state.Board, move)!.Value;
+                Piece victim = capturedPiece.Value;
                 Piece attacker = _state.Board[move.From]!.Value;
 
                 _scores[i] = CAPTURE_BASE
