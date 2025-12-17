@@ -161,7 +161,7 @@ public class MainViewModel : INotifyPropertyChanged
         Move move = _gameState.GetLegalMovesForPiece()
                               .FirstOrDefault(m => m.To.Equals(pos));
 
-        if (move.Equals(default(Move)))
+        if (move.Equals(default))
         {
             _gameState.ClearSelection();
             ClearHighlights();
@@ -258,7 +258,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void OnPromotionPieceSelected(PieceType selectedPiece)
     {
-        Move promotionMove = new Move(
+        Move promotionMove = new(
             _pendingPromotionMove.From,
             _pendingPromotionMove.To,
             MoveType.Promotion,
@@ -341,8 +341,8 @@ public class MainViewModel : INotifyPropertyChanged
         SetBusy(true);
 
         int maxDepth = 6;
-        Evaluator evaluator = new Evaluator();
-        Negamax engine = new Negamax(evaluator);
+        Evaluator evaluator = new();
+        Negamax engine = new(evaluator);
 
         var (bestMove, score) = await Task.Run(() => engine.IterativeDeepeningSearch(_gameState.GameStateEngine, maxDepth));
         if (bestMove != null)
