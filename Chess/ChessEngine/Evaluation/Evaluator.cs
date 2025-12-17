@@ -29,17 +29,20 @@ public sealed class Evaluator : IEvaluationFunction
         if (piece.Owner == Player.Black)
             index = 63 - index;
 
-        return piece.Type switch
-        {
-            PieceType.Pawn => PieceSquareTables.Pawn[index],
-            PieceType.Knight => PieceSquareTables.Knight[index],
-            PieceType.Bishop => PieceSquareTables.Bishop[index],
-            PieceType.Rook => PieceSquareTables.Rook[index],
-            PieceType.Queen => PieceSquareTables.Queen[index],
-            PieceType.King => PieceSquareTables.King[isEndgame ? 1 : 0, index],
-            _ => 0
-        };
+        if (piece.Type != PieceType.King)
+            return PieceTables[(int)piece.Type][index];
+
+        return PieceSquareTables.King[isEndgame ? 1 : 0, index];
     }
+
+    private static readonly int[][] PieceTables =
+    {
+        PieceSquareTables.Pawn,
+        PieceSquareTables.Knight,
+        PieceSquareTables.Bishop,
+        PieceSquareTables.Rook,
+        PieceSquareTables.Queen
+    };
 
     private static bool IsEndgame(Board board)
     {
