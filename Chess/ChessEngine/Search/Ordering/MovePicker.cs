@@ -27,7 +27,7 @@ public struct MovePicker
         _ttMove = ttMove;
         _state = state;
 
-        ScoreMoves(state);
+        ScoreMoves();
         SortMoves();
     }
 
@@ -43,7 +43,7 @@ public struct MovePicker
         return true;
     }
 
-    private readonly void ScoreMoves(GameStateEngine state)
+    private readonly void ScoreMoves()
     {
         for (int i = 0; i < _moves.Length; i++)
         {
