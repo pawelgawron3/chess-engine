@@ -19,8 +19,8 @@ public static class AttackUtils
         if (!IsInside(square)) return false;
 
         return IsAttackedByPawn(board, square, attacker) || IsAttackedByKnight(board, square, attacker) ||
-               IsAttackedByKing(board, square, attacker) || OrthAttacks(board, square, attacker) ||
-               DiagAttacks(board, square, attacker);
+               OrthAttacks(board, square, attacker) || DiagAttacks(board, square, attacker) ||
+               IsAttackedByKing(board, square, attacker);
     }
 
     public static Piece? GetCapturedPiece(Board board, Move move)
