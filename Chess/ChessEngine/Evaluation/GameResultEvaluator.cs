@@ -34,7 +34,7 @@ public class GameResultEvaluator
             : GameResult.Draw(GameEndReason.Stalemate);
     }
 
-    public string ToDisplayString(GameResult? result)
+    public static string ToDisplayString(GameResult? result)
     {
         if (result == null)
             return "Game in progress...";
@@ -46,7 +46,7 @@ public class GameResultEvaluator
         };
     }
 
-    private string FormatReason(GameEndReason reason) => reason switch
+    private static string FormatReason(GameEndReason reason) => reason switch
     {
         GameEndReason.Stalemate => "Stalemate",
         GameEndReason.FiftyMovesRule => "50-move rule",
@@ -55,7 +55,7 @@ public class GameResultEvaluator
         _ => reason.ToString()
     };
 
-    private bool IsInsufficientMaterial(Board board)
+    private static bool IsInsufficientMaterial(Board board)
     {
         var pieces = board.GetAllPiecesWithPosition().ToList();
         int pieceCount = pieces.Count;
@@ -72,7 +72,7 @@ public class GameResultEvaluator
         return false;
     }
 
-    private bool HasTwoBishopsOnSameColor(List<(Piece piece, Position pos)> pieces)
+    private static bool HasTwoBishopsOnSameColor(List<(Piece piece, Position pos)> pieces)
     {
         var bishops = pieces.Where(p => p.piece.Type == PieceType.Bishop).ToList();
         if (bishops.Count != 2)
