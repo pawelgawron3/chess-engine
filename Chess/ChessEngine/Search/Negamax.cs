@@ -10,7 +10,7 @@ namespace ChessEngine.Search;
 
 public class Negamax
 {
-    private const int MATE_SCORE = 1_000_000;
+    private const int MATE_SCORE = 50_000;
     private readonly IEvaluationFunction _evaluator;
 
     public Negamax(IEvaluationFunction evaluator)

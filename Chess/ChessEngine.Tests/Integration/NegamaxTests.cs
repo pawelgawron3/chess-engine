@@ -21,6 +21,6 @@ public class NegamaxTests
         var (bestMove, score) = negamax.IterativeDeepeningSearch(state, 5);
 
         Assert.NotNull(bestMove);
-        Assert.InRange(score, 999_999, 1_000_010);
+        Assert.InRange(score, 49_999, 50_010);
     }
 }
