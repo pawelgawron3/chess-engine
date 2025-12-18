@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Media;
-using ChessEngine.Core.Chessboard;
 using ChessEngine.Core.Moves;
 
 namespace ChessUI.Services;
@@ -31,7 +30,7 @@ public static class ChessSounds
         }
     }
 
-    public static void PlaySoundForMove(Move move, Piece? capturedPiece, bool KingInCheck)
+    public static void PlaySoundForMove(Move move, bool KingInCheck)
     {
         if (KingInCheck)
         {
@@ -41,11 +40,13 @@ public static class ChessSounds
 
         switch (move.Type)
         {
-            case MoveType.Normal:
-                if (capturedPiece == null)
-                    PlayMoveSound();
-                else
-                    PlayCaptureSound();
+            case MoveType.Quiet:
+                PlayMoveSound();
+                break;
+
+            case MoveType.Capture:
+            case MoveType.EnPassant:
+                PlayCaptureSound();
                 break;
 
             case MoveType.Castling:
@@ -54,10 +55,6 @@ public static class ChessSounds
 
             case MoveType.Promotion:
                 PlayPromoteSound();
-                break;
-
-            case MoveType.EnPassant:
-                PlayCaptureSound();
                 break;
         }
     }

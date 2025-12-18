@@ -74,7 +74,8 @@ public class Board
 
         switch (move.Type)
         {
-            case MoveType.Normal:
+            case MoveType.Quiet:
+            case MoveType.Capture:
                 this[move.To] = piece;
                 this[move.From] = null;
                 break;
@@ -118,7 +119,8 @@ public class Board
     {
         switch (move.Type)
         {
-            case MoveType.Normal:
+            case MoveType.Quiet:
+            case MoveType.Capture:
                 this[move.From] = movedPiece;
                 this[move.To] = capturedPiece;
                 break;

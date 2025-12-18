@@ -124,7 +124,7 @@ public class Negamax
 
             if (alpha >= beta)
             {
-                if (AttackUtils.IsQuietMove(state.Board, move))
+                if (!move.IsCapture)
                 {
                     KillerMoves.AddKillerMove(depth, move);
                     HistoryHeuristicTable.Add(move, depth);

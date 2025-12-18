@@ -49,7 +49,7 @@ public static class PseudoLegalMoveGenerator
         int direction = piece.Owner == Player.White ? -1 : 1;
         int promotionRow = piece.Owner == Player.White ? 0 : 7;
 
-        Position oneStep = new Position(pos.Row + direction, pos.Column);
+        Position oneStep = new(pos.Row + direction, pos.Column);
         if (IsInside(oneStep) && board[oneStep] == null)
         {
             if (oneStep.Row == promotionRow)
@@ -65,15 +65,15 @@ public static class PseudoLegalMoveGenerator
             }
 
             int startRow = piece.Owner == Player.White ? 6 : 1;
-            Position twoStep = new Position(pos.Row + 2 * direction, pos.Column);
+            Position twoStep = new(pos.Row + 2 * direction, pos.Column);
             if (pos.Row == startRow && board[twoStep] == null)
                 yield return new Move(pos, twoStep);
         }
 
         Position[] diagonals =
         {
-            new Position(pos.Row + direction, pos.Column - 1),
-            new Position(pos.Row + direction, pos.Column + 1)
+            new(pos.Row + direction, pos.Column - 1),
+            new(pos.Row + direction, pos.Column + 1)
         };
 
         foreach (var target in diagonals)
@@ -85,14 +85,14 @@ public static class PseudoLegalMoveGenerator
             {
                 if (target.Row == promotionRow)
                 {
-                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Queen);
-                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Rook);
-                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Bishop);
-                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Knight);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Queen, true);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Rook, true);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Bishop, true);
+                    yield return new Move(pos, target, MoveType.Promotion, PieceType.Knight, true);
                 }
                 else
                 {
-                    yield return new Move(pos, target);
+                    yield return new Move(pos, target, MoveType.Capture, null, true);
                 }
             }
         }
@@ -106,7 +106,7 @@ public static class PseudoLegalMoveGenerator
             if (sidePawn?.Type == PieceType.Pawn && sidePawn.Value.Owner != piece.Owner)
             {
                 if (IsInside(targetRow, targetCol) && board[targetRow, targetCol] == null)
-                    yield return new Move(pos, new Position(targetRow, targetCol), MoveType.EnPassant);
+                    yield return new Move(pos, new Position(targetRow, targetCol), MoveType.EnPassant, null, true);
             }
         }
     }
@@ -128,8 +128,10 @@ public static class PseudoLegalMoveGenerator
 
             Piece? targetPiece = board[row, col];
 
-            if (targetPiece == null || targetPiece.Value.Owner != piece.Owner)
+            if (targetPiece == null)
                 yield return new Move(pos, new Position(row, col));
+            else if (targetPiece.Value.Owner != piece.Owner)
+                yield return new Move(pos, new Position(row, col), MoveType.Capture, null, true);
         }
     }
 
@@ -171,8 +173,10 @@ public static class PseudoLegalMoveGenerator
             if (!IsInside(r, c)) continue;
             Piece? targetPiece = board[r, c];
 
-            if (targetPiece == null || targetPiece.Value.Owner != piece.Owner)
+            if (targetPiece == null)
                 yield return new Move(pos, new Position(r, c));
+            else if (targetPiece.Value.Owner != piece.Owner)
+                yield return new Move(pos, new Position(r, c), MoveType.Capture, null, true);
         }
 
         int row = piece.Owner == Player.White ? 7 : 0;
@@ -220,7 +224,7 @@ public static class PseudoLegalMoveGenerator
                 {
                     if (targetPiece.Value.Owner != piece.Owner)
                     {
-                        yield return new Move(pos, new Position(row, col));
+                        yield return new Move(pos, new Position(row, col), MoveType.Capture, null, true);
                     }
                     break;
                 }

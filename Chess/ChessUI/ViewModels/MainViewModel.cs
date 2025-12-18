@@ -197,9 +197,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         foreach (var move in moves)
         {
-            Piece? targetPiece = _gameState.GameStateEngine.Board[move.To];
-
-            if (targetPiece == null)
+            if (!move.IsCapture)
             {
                 var ellipse = new HighlightViewModel
                 {
@@ -258,11 +256,14 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void OnPromotionPieceSelected(PieceType selectedPiece)
     {
+        bool isCapture = _gameState.GameStateEngine.Board[_pendingPromotionMove.To] != null;
+
         Move promotionMove = new(
             _pendingPromotionMove.From,
             _pendingPromotionMove.To,
             MoveType.Promotion,
-            selectedPiece
+            selectedPiece,
+            isCapture
         );
 
         if (_gameState.TryMakeMove(promotionMove))
@@ -289,13 +290,13 @@ public class MainViewModel : INotifyPropertyChanged
             MoveCountText = "0";
         }
 
-        GameStatusText = _gameState.GameStateEngine.Services.Evaluator.ToDisplayString(_gameState.GameStateEngine.GameResult);
+        GameStatusText = GameResultEvaluator.ToDisplayString(_gameState.GameStateEngine.GameResult);
         SideToMove = _gameState.GameStateEngine.CurrentPlayer.ToString();
     }
 
     private void OnMoveMade(MoveRecord lastMove)
     {
-        ChessSounds.PlaySoundForMove(lastMove.Move, lastMove.CapturedPiece, lastMove.KingInCheck);
+        ChessSounds.PlaySoundForMove(lastMove.Move, lastMove.KingInCheck);
     }
 
     private void SetBusy(bool value)

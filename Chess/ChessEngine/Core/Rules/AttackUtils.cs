@@ -23,15 +23,14 @@ public static class AttackUtils
                DiagAttacks(board, square, attacker);
     }
 
-    public static Piece? GetCapturedPiece(Board board, Move move) =>
-        move.Type switch
-        {
-            MoveType.Normal or MoveType.Promotion => board[move.To],
-            MoveType.EnPassant => board[move.From.Row, move.To.Column],
-            _ => null
-        };
-
-    public static bool IsQuietMove(Board board, Move move) => GetCapturedPiece(board, move) == null;
+    public static Piece? GetCapturedPiece(Board board, Move move)
+    {
+        if (move.Type == MoveType.EnPassant)
+            return board[move.From.Row, move.To.Column];
+        else if (move.IsCapture)
+            return board[move.To];
+        else return null;
+    }
 
     private static bool IsAttackedByPawn(Board board, Position square, Player attacker)
     {
