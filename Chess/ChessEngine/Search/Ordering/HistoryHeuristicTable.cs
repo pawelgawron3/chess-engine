@@ -4,7 +4,7 @@ namespace ChessEngine.Search.Ordering;
 
 public static class HistoryHeuristicTable
 {
-    private static int[,] _table = new int[64, 64];
+    private static readonly int[,] _table = new int[64, 64];
 
     public static void Add(Move move, int depth)
     {
