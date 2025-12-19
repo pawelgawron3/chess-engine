@@ -17,34 +17,30 @@ public class RuleManager
 
     public void UpdateCastlingRights(Piece movedPiece, Move move)
     {
-        var rights = CastlingRights;
-
-        if (movedPiece.Owner == Player.White)
+        if (movedPiece.Type == PieceType.King)
         {
-            if (movedPiece.Type == PieceType.King)
-                rights.White.KingMoved = true;
-            else if (movedPiece.Type == PieceType.Rook)
+            if (movedPiece.Owner == Player.White)
+                CastlingRights &= ~(CastlingRights.WhiteKing | CastlingRights.WhiteQueen);
+            else
+                CastlingRights &= ~(CastlingRights.BlackKing | CastlingRights.BlackQueen);
+        }
+        else if (movedPiece.Type == PieceType.Rook)
+        {
+            if (movedPiece.Owner == Player.White)
             {
                 if (move.From.Column == 0)
-                    rights.White.RookAMoved = true;
+                    CastlingRights &= ~CastlingRights.WhiteQueen;
                 else if (move.From.Column == 7)
-                    rights.White.RookHMoved = true;
+                    CastlingRights &= ~CastlingRights.WhiteKing;
             }
-        }
-        else if (movedPiece.Owner == Player.Black)
-        {
-            if (movedPiece.Type == PieceType.King)
-                rights.Black.KingMoved = true;
-            else if (movedPiece.Type == PieceType.Rook)
+            else
             {
                 if (move.From.Column == 0)
-                    rights.Black.RookAMoved = true;
+                    CastlingRights &= ~CastlingRights.BlackQueen;
                 else if (move.From.Column == 7)
-                    rights.Black.RookHMoved = true;
+                    CastlingRights &= ~CastlingRights.BlackKing;
             }
         }
-
-        CastlingRights = rights;
     }
 
     public void UpdateEnPassantFile(Move move, Piece movedPiece)

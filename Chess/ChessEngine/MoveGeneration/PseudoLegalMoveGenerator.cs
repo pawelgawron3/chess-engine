@@ -182,27 +182,30 @@ public static class PseudoLegalMoveGenerator
         int row = piece.Owner == Player.White ? 7 : 0;
         Player player = piece.Owner;
 
-        var (KingMoved, RookAMoved, RookHMoved) = (player == Player.White) ? castlingRights.White : castlingRights.Black;
+        bool canCastleKingSide = (player == Player.White)
+            ? castlingRights.HasFlag(CastlingRights.WhiteKing)
+            : castlingRights.HasFlag(CastlingRights.BlackKing);
 
-        if (!KingMoved)
+        bool canCastleQueenSide = (player == Player.White)
+                ? castlingRights.HasFlag(CastlingRights.WhiteQueen)
+                : castlingRights.HasFlag(CastlingRights.BlackQueen);
+
+        if (canCastleKingSide &&
+            board[row, 5] == null && board[row, 6] == null &&
+            !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
+            !IsSquareAttacked(board, new Position(row, 5), player.Opponent()) &&
+            !IsSquareAttacked(board, new Position(row, 6), player.Opponent()))
         {
-            if (!RookHMoved &&
-                board[row, 5] == null && board[row, 6] == null &&
-                !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
-                !IsSquareAttacked(board, new Position(row, 5), player.Opponent()) &&
-                !IsSquareAttacked(board, new Position(row, 6), player.Opponent()))
-            {
-                yield return new Move(pos, new Position(row, 6), MoveType.Castling);
-            }
+            yield return new Move(pos, new Position(row, 6), MoveType.Castling);
+        }
 
-            if (!RookAMoved &&
-                board[row, 1] == null && board[row, 2] == null && board[row, 3] == null &&
-                !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
-                !IsSquareAttacked(board, new Position(row, 3), player.Opponent()) &&
-                !IsSquareAttacked(board, new Position(row, 2), player.Opponent()))
-            {
-                yield return new Move(pos, new Position(row, 2), MoveType.Castling);
-            }
+        if (canCastleQueenSide &&
+            board[row, 1] == null && board[row, 2] == null && board[row, 3] == null &&
+            !IsSquareAttacked(board, new Position(row, 4), player.Opponent()) &&
+            !IsSquareAttacked(board, new Position(row, 3), player.Opponent()) &&
+            !IsSquareAttacked(board, new Position(row, 2), player.Opponent()))
+        {
+            yield return new Move(pos, new Position(row, 2), MoveType.Castling);
         }
     }
 

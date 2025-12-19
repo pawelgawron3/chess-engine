@@ -66,11 +66,8 @@ public class ZobristHasher
         if (newEnPassantFile.HasValue)
             CurrentHash ^= Zobrist.EnPassantKeys[newEnPassantFile.Value];
 
-        ulong beforeHash = ComputeCastlingRightsHash(castlingBefore);
-        ulong afterHash = ComputeCastlingRightsHash(castlingAfter);
-
-        CurrentHash ^= beforeHash;
-        CurrentHash ^= afterHash;
+        CurrentHash ^= Zobrist.CastlingKeys[(int)castlingBefore];
+        CurrentHash ^= Zobrist.CastlingKeys[(int)castlingAfter];
 
         if (move.Type == MoveType.Castling)
         {
@@ -102,23 +99,6 @@ public class ZobristHasher
             PositionCounts[CurrentHash] = 1;
     }
 
-    private static ulong ComputeCastlingRightsHash(CastlingRights rights)
-    {
-        ulong hash = 0;
-
-        if (!rights.White.KingMoved && !rights.White.RookAMoved)
-            hash ^= Zobrist.CastlingKeys[0, 0];
-        if (!rights.White.KingMoved && !rights.White.RookHMoved)
-            hash ^= Zobrist.CastlingKeys[0, 1];
-
-        if (!rights.Black.KingMoved && !rights.Black.RookAMoved)
-            hash ^= Zobrist.CastlingKeys[1, 0];
-        if (!rights.Black.KingMoved && !rights.Black.RookHMoved)
-            hash ^= Zobrist.CastlingKeys[1, 1];
-
-        return hash;
-    }
-
     internal ulong ComputeZobristHash()
     {
         ulong hash = 0;
@@ -138,7 +118,7 @@ public class ZobristHasher
             }
         }
 
-        hash ^= ComputeCastlingRightsHash(_getCastlingRights());
+        hash ^= Zobrist.CastlingKeys[(int)_getCastlingRights()];
 
         if (_getEnPassantFile() is int file)
             hash ^= Zobrist.EnPassantKeys[file];

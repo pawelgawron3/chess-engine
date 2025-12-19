@@ -22,7 +22,7 @@ public class GameServices
     {
         _state = state;
 
-        var initialRights = new CastlingRights((false, false, false), (false, false, false));
+        var initialRights = CastlingRights.WhiteKing | CastlingRights.WhiteQueen | CastlingRights.BlackKing | CastlingRights.BlackQueen;
 
         Rules = new RuleManager(initialRights);
         History = new MoveHistoryManager();

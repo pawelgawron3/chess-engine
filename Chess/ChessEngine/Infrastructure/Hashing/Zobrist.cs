@@ -4,7 +4,7 @@ public static class Zobrist
 {
     public static readonly ulong[,,] PieceKeys = new ulong[2, 6, 64]; // [player, pieceType, square]
     public static readonly ulong SideToMoveKey;
-    public static readonly ulong[,] CastlingKeys = new ulong[2, 2]; // [player, side]
+    public static readonly ulong[] CastlingKeys = new ulong[16];
     public static readonly ulong[] EnPassantKeys = new ulong[8];
 
     static Zobrist()
@@ -16,9 +16,8 @@ public static class Zobrist
                 for (int k = 0; k < PieceKeys.GetLength(2); k++)
                     PieceKeys[i, j, k] = RandomUlong(rng);
 
-        for (int i = 0; i < 2; i++)
-            for (int j = 0; j < 2; j++)
-                CastlingKeys[i, j] = RandomUlong(rng);
+        for (int i = 0; i < 16; i++)
+            CastlingKeys[i] = RandomUlong(rng);
 
         for (int i = 0; i < 8; i++)
             EnPassantKeys[i] = RandomUlong(rng);

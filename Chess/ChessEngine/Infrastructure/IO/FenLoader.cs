@@ -53,12 +53,12 @@ public static class FenLoader
 
         state.CurrentPlayer = sideToMove == "w" ? Player.White : Player.Black;
 
-        var rights = new CastlingRights(
-            white: (!castling.Contains('K'), !castling.Contains('Q'), !castling.Contains('K')
-        ),
-            black: (!castling.Contains('k'), !castling.Contains('q'), !castling.Contains('k')
-        )
-        );
+        CastlingRights rights = CastlingRights.None;
+
+        if (castling.Contains('K')) rights |= CastlingRights.WhiteKing;
+        if (castling.Contains('Q')) rights |= CastlingRights.WhiteQueen;
+        if (castling.Contains('k')) rights |= CastlingRights.BlackKing;
+        if (castling.Contains('q')) rights |= CastlingRights.BlackQueen;
 
         state.Services.Rules.CastlingRights = rights;
 
