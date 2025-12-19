@@ -176,13 +176,8 @@ public class MainViewModel : INotifyPropertyChanged
             return;
         }
 
-        if (_gameState.TryMakeMove(move))
-            RefreshUI();
-        else
-        {
-            _gameState.ClearSelection();
-            ClearHighlights();
-        }
+        _gameState.MakeMove(move);
+        RefreshUI();
     }
 
     private void HighlightMovesForSelectedPiece()
@@ -266,11 +261,9 @@ public class MainViewModel : INotifyPropertyChanged
             isCapture
         );
 
-        if (_gameState.TryMakeMove(promotionMove))
-        {
-            _isAwaitingPromotion = false;
-            RefreshUI();
-        }
+        _gameState.MakeMove(promotionMove);
+        _isAwaitingPromotion = false;
+        RefreshUI();
 
         HidePromotionMenu();
     }
@@ -348,7 +341,7 @@ public class MainViewModel : INotifyPropertyChanged
         var (bestMove, score) = await Task.Run(() => engine.IterativeDeepeningSearch(_gameState.GameStateEngine, maxDepth));
         if (bestMove != null)
         {
-            _gameState.TryMakeMove(bestMove.Value);
+            _gameState.MakeMove(bestMove.Value);
             RefreshUI();
         }
         else

@@ -27,19 +27,13 @@ public class GameStateUI
 
     public void ClearSelection() => SelectedPosition = null;
 
-    public bool TryMakeMove(Move move)
+    public void MakeMove(Move move)
     {
         var command = new MoveCommand(GameStateEngine, move);
         command.Execute();
 
-        if (GameStateEngine.Services.History.MoveHistory.LastOrDefault()?.Move == move)
-        {
-            ClearSelection();
-            RaiseMoveMade(GameStateEngine.Services.History.MoveHistory.Last());
-            return true;
-        }
-
-        return false;
+        ClearSelection();
+        RaiseMoveMade(GameStateEngine.Services.History.MoveHistory.Last());
     }
 
     public void UndoMove()
