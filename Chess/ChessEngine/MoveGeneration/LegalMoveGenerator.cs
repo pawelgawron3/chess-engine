@@ -36,7 +36,7 @@ public static class LegalMoveGenerator
     /// <summary>
     /// Tests if a move is legal without modifying the actual game history.
     /// </summary>
-    public static bool IsMoveLegal(GameStateEngine state, Move move)
+    private static bool IsMoveLegal(GameStateEngine state, Move move)
     {
         Piece movedPiece = state.Board[move.From]!.Value;
         Piece? capturedPiece = GetCapturedPiece(state.Board, move);
