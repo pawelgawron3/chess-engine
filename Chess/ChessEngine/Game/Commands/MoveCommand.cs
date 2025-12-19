@@ -2,7 +2,6 @@
 using ChessEngine.Core.Moves;
 using ChessEngine.Core.Players;
 using ChessEngine.Core.Rules;
-using ChessEngine.MoveGeneration;
 
 namespace ChessEngine.Game.Commands;
 
@@ -21,9 +20,6 @@ public class MoveCommand : ICommand
 
     public void Execute()
     {
-        if (_state.GameResult != null || !LegalMoveGenerator.IsMoveLegal(_state, _move))
-            return;
-
         Piece movedPiece = _state.Board[_move.From]!.Value;
         Piece? capturedPiece = AttackUtils.GetCapturedPiece(_state.Board, _move);
 
